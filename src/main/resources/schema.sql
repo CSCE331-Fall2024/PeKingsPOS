@@ -6,47 +6,49 @@
 --DROP TABLE IF EXISTS "menu_ingredients";
 --DROP TABLE IF EXISTS "individual_items";
 
-CREATE TABLE "customers" (
+CREATE TABLE "customers" ( --necessary?
     id SERIAL PRIMARY KEY,
-    phone_num VARCHAR(15),
-    email VARCHAR(50),
-    last_purchase DATE
+    --phone_num VARCHAR(15), --necessary?
+    --email VARCHAR(50), --necessary?
+    --last_purchase DATE --necessary?
+    
 );
 
 CREATE TABLE "employees" (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(20),
-    password VARCHAR(20),
-    last_clockin DATE,
+    username text,
+    password text,
+    last_clockin timestamp, --timestamp 
     is_clockedin BOOLEAN,
-    total_hours INT
+    total_hours INT 
 );
 
 CREATE TABLE "orders" (
     id SERIAL PRIMARY KEY,
     customer_id BIGINT NOT NULL,
-    price INT,
-    payment_method VARCHAR(10),
+    price decimal,
+    payment_method text,
     employee_id BIGINT NOT NULL,
-    order_time DATE,
-    item VARCHAR(50),
+    order_time timestamp,
+    --item VARCHAR(50),
     CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
     CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employees(id)
 );
 
 CREATE TABLE "menu" (
     id SERIAL PRIMARY KEY,
-    price INT
+    names text, -- adding names to menu items
+    price decimal
 );
 
 CREATE TABLE inventory (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(15),
-    price INT,
+    name text,
+    serving_price decimal,
     amount INT,
-    price_batch INT,
-    received DATE,
-    expires DATE
+    price_batch decimal,
+    -- received DATE,
+    -- expires DATE
 );
 
 -- List of ingredients for each menu item
@@ -54,9 +56,9 @@ CREATE TABLE inventory (
 -- Inventory removal is done in Java code. There are no SQL functions in the DB
 CREATE TABLE "menu_ingredients" (
     id SERIAL PRIMARY KEY,
-    ingredient_id BIGINT NOT NULL,
-    menu_item BIGINT NOT NULL,
-    amount INT,
+    ingredient_id INT,
+    menu_item INT,
+    ingredients_in_item INT,
     CONSTRAINT fk_item FOREIGN KEY (menu_item) REFERENCES menu(id),
     CONSTRAINT fk_ingredient FOREIGN KEY (ingredient_id) REFERENCES inventory(id)
 );
@@ -64,10 +66,10 @@ CREATE TABLE "menu_ingredients" (
 -- Record of items purchased by customers
 -- Different from menu_items. This is an individual sale of an item
 -- An order has many individual items
-CREATE TABLE "individual_items" (
+CREATE TABLE "order_items" ( -- individual_items
     id SERIAL PRIMARY KEY,
-    order_id BIGINT,
-    item_id BIGINT,
+    order_id INT,
+    item_id INT,
     CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id),
     CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES menu(id)
 );
