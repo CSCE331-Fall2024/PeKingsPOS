@@ -1,9 +1,9 @@
 package com.pekings.pos;
 
+
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -15,14 +15,12 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-//import java.awt.*;
-
 public class POSApp extends Application {
     private final StringProperty greeting = new SimpleStringProperty("");
     private final StringProperty name = new SimpleStringProperty("");
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage){
         Scene scene = new Scene(createContents(), 400, 200);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -31,7 +29,7 @@ public class POSApp extends Application {
     private Region createContents() {
         VBox results = new VBox(20, createInputRow(), createOutputLabel(), createButton());
         results.setAlignment(Pos.CENTER);
-        results.getStylesheets().add("style.css");
+        results.getStylesheets().add(getClass().getResource("../css/application.css").toExternalForm());
         return results;
     }
 
