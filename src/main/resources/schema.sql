@@ -20,8 +20,7 @@ CREATE TABLE "employees" (
     pass TEXT,
     position TEXT,
     last_clockin TIME, --timestamp
-    is_clockedin BOOLEAN,
-    total_hours INT 
+    is_clockedin BOOLEAN
 );
 
 CREATE TABLE "orders" (
