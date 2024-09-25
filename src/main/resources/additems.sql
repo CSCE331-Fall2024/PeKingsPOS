@@ -42,3 +42,10 @@ FROM generate_series(1, 1000);
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Medium cup', 1.0, 1000, 500.0);
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Large cup', 1.0, 1000, 500.0);
 
+-- employees added
+--- INSERT INTO employees (username,pass,position,last_clockin,is_clockedin) VALUES ('ThomasC', 'CC137', 'employee','00:00:00',false);
+--- INSERT INTO employees (username,pass,position,last_clockin,is_clockedin) VALUES ('Fabio', 'thebatcave', 'employee','00:00:00',true);
+--- INSERT INTO employees (username,pass,position,last_clockin,is_clockedin) VALUES ('Germ', 'Machamp', 'employee','00:00:00',false);
+--- INSERT INTO employees (username,pass,position,last_clockin,is_clockedin) VALUES ('NathanL', 'meltmyeyes', 'employee','00:00:00',true);
+--- INSERT INTO employees (username,pass,position,last_clockin,is_clockedin) VALUES ('NathanM', 'yourboi', 'employee','00:00:00',false);
+--- INSERT INTO employees (username,pass,position,last_clockin,is_clockedin) VALUES ('Yasuo', 'hasagi', 'manager','00:00:00',false);
