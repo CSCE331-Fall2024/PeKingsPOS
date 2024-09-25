@@ -19,7 +19,7 @@ CREATE TABLE "employees" (
     username TEXT,
     pass TEXT,
     position TEXT,
-    last_clockin TIMESTAMP, --timestamp
+    last_clockin TIME, --timestamp
     is_clockedin BOOLEAN,
     total_hours INT 
 );
@@ -30,8 +30,7 @@ CREATE TABLE "orders" (
     price DECIMAL,
     payment_method TEXT,
     employee_id BIGINT NOT NULL,
-    order_time TIMESTAMP,
-    --item VARCHAR(50),
+    order_time TIME,
     CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
     CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employees(id)
 );
@@ -69,10 +68,11 @@ CREATE TABLE "menu_ingredients" (
 -- Record of items purchased by customers
 -- Different from menu_items. This is an individual sale of an item
 -- An order has many individual items
-CREATE TABLE "order_items" ( -- individual_items
+CREATE TABLE "order_items" ( 
     id SERIAL PRIMARY KEY,
     order_id INT,
     item_id INT,
     CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id),
     CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES menu(id)
 );
+---INSERT INTO employees (username,pass,position,last_clockin,is_clockedin,total_hours) VALUES ('ThomasC', 'CC137', 'employee',00:00)
