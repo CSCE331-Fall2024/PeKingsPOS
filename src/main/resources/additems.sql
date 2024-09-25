@@ -21,7 +21,7 @@ FROM generate_series(1, 1000);
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Broccoli', 1.0, 1000, 500.0);
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Steamed Rice', 1.0, 1000, 500.0);
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Oranges', 1.0, 1000, 500.0);
---INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Egg Roll Wrappers', 1.0, 1000, 500.0);
+--INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Egg Roll Wrappers', 1.0, 1000, 500.0);1
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Onion', 1.0, 1000, 500.0);
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Red Pepper', 1.0, 1000, 500.0);
 --INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Beijin Beef Sauce', 1.0, 1000, 500.0);

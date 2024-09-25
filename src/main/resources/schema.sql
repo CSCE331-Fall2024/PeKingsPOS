@@ -17,8 +17,8 @@ CREATE TABLE "customers" ( --necessary?
 CREATE TABLE "employees" (
     id SERIAL PRIMARY KEY,
     username TEXT,
-    password TEXT,
-    role TEXT,
+    pass TEXT,
+    position TEXT,
     last_clockin TIMESTAMP, --timestamp
     is_clockedin BOOLEAN,
     total_hours INT 
