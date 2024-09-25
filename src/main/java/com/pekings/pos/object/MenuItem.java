@@ -6,6 +6,15 @@ public class MenuItem {
 
     private final long id;
     private final List<Ingredient> ingredients;
+    private final String name;
+    private final int price;
+
+    public MenuItem(long id, String name, int price, List<Ingredient> ingredients) {
+        this.id = id;
+        this.price = price;
+        this.name = name;
+        this.ingredients = ingredients;
+    }
 
     public List<Ingredient> getIngredients() {
         return ingredients;
@@ -15,8 +24,11 @@ public class MenuItem {
         return id;
     }
 
-    public MenuItem(long id, List<Ingredient> ingredients) {
-        this.id = id;
-        this.ingredients = ingredients;
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
     }
 }
