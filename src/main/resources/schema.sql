@@ -15,9 +15,8 @@ CREATE TABLE "employees" (
     username TEXT,
     pass TEXT,
     position TEXT,
-    last_clockin TIMESTAMP,
-    is_clockedin BOOLEAN,
-    total_hours INT
+    last_clockin TIME, --timestamp
+    is_clockedin BOOLEAN
 );
 
 CREATE TABLE "orders" (
@@ -26,11 +25,7 @@ CREATE TABLE "orders" (
     price DECIMAL,
     payment_method TEXT,
     employee_id BIGINT NOT NULL,
-<<<<<<< HEAD
-    order_time TIMESTAMP,
-=======
     order_time TIME,
->>>>>>> f1327f0298a4835c1694a33a5048cc0cacce22dc
     CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
     CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employees(id)
 );
@@ -62,14 +57,7 @@ CREATE TABLE "menu_ingredients" (
     CONSTRAINT fk_ingredient FOREIGN KEY (ingredient_id) REFERENCES inventory(id)
 );
 
-<<<<<<< HEAD
 CREATE TABLE "order_inventory" (
-=======
--- Record of items purchased by customers
--- Different from menu_items. This is an individual sale of an item
--- An order has many individual items
-CREATE TABLE "order_items" ( 
->>>>>>> f1327f0298a4835c1694a33a5048cc0cacce22dc
     id SERIAL PRIMARY KEY,
     order_id INT,
     inventory_id INT,
