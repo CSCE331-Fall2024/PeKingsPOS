@@ -7,7 +7,7 @@
 --DROP TABLE IF EXISTS "individual_items";
 
 CREATE TABLE "customers" ( --necessary?
-    id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY
     --phone_num VARCHAR(15), --necessary?
     --email VARCHAR(50), --necessary?
     --last_purchase DATE --necessary?
@@ -16,9 +16,9 @@ CREATE TABLE "customers" ( --necessary?
 
 CREATE TABLE "employees" (
     id SERIAL PRIMARY KEY,
-    username text,
-    password text,
-    last_clockin timestamp, --timestamp 
+    username TEXT,
+    password TEXT,
+    last_clockin TIMESTAMP, --timestamp
     is_clockedin BOOLEAN,
     total_hours INT 
 );
@@ -26,10 +26,10 @@ CREATE TABLE "employees" (
 CREATE TABLE "orders" (
     id SERIAL PRIMARY KEY,
     customer_id BIGINT NOT NULL,
-    price decimal,
-    payment_method text,
+    price DECIMAL,
+    payment_method TEXT,
     employee_id BIGINT NOT NULL,
-    order_time timestamp,
+    order_time TIMESTAMP,
     --item VARCHAR(50),
     CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
     CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employees(id)
@@ -37,16 +37,16 @@ CREATE TABLE "orders" (
 
 CREATE TABLE "menu" (
     id SERIAL PRIMARY KEY,
-    names text, -- adding names to menu items
-    price decimal
+    name TEXT, -- adding names to menu items
+    price DECIMAL
 );
 
 CREATE TABLE inventory (
     id SERIAL PRIMARY KEY,
-    name text,
-    serving_price decimal,
+    name TEXT,
+    serving_price DECIMAL,
     amount INT,
-    price_batch decimal,
+    price_batch DECIMAL
     -- received DATE,
     -- expires DATE
 );
