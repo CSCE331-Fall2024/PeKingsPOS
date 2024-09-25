@@ -51,6 +51,8 @@ CREATE TABLE inventory (
     -- expires DATE
 );
 
+INSERT INTO inventory (name, serving_price, amount, price_batch) VALUES ('Carrots', 1.0, 1000, 500.0);
+
 -- List of ingredients for each menu item
 -- This is how we know how many of what to remove from the inventory
 -- Inventory removal is done in Java code. There are no SQL functions in the DB
