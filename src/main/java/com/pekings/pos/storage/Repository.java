@@ -12,8 +12,6 @@ public interface Repository {
 
     void addMenuItem(MenuItem menuItem);
 
-    void removeMenuItem(MenuItem menuItem);
-
     MenuItem getMenuItem(int id);
 
     int getDailyIncome();

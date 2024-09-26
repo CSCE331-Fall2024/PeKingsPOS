@@ -65,11 +65,6 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public void removeMenuItem(MenuItem menuItem) {
-
-    }
-
-    @Override
     public MenuItem getMenuItem(int id) {
         try {
             Statement statement = conn.createStatement();
