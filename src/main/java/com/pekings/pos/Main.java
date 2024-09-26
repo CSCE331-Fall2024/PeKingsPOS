@@ -1,5 +1,6 @@
 package com.pekings.pos;
 
+import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.storage.PersistentRepository;
 import com.pekings.pos.storage.Repository;
@@ -17,8 +18,9 @@ public class Main {
         ((PersistentRepository) repository).initialize();
 
         long now = System.currentTimeMillis();
-        Set<MenuItem> menuItems = repository.getMenuItems();
+        Ingredient ingredient = repository.getIngredient(9);
         long after = System.currentTimeMillis();
+        System.out.println(ingredient.getName());
 
         System.out.println("Fetched! Took " + (after - now) + "ms");
 

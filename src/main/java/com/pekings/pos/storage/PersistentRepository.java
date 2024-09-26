@@ -4,6 +4,8 @@ import com.pekings.pos.object.Employee;
 import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
@@ -15,6 +17,7 @@ import java.util.*;
 public class PersistentRepository implements Repository {
 
     private Connection conn;
+    private QueryLoader queryLoader;
 
     private static final String DB_USERNAME = "pekings_01";
     private static final String DB_PASSWORD = "uD37k2)R1Kp}";
@@ -22,7 +25,7 @@ public class PersistentRepository implements Repository {
     private static final String DB_ADDRESS = "csce-315-db.engr.tamu.edu";
     private static final String DB_PORT = "5432";
 
-    public void initialize() throws SQLException {
+    public void initialize() throws SQLException, IOException, URISyntaxException {
         Properties props = new Properties();
         props.setProperty("user", DB_USERNAME);
         props.setProperty("password", DB_PASSWORD);
@@ -30,7 +33,10 @@ public class PersistentRepository implements Repository {
                 "jdbc:" + "postgresql" + "://" +
                         DB_ADDRESS + ":" + DB_PORT + "/" + DB_NAME, props);
 
-        if (conn == null)
+        queryLoader = new QueryLoader();
+        queryLoader.loadQueries();
+
+        if (conn == null || queryLoader == null)
             throw new SQLException("Could not create connection with PostgreSQL server!");
     }
 
@@ -39,8 +45,8 @@ public class PersistentRepository implements Repository {
         try {
             Statement statement = conn.createStatement();
 
-            String query = "INSERT INTO menu (name, price) " +
-                    "VALUES (" + menuItem.getName() + "," + menuItem.getPrice() + ");";
+            String query = queryLoader.getQuery("add_menu_item")
+                    .formatted(menuItem.getName(), menuItem.getPrice());
 
             for (Ingredient ingredient : menuItem.getIngredients()) {
                 String ingredientQuery =
@@ -68,7 +74,9 @@ public class PersistentRepository implements Repository {
         try {
             Statement statement = conn.createStatement();
 
-            String query = "SELECT * FROM menu WHERE id = " + id + ";";
+            String query = queryLoader.getQuery("get_menu_item")
+                    .formatted(id);
+
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
 
@@ -120,21 +128,7 @@ public class PersistentRepository implements Repository {
         try {
             Statement statement = conn.createStatement();
 
-            String query = "SELECT\n" +
-                    "    menu.id AS menu_item_id,\n" +
-                    "    menu.name AS menu_item_name,\n" +
-                    "    menu.price AS menu_item_price,\n" +
-                    "    inventory.name AS ingredient_name,\n" +
-                    "    menu_ingredients.ingredients_in_item AS ingredient_quantity,\n" +
-                    "    inventory.price_batch AS ingredient_batch_price,\n" +
-                    "    inventory.serving_price AS serving_price,\n" +
-                    "    inventory.id AS ingredient_id\n" +
-                    "FROM\n" +
-                    "    menu\n" +
-                    "        JOIN\n" +
-                    "    menu_ingredients ON menu.id = menu_ingredients.menu_item\n" +
-                    "        JOIN\n" +
-                    "    inventory ON menu_ingredients.ingredient_id = inventory.id;";
+            String query = queryLoader.getQuery("get_menu_items");
             ResultSet resultSet = statement.executeQuery(query);
 
             Set<MenuItem> menuItems = new HashSet<>();
@@ -145,10 +139,21 @@ public class PersistentRepository implements Repository {
 
                 String ingredient_name = resultSet.getString("ingredient_name");
                 int quantity = resultSet.getInt("ingredient_quantity");
-                //Ingredient ingredient = new Ingredient()
-                List<Ingredient> ingredients = getIngredients(id);
-                MenuItem menuItem = new MenuItem(id, name, price, ingredients);
-                menuItems.add(menuItem);
+                int ingredient_batch_price = resultSet.getInt("ingredient_batch_price");
+                int ingredient_price = resultSet.getInt("serving_price");
+                int ingredient_id = resultSet.getInt("ingredient_id");
+
+                Ingredient ingredient = new Ingredient(ingredient_id, ingredient_name, quantity, ingredient_batch_price, ingredient_price);
+
+                if (menuItems.stream().anyMatch(menuItem -> menuItem.getId() == id)) {
+                    MenuItem menuItem = menuItems.stream().filter(menuItem1 -> menuItem1.getId() == id).findAny().orElse(null);
+                    assert menuItem != null;
+                    menuItem.addIngredient(ingredient);
+                } else {
+                    MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>());
+                    menuItem.addIngredient(ingredient);
+                    menuItems.add(menuItem);
+                }
             }
 
             resultSet.close();
@@ -165,7 +170,9 @@ public class PersistentRepository implements Repository {
         try {
             Statement statement = conn.createStatement();
 
-            String query = "SELECT * FROM inventory WHERE id=" + id + ";";
+            String query = queryLoader.getQuery("get_ingredient")
+                    .formatted(id);
+
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
 
@@ -189,7 +196,8 @@ public class PersistentRepository implements Repository {
         try {
             Statement statement = conn.createStatement();
 
-            String query = "SELECT * FROM menu_ingredients WHERE id=" + menuItemID + ";";
+            String query = queryLoader.getQuery("get_menu_item_ingredients")
+                    .formatted(menuItemID);
             ResultSet resultSet = statement.executeQuery(query);
 
             List<Ingredient> ingredients = new ArrayList<>();
