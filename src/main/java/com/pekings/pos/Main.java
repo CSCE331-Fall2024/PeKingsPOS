@@ -15,7 +15,6 @@ public class Main {
         repository = new PersistentRepository();
         ((PersistentRepository) repository).initialize();
 
-        Repository repository = new PersistentRepository();
         List<MenuItem> menuItems = repository.getMenuItems();
         for (MenuItem menuItem : menuItems) {
             System.out.println(menuItem.getName());

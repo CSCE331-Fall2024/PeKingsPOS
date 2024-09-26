@@ -32,9 +32,8 @@ public class PersistentRepository implements Repository {
                 "jdbc:" + "postgresql" + "://" +
                         DB_ADDRESS + ":" + DB_PORT + "/" + DB_NAME, props);
 
-        if (conn == null) {
+        if (conn == null)
             throw new SQLException("Could not create connection with PostgreSQL server!");
-        }
     }
 
     @Override
@@ -64,6 +63,28 @@ public class PersistentRepository implements Repository {
     @Override
     public void removeMenuItem(MenuItem menuItem) {
 
+    }
+
+    @Override
+    public MenuItem getMenuItem(int id) {
+        try {
+            Statement statement = conn.createStatement();
+
+            String query = "SELECT * FROM menu WHERE id = " + id + ";";
+            ResultSet resultSet = statement.executeQuery(query);
+            resultSet.next();
+
+            int menuID = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            float price = resultSet.getFloat("price");
+
+            resultSet.close();
+            statement.close();
+
+            return new MenuItem(menuID, name, price, getIngredients(menuID));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -130,6 +151,7 @@ public class PersistentRepository implements Repository {
 
             String query = "SELECT * FROM inventory WHERE id=" + id + ";";
             ResultSet resultSet = statement.executeQuery(query);
+            resultSet.next();
 
             int ingredientID = resultSet.getInt("id");
             String name = resultSet.getString("name");

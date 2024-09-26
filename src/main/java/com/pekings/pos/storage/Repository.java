@@ -13,6 +13,8 @@ public interface Repository {
 
     void removeMenuItem(MenuItem menuItem);
 
+    MenuItem getMenuItem(int id);
+
     int getDailyIncome();
 
     int getWeeklyIncome();
