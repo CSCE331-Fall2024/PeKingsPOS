@@ -29,7 +29,8 @@ public class POSApp extends Application {
     private Region createContents() {
         VBox results = new VBox(20, createInputRow(), createOutputLabel(), createButton());
         results.setAlignment(Pos.CENTER);
-        results.getStylesheets().add(getClass().getResource("../css/application.css").toExternalForm());
+        String css = getClass().getResource("/css/application.css").toExternalForm();
+        results.getStylesheets().add(css);
         return results;
     }
 
