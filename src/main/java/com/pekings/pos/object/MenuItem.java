@@ -7,9 +7,9 @@ public class MenuItem {
     private final long id;
     private final List<Ingredient> ingredients;
     private final String name;
-    private final int price;
+    private final float price;
 
-    public MenuItem(long id, String name, int price, List<Ingredient> ingredients) {
+    public MenuItem(long id, String name, float price, List<Ingredient> ingredients) {
         this.id = id;
         this.price = price;
         this.name = name;
@@ -28,7 +28,7 @@ public class MenuItem {
         return name;
     }
 
-    public int getPrice() {
+    public float getPrice() {
         return price;
     }
 }

@@ -31,4 +31,6 @@ public interface Repository {
 
     List<MenuItem> getTopMenuItems(int topWhat);
 
+    List<Ingredient> getIngredients(int menuItemID);
+
 }
