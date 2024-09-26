@@ -6,6 +6,7 @@ import com.pekings.pos.storage.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
 
@@ -15,10 +16,11 @@ public class Main {
         repository = new PersistentRepository();
         ((PersistentRepository) repository).initialize();
 
-        List<MenuItem> menuItems = repository.getMenuItems();
-        for (MenuItem menuItem : menuItems) {
-            System.out.println(menuItem.getName());
-        }
+        long now = System.currentTimeMillis();
+        Set<MenuItem> menuItems = repository.getMenuItems();
+        long after = System.currentTimeMillis();
+
+        System.out.println("Fetched! Took " + (after - now) + "ms");
 
         POSApp posApp = new POSApp();
         posApp.initialize();

@@ -10,9 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class PersistentRepository implements Repository {
 
@@ -118,18 +116,36 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public List<MenuItem> getMenuItems() {
+    public Set<MenuItem> getMenuItems() {
         try {
             Statement statement = conn.createStatement();
 
-            String query = "SELECT * FROM menu";
+            String query = "SELECT\n" +
+                    "    menu.id AS menu_item_id,\n" +
+                    "    menu.name AS menu_item_name,\n" +
+                    "    menu.price AS menu_item_price,\n" +
+                    "    inventory.name AS ingredient_name,\n" +
+                    "    menu_ingredients.ingredients_in_item AS ingredient_quantity,\n" +
+                    "    inventory.price_batch AS ingredient_batch_price,\n" +
+                    "    inventory.serving_price AS serving_price,\n" +
+                    "    inventory.id AS ingredient_id\n" +
+                    "FROM\n" +
+                    "    menu\n" +
+                    "        JOIN\n" +
+                    "    menu_ingredients ON menu.id = menu_ingredients.menu_item\n" +
+                    "        JOIN\n" +
+                    "    inventory ON menu_ingredients.ingredient_id = inventory.id;";
             ResultSet resultSet = statement.executeQuery(query);
 
-            List<MenuItem> menuItems = new ArrayList<>();
+            Set<MenuItem> menuItems = new HashSet<>();
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                float price = resultSet.getFloat("price");
+                int id = resultSet.getInt("menu_item_id");
+                String name = resultSet.getString("menu_item_name");
+                float price = resultSet.getFloat("menu_item_price");
+
+                String ingredient_name = resultSet.getString("ingredient_name");
+                int quantity = resultSet.getInt("ingredient_quantity");
+                //Ingredient ingredient = new Ingredient()
                 List<Ingredient> ingredients = getIngredients(id);
                 MenuItem menuItem = new MenuItem(id, name, price, ingredients);
                 menuItems.add(menuItem);
