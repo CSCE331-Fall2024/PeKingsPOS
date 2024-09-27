@@ -1,11 +1,18 @@
 .root {
    prompt-colour: #a04000;
    greeting-colour: #6000b0;
+   filler-color: #423e3e;
+
+   -fx-background-color: filler-color;
 }
 
 .greeting-label {
    -fx-text-fill: greeting-colour;
    -fx-font-size: 32px;
+}
+
+.manager-text{
+    -text-align: center;
 }
 
 .prompt-label {

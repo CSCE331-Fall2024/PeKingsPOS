@@ -1,5 +1,6 @@
 package com.pekings.pos;
-
+//        String css = getClass().getResource("/css/application.css").toExternalForm();
+//        results.getStylesheets().add(css);
 
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
@@ -13,6 +14,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class POSApp extends Application {
@@ -21,17 +24,25 @@ public class POSApp extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        Scene scene = new Scene(createContents(), 400, 200);
+        Scene scene = new Scene(createContents(), 1200, 700);
+        scene.setFill(Color.web("#81c483"));
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
     private Region createContents() {
-        VBox results = new VBox(20, createInputRow(), createOutputLabel(), createButton());
+        VBox results = new VBox(20, createText(), createInputRow(), createOutputLabel(), createButton());
         results.setAlignment(Pos.CENTER);
         String css = getClass().getResource("/css/application.css").toExternalForm();
         results.getStylesheets().add(css);
+
         return results;
+    }
+
+    private Text createText(){
+        Text text = new Text("Manager \nLogin");
+        text.getStyleClass().add("manager-text");
+        return text;
     }
 
     private Button createButton() {
