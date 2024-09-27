@@ -115,12 +115,47 @@ public class PersistentRepository implements Repository {
 
     @Override
     public List<Employee> getActiveEmployees() {
-        return null;
+        try {
+            Statement statement = conn.createStatement();
+
+            String query = queryLoader.getQuery("get_active_employees");
+            ResultSet resultSet = statement.executeQuery(query);
+
+            List<Employee> employees = new ArrayList<>();
+            while (resultSet.next()) {
+                Employee employee = makeEmployee(resultSet);
+                employees.add(employee);
+            }
+
+            resultSet.close();
+            statement.close();
+
+            return employees;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public List<Employee> getEmployees() {
-        return null;
+        try {
+            Statement statement = conn.createStatement();
+
+            String query = queryLoader.getQuery("get_all_employees");
+            ResultSet resultSet = statement.executeQuery(query);
+
+            List<Employee> employees = new ArrayList<>();
+            while (resultSet.next()) {
+                employees.add(makeEmployee(resultSet));
+            }
+
+            resultSet.close();
+            statement.close();
+
+            return employees;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -176,16 +211,12 @@ public class PersistentRepository implements Repository {
             ResultSet resultSet = statement.executeQuery(query);
             resultSet.next();
 
-            int ingredientID = resultSet.getInt("id");
-            String name = resultSet.getString("name");
-            float servingPrice = resultSet.getFloat("serving_price");
-            int amount = resultSet.getInt("amount");
-            int price_batch = resultSet.getInt("price_batch");
+            Ingredient ingredient = makeIngredient(resultSet);
 
             resultSet.close();
             statement.close();
 
-            return new Ingredient(ingredientID, name, servingPrice, amount, price_batch);
+            return ingredient;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -220,5 +251,24 @@ public class PersistentRepository implements Repository {
     @Override
     public List<MenuItem> getTopMenuItems(int topWhat) {
         return null;
+    }
+
+    public Employee makeEmployee(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt("id");
+        String username = resultSet.getString("username");
+        String pass = resultSet.getString("pass");
+        String position = resultSet.getString("position");
+        Date date = resultSet.getDate("last_clockin");
+        boolean b = resultSet.getBoolean("is_clockedin");
+        return new Employee(id, username, pass, position, date, b);
+    }
+
+    public Ingredient makeIngredient(ResultSet resultSet) throws SQLException {
+        int ingredientID = resultSet.getInt("id");
+        String name = resultSet.getString("name");
+        float servingPrice = resultSet.getFloat("serving_price");
+        int amount = resultSet.getInt("amount");
+        int price_batch = resultSet.getInt("price_batch");
+        return new Ingredient(ingredientID, name, servingPrice, amount, price_batch);
     }
 }
