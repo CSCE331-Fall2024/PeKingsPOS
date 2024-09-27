@@ -25,7 +25,7 @@ CREATE TABLE "orders" (
     price DECIMAL,
     payment_method TEXT,
     employee_id BIGINT NOT NULL,
-    order_time TIME,
+    order_time TIMESTAMP,
     CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES customers(id),
     CONSTRAINT fk_employee FOREIGN KEY (employee_id) REFERENCES employees(id)
 );
