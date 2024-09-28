@@ -27,5 +27,9 @@ SELECT * FROM inventory WHERE id = '%s';
 -- get_menu_item_ingredients
 SELECT * FROM menu_ingredients WHERE id = '%s';
 
+-- get_active_employees
+SELECT * FROM employees WHERE is_clockedin = 'true';
 
+-- get_all_employees
+SELECT * FROM employees;
 
