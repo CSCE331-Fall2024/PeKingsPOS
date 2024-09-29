@@ -43,50 +43,34 @@ public class PersistentRepository implements Repository {
 
     @Override
     public void addMenuItem(MenuItem menuItem) {
-        try {
-            Statement statement = conn.createStatement();
+        String addItemQuery = queryLoader.getQuery("add_menu_item")
+                .formatted(menuItem.getName(), menuItem.getPrice());
 
-            String query = queryLoader.getQuery("add_menu_item")
-                    .formatted(menuItem.getName(), menuItem.getPrice());
+        List<String> queries = new ArrayList<>();
+        queries.add(addItemQuery);
 
-            for (Ingredient ingredient : menuItem.getIngredients()) {
-                String ingredientQuery =
-                        "INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) " +
-                                "VALUES( " + ingredient.getId() + "," + menuItem.getId() + "," + ingredient.getAmount() + ");";
-                statement.addBatch(ingredientQuery);
-            }
-
-            statement.addBatch(query);
-            statement.executeBatch();
-
-            statement.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        for (Ingredient ingredient : menuItem.getIngredients()) {
+            String ingredientQuery =
+                    "INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) " +
+                            "VALUES( " + ingredient.getId() + "," + menuItem.getId() + "," + ingredient.getAmount() + ");";
+            queries.add(ingredientQuery);
         }
+
+        performInsertQuery(queries.toArray(String[]::new));
     }
 
     @Override
     public MenuItem getMenuItem(int id) {
-        try {
-            Statement statement = conn.createStatement();
-
-            String query = queryLoader.getQuery("get_menu_item")
-                    .formatted(id);
-
-            ResultSet resultSet = statement.executeQuery(query);
-            resultSet.next();
-
+        List<MenuItem> menuItems = new ArrayList<>();
+        performFetchQuery("get_menu_item", resultSet -> {
             int menuID = resultSet.getInt("id");
             String name = resultSet.getString("name");
             float price = resultSet.getFloat("price");
+            List<Ingredient> ingredients = getIngredients(menuID);
+            menuItems.add(new MenuItem(menuID, name, price, ingredients));
+        }, id + "");
 
-            resultSet.close();
-            statement.close();
-
-            return new MenuItem(menuID, name, price, getIngredients(menuID));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return menuItems.getFirst();
     }
 
     @Override
@@ -114,117 +98,70 @@ public class PersistentRepository implements Repository {
 
     @Override
     public List<Employee> getActiveEmployees() {
-        try {
-            Statement statement = conn.createStatement();
+        List<Employee> employees = new ArrayList<>();
+        performFetchQuery("get_active_employees", resultSet -> {
+            Employee employee = makeEmployee(resultSet);
+            employees.add(employee);
+        });
 
-            String query = queryLoader.getQuery("get_active_employees");
-            ResultSet resultSet = statement.executeQuery(query);
-
-            List<Employee> employees = new ArrayList<>();
-            while (resultSet.next()) {
-                Employee employee = makeEmployee(resultSet);
-                employees.add(employee);
-            }
-
-            resultSet.close();
-            statement.close();
-
-            return employees;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return employees;
     }
 
     @Override
     public List<Employee> getEmployees() {
-        try {
-            Statement statement = conn.createStatement();
+        List<Employee> employees = new ArrayList<>();
+        performFetchQuery("get_all_employees", resultSet -> {
+            employees.add(makeEmployee(resultSet));
+        });
 
-            String query = queryLoader.getQuery("get_all_employees");
-            ResultSet resultSet = statement.executeQuery(query);
-
-            List<Employee> employees = new ArrayList<>();
-            while (resultSet.next()) {
-                employees.add(makeEmployee(resultSet));
-            }
-
-            resultSet.close();
-            statement.close();
-
-            return employees;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return employees;
     }
 
     @Override
     public Set<MenuItem> getMenuItems() {
-        try {
-            Statement statement = conn.createStatement();
+        Set<MenuItem> menuItems = new HashSet<>();
+        performFetchQuery("get_menu_items", resultSet -> {
+            int id = resultSet.getInt("menu_item_id");
+            String name = resultSet.getString("menu_item_name");
+            float price = resultSet.getFloat("menu_item_price");
 
-            String query = queryLoader.getQuery("get_menu_items");
-            ResultSet resultSet = statement.executeQuery(query);
+            String ingredient_name = resultSet.getString("ingredient_name");
+            int quantity = resultSet.getInt("ingredient_quantity");
+            int ingredient_batch_price = resultSet.getInt("ingredient_batch_price");
+            int ingredient_price = resultSet.getInt("serving_price");
+            int ingredient_id = resultSet.getInt("ingredient_id");
 
-            Set<MenuItem> menuItems = new HashSet<>();
-            while (resultSet.next()) {
-                int id = resultSet.getInt("menu_item_id");
-                String name = resultSet.getString("menu_item_name");
-                float price = resultSet.getFloat("menu_item_price");
+            Ingredient ingredient = new Ingredient(ingredient_id, ingredient_name, quantity, ingredient_batch_price, ingredient_price);
 
-                String ingredient_name = resultSet.getString("ingredient_name");
-                int quantity = resultSet.getInt("ingredient_quantity");
-                int ingredient_batch_price = resultSet.getInt("ingredient_batch_price");
-                int ingredient_price = resultSet.getInt("serving_price");
-                int ingredient_id = resultSet.getInt("ingredient_id");
-
-                Ingredient ingredient = new Ingredient(ingredient_id, ingredient_name, quantity, ingredient_batch_price, ingredient_price);
-
-                if (menuItems.stream().anyMatch(menuItem -> menuItem.getId() == id)) {
-                    MenuItem menuItem = menuItems.stream().filter(menuItem1 -> menuItem1.getId() == id).findAny().orElse(null);
-                    assert menuItem != null;
-                    menuItem.addIngredient(ingredient);
-                } else {
-                    MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>());
-                    menuItem.addIngredient(ingredient);
-                    menuItems.add(menuItem);
-                }
+            if (menuItems.stream().anyMatch(menuItem -> menuItem.getId() == id)) {
+                MenuItem menuItem = menuItems.stream().filter(menuItem1 -> menuItem1.getId() == id).findAny().orElse(null);
+                assert menuItem != null;
+                menuItem.addIngredient(ingredient);
+            } else {
+                MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>());
+                menuItem.addIngredient(ingredient);
+                menuItems.add(menuItem);
             }
+        });
 
-            resultSet.close();
-            statement.close();
-
-            return menuItems;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return menuItems;
     }
 
     @Override
     public Ingredient getIngredient(int id) {
-        try {
-            Statement statement = conn.createStatement();
+        // We need an atomic reference or something weird to create an object that isn't
+        // inside the consumer, so just make a list and get the first (and only) element
+        List<Ingredient> ingredients = new ArrayList<>();
+        performFetchQuery("get_ingredient", resultSet ->  {
+            ingredients.add(makeIngredient(resultSet));
+        }, id + "");
 
-            String query = queryLoader.getQuery("get_ingredient")
-                    .formatted(id);
-
-            ResultSet resultSet = statement.executeQuery(query);
-            resultSet.next();
-
-            Ingredient ingredient = makeIngredient(resultSet);
-
-            resultSet.close();
-            statement.close();
-
-            return ingredient;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return ingredients.getFirst();
     }
 
     @Override
     public Map<MenuItem, Double> getTopMenuItemsRevenue(int topWhat) {
         Map<MenuItem, Double> revenue = new HashMap<>();
-
         performFetchQuery("get_top_menu_items_revenue", resultSet -> {
             int menu_item_id = resultSet.getInt("menu_item_id");
             double totalRevenue = resultSet.getDouble("total_revenue");
@@ -239,7 +176,6 @@ public class PersistentRepository implements Repository {
     @Override
     public Map<MenuItem, Integer> getTopMenuItemsOrders(int topWhat) {
         Map<MenuItem, Integer> orders = new HashMap<>();
-
         performFetchQuery("get_top_menu_items_orders", resultSet -> {
             int menu_item_id = resultSet.getInt("menu_item_id");
             int totalOrders = resultSet.getInt("total_orders");
@@ -277,28 +213,15 @@ public class PersistentRepository implements Repository {
 
     @Override
     public List<Ingredient> getIngredients(int menuItemID) {
-        try {
-            Statement statement = conn.createStatement();
+        List<Ingredient> ingredients = new ArrayList<>();
+        performFetchQuery("get_menu_item_ingredients", resultSet -> {
+            int ingredientID = resultSet.getInt("ingredient_id");
+            Ingredient ingredient = getIngredient(ingredientID);
 
-            String query = queryLoader.getQuery("get_menu_item_ingredients")
-                    .formatted(menuItemID);
-            ResultSet resultSet = statement.executeQuery(query);
+            ingredients.add(ingredient);
+        }, menuItemID + "");
 
-            List<Ingredient> ingredients = new ArrayList<>();
-            while (resultSet.next()) {
-                int ingredientID = resultSet.getInt("ingredient_id");
-                Ingredient ingredient = getIngredient(ingredientID);
-
-                ingredients.add(ingredient);
-            }
-
-            resultSet.close();
-            statement.close();
-
-            return ingredients;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return ingredients;
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
@@ -333,6 +256,22 @@ public class PersistentRepository implements Repository {
 
             conn.close();
             resultSet.close();
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    private void performInsertQuery(String... queries) {
+        try {
+            Statement statement = conn.createStatement();
+            for (String query : queries) {
+                statement.addBatch(query);
+            }
+
+            statement.executeBatch();
+
+            statement.close();
+            conn.close();
         } catch (Exception x) {
             throw new RuntimeException(x);
         }
