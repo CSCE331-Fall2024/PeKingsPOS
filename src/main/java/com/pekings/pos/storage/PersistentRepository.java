@@ -60,6 +60,8 @@ public class PersistentRepository implements Repository {
 
     @Override
     public MenuItem getMenuItem(int id) {
+        // We need an atomic reference or something weird to create an object that isn't
+        // inside the consumer, so just make a list and get the first (and only) element
         List<MenuItem> menuItems = new ArrayList<>();
         performFetchQuery("get_menu_item", resultSet -> {
             int menuID = resultSet.getInt("id");
@@ -151,10 +153,9 @@ public class PersistentRepository implements Repository {
         // We need an atomic reference or something weird to create an object that isn't
         // inside the consumer, so just make a list and get the first (and only) element
         List<Ingredient> ingredients = new ArrayList<>();
-        performFetchQuery("get_ingredient", resultSet ->  {
-            ingredients.add(makeIngredient(resultSet));
-        }, id + "");
-
+        performFetchQuery("get_ingredient", resultSet ->
+                ingredients.add(makeIngredient(resultSet)),
+                id + "");
         return ingredients.getFirst();
     }
 
@@ -221,6 +222,18 @@ public class PersistentRepository implements Repository {
         }, menuItemID + "");
 
         return ingredients;
+    }
+
+    @Override
+    public Map<String, Integer> getTopPaymentMethods() {
+        Map<String, Integer> map = new HashMap<>();
+        performFetchQuery("get_top_payment_methods", resultSet -> {
+            String paymentMethod = resultSet.getString("payment_method");
+            int total_orders = resultSet.getInt("total_orders");
+            map.put(paymentMethod, total_orders);
+        });
+
+        return map;
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {

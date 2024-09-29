@@ -80,3 +80,11 @@ WHERE
 GROUP BY oi.menu_item_id
 ORDER BY total_orders DESC;
 
+-- get_top_payment_methods
+SELECT
+    o.payment_method,
+    COUNT(o.payment_method) AS total_orders
+FROM orders o
+GROUP BY o.payment_method
+ORDER BY total_orders DESC;
+

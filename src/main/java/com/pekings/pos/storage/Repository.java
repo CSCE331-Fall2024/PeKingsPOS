@@ -5,6 +5,7 @@ import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
 
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,4 +42,5 @@ public interface Repository {
 
     List<Ingredient> getIngredients(int menuItemID);
 
+    Map<String, Integer> getTopPaymentMethods();
 }
