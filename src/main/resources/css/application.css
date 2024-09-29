@@ -12,7 +12,9 @@
 }
 
 .manager-text{
-    -text-align: center;
+    -fx-text-alignment: center;
+    -fx-font-size: 50px;
+    -fx-alignment: top-center;
 }
 
 .prompt-label {
