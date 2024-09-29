@@ -5,7 +5,11 @@ import com.pekings.pos.storage.PersistentRepository;
 import com.pekings.pos.storage.Repository;
 
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Map;
 
 public class Main {
@@ -16,11 +20,15 @@ public class Main {
         repository = new PersistentRepository();
         ((PersistentRepository) repository).initialize();
 
-        long now = System.currentTimeMillis();
-        double income = repository.getWeeklyIncome(LocalDate.parse("2024-01-01"));
-        long after = System.currentTimeMillis();
+        long initial = System.currentTimeMillis();
 
-        System.out.println("Fetched! Took " + (after - now) + "ms");
+        Calendar cal = Calendar.getInstance();
+        cal.set(2024, Calendar.JANUARY, 1);
+        Date date = new Date(cal.getTime().getTime());
+
+        double income = repository.getWeeklyIncome(date);
+
+        System.out.println("Fetched! Took " + (System.currentTimeMillis() - initial) + "ms");
         System.out.println("Income " + income);
 
         //POSApp posApp = new POSApp();

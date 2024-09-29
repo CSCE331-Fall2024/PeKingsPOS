@@ -62,7 +62,7 @@ FROM order_items oi
          JOIN orders o ON oi.id = o.id
          JOIN menu m ON oi.menu_item_id = m.id
 WHERE
-    o.order_time BETWEEN '%d' AND '%s'
+    o.order_time BETWEEN '%s' AND '%s'
 GROUP BY oi.menu_item_id
 ORDER BY revenue DESC;
 
@@ -73,7 +73,7 @@ SELECT
 FROM order_items oi
          JOIN orders o ON oi.id = o.id
 WHERE
-    o.order_time BETWEEN '%d' AND '%s'
+    o.order_time BETWEEN '%s' AND '%s'
 GROUP BY oi.menu_item_id
 ORDER BY total_orders DESC;
 

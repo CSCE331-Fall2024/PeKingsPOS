@@ -13,8 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public class PersistentRepository implements Repository {
 
@@ -92,22 +90,19 @@ public class PersistentRepository implements Repository {
 
     @Override
     public double getDailyIncome(Date date) {
-        Date dayAfter = (Date) date.clone();
-        dayAfter.setTime(TimeUnit.DAYS.toMillis(1));
+        Date dayAfter = Date.valueOf(date.toLocalDate().plusDays(1));
         return getIncome(date, dayAfter);
     }
 
     @Override
     public double getWeeklyIncome(Date startOfWeek) {
-        Date weekAfter = (Date) startOfWeek.clone();
-        weekAfter.setTime(TimeUnit.DAYS.toMillis(7));
+        Date weekAfter = Date.valueOf(startOfWeek.toLocalDate().plusDays(7));
         return getIncome(startOfWeek, weekAfter);
     }
 
     @Override
     public double getMonthlyIncome(Date startOfMonth) {
-        Date monthAfter = (Date) startOfMonth.clone();
-        monthAfter.setTime(TimeUnit.DAYS.toMillis(7));
+        Date monthAfter = Date.valueOf(startOfMonth.toLocalDate().plusDays(30));
         return getIncome(startOfMonth, monthAfter);
     }
 
