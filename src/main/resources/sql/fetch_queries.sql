@@ -113,3 +113,13 @@ LIMIT '%s';
 SELECT *
     FROM orders o
 WHERE o.customer_id = '%s';
+
+-- clock_out_employee
+UPDATE employees
+SET is_clockedin = false
+WHERE employees.id = '%s';
+
+-- clock_in_employee
+UPDATE employees
+SET is_clockedin = true, last_clockin = NOW()
+WHERE employees.id = '%s';

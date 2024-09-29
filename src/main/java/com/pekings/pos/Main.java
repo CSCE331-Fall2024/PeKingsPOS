@@ -11,14 +11,8 @@ public class Main {
         repository = new PersistentRepository();
         ((PersistentRepository) repository).initialize();
 
-        long startTime = System.currentTimeMillis();
-
-        System.out.println(repository.getMenuItem(5).getName());;
-
-        System.out.println("Fetched! Took " + (System.currentTimeMillis() - startTime) + "ms");
-
-        //POSApp posApp = new POSApp();
-        //posApp.initialize();
+        POSApp posApp = new POSApp();
+        posApp.initialize();
     }
 
     public Repository getRepository() {

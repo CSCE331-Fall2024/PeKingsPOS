@@ -53,7 +53,7 @@ public class PersistentRepository implements Repository {
             queries.add(ingredientQuery);
         }
 
-        performInsertQuery(queries.toArray(String[]::new));
+        performNonFetchQuery(queries.toArray(String[]::new));
     }
 
     @Override
@@ -300,6 +300,20 @@ public class PersistentRepository implements Repository {
         return customer;
     }
 
+    @Override
+    public void clockIn(int employeeID) {
+        String query = queryLoader.getQuery("clock_in_employee")
+                .formatted(employeeID + "");
+        performNonFetchQuery(query);
+    }
+
+    @Override
+    public void clockOut(int employeeID) {
+        String query = queryLoader.getQuery("clock_out_employee")
+                .formatted(employeeID + "");
+        performNonFetchQuery(query);
+    }
+
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String username = resultSet.getString("username");
@@ -337,7 +351,7 @@ public class PersistentRepository implements Repository {
         }
     }
 
-    private void performInsertQuery(String... queries) {
+    private void performNonFetchQuery(String... queries) {
         try {
             Statement statement = conn.createStatement();
             for (String query : queries) {

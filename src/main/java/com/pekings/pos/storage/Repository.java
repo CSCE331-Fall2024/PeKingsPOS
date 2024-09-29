@@ -50,4 +50,8 @@ public interface Repository {
     List<Order> getOrders(int customerID);
 
     Customer getCustomer(int customerID);
+
+    void clockIn(int employeeID);
+
+    void clockOut(int employeeID);
 }
