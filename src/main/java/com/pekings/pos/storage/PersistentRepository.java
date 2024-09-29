@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class PersistentRepository implements Repository {
 
@@ -89,23 +91,29 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public int getDailyIncome() {
-        return 0;
+    public double getDailyIncome(Date date) {
+        Date dayAfter = (Date) date.clone();
+        dayAfter.setTime(TimeUnit.DAYS.toMillis(1));
+        return getIncome(date, dayAfter);
     }
 
     @Override
-    public int getWeeklyIncome() {
-        return 0;
+    public double getWeeklyIncome(Date startOfWeek) {
+        Date weekAfter = (Date) startOfWeek.clone();
+        weekAfter.setTime(TimeUnit.DAYS.toMillis(7));
+        return getIncome(startOfWeek, weekAfter);
     }
 
     @Override
-    public int getMonthlyIncome() {
-        return 0;
+    public double getMonthlyIncome(Date startOfMonth) {
+        Date monthAfter = (Date) startOfMonth.clone();
+        monthAfter.setTime(TimeUnit.DAYS.toMillis(7));
+        return getIncome(startOfMonth, monthAfter);
     }
 
     @Override
-    public int getIncome(Date from, Date to) {
-        return 0;
+    public double getIncome(Date from, Date to) {
+        return getTopMenuItemsRevenue(from, to).values().stream().reduce(Double::sum).orElse(-1D);
     }
 
     @Override
@@ -218,6 +226,60 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
+    public Map<MenuItem, Double> getTopMenuItemsRevenue(int topWhat) {
+        Map<MenuItem, Double> revenue = new HashMap<>();
+
+        performFetchQuery("get_top_menu_items_revenue", resultSet -> {
+            int menu_item_id = resultSet.getInt("menu_item_id");
+            double totalRevenue = resultSet.getDouble("total_revenue");
+
+            MenuItem menuItem = getMenuItem(menu_item_id);
+            revenue.put(menuItem, totalRevenue);
+        }, topWhat + "");
+
+        return revenue;
+    }
+
+    @Override
+    public Map<MenuItem, Integer> getTopMenuItemsOrders(int topWhat) {
+        Map<MenuItem, Integer> orders = new HashMap<>();
+
+        performFetchQuery("get_top_menu_items_orders", resultSet -> {
+            int menu_item_id = resultSet.getInt("menu_item_id");
+            int totalOrders = resultSet.getInt("total_orders");
+
+            MenuItem menuItem = getMenuItem(menu_item_id);
+            orders.put(menuItem, totalOrders);
+        }, topWhat + "");
+
+        return orders;
+    }
+
+    @Override
+    public Map<MenuItem, Double> getTopMenuItemsRevenue(Date from, Date to) {
+        Map<MenuItem, Double> revenueMap = new HashMap<>();
+        performFetchQuery("get_periodic_revenue", resultSet -> {
+            MenuItem menuItem = getMenuItem(resultSet.getInt("menu_item_id"));
+            double revenue = resultSet.getDouble("revenue");
+            revenueMap.put(menuItem, revenue);
+        }, from.toString(), to.toString());
+
+        return revenueMap;
+    }
+
+    @Override
+    public Map<MenuItem, Integer> getTopMenuItemsOrders(Date from, Date to) {
+        Map<MenuItem, Integer> revenueMap = new HashMap<>();
+        performFetchQuery("get_periodic_orders", resultSet -> {
+            MenuItem menuItem = getMenuItem(resultSet.getInt("menu_item_id"));
+            int totalOrders = resultSet.getInt("total_orders");
+            revenueMap.put(menuItem, totalOrders);
+        }, from.toString(), to.toString());
+
+        return revenueMap;
+    }
+
+    @Override
     public List<Ingredient> getIngredients(int menuItemID) {
         try {
             Statement statement = conn.createStatement();
@@ -243,11 +305,6 @@ public class PersistentRepository implements Repository {
         }
     }
 
-    @Override
-    public List<MenuItem> getTopMenuItems(int topWhat) {
-        return null;
-    }
-
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String username = resultSet.getString("username");
@@ -265,5 +322,23 @@ public class PersistentRepository implements Repository {
         int amount = resultSet.getInt("amount");
         int price_batch = resultSet.getInt("price_batch");
         return new Ingredient(ingredientID, name, servingPrice, amount, price_batch);
+    }
+
+    private void performFetchQuery(String query, ThrowingConsumer<ResultSet> forEachItem, String... parameters) {
+        try {
+            Statement statement = conn.createStatement();
+            String s = queryLoader.getQuery(query)
+                    .formatted(parameters);
+            ResultSet resultSet = statement.executeQuery(s);
+
+            while (resultSet.next()) {
+                forEachItem.accept(resultSet);
+            }
+
+            conn.close();
+            resultSet.close();
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
     }
 }

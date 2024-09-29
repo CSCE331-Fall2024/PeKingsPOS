@@ -33,3 +33,47 @@ SELECT * FROM employees WHERE is_clockedin = 'true';
 -- get_all_employees
 SELECT * FROM employees;
 
+-- get_top_menu_items_orders
+SELECT m.id AS menu_item_id,
+       m.name AS menu_item_name,
+       COUNT(oi.menu_item_id) AS total_orders
+FROM order_items oi
+         JOIN menu m ON oi.menu_item_id = m.id
+GROUP BY m.id, m.name
+ORDER BY total_orders DESC
+LIMIT '%s';
+
+-- get_top_menu_items_revenue
+SELECT
+    m.id AS menu_item_id,
+    m.name AS menu_item_name,
+    SUM(m.price) AS total_revenue
+FROM order_items oi
+         JOIN menu m ON oi.menu_item_id = m.id
+GROUP BY m.id, m.name
+ORDER BY total_revenue DESC
+LIMIT '%s';
+
+-- get_periodic_revenue
+SELECT
+    oi.menu_item_id AS menu_item_id,
+    SUM(m.price) AS revenue
+FROM order_items oi
+         JOIN orders o ON oi.id = o.id
+         JOIN menu m ON oi.menu_item_id = m.id
+WHERE
+    o.order_time BETWEEN '%d' AND '%s'
+GROUP BY oi.menu_item_id
+ORDER BY revenue DESC;
+
+-- get_periodic_orders
+SELECT
+    oi.menu_item_id AS menu_item_id,
+    COUNT(oi.menu_item_id) AS total_orders
+FROM order_items oi
+         JOIN orders o ON oi.id = o.id
+WHERE
+    o.order_time BETWEEN '%d' AND '%s'
+GROUP BY oi.menu_item_id
+ORDER BY total_orders DESC;
+

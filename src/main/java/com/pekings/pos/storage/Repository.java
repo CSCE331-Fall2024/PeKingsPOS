@@ -6,6 +6,7 @@ import com.pekings.pos.object.MenuItem;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface Repository {
@@ -14,13 +15,13 @@ public interface Repository {
 
     MenuItem getMenuItem(int id);
 
-    int getDailyIncome();
+    double getDailyIncome(Date date);
 
-    int getWeeklyIncome();
+    double getWeeklyIncome(Date startOfWeek);
 
-    int getMonthlyIncome();
+    double getMonthlyIncome(Date startOfMonth);
 
-    int getIncome(Date from, Date to);
+    double getIncome(Date from, Date to);
 
     List<Employee> getActiveEmployees();
 
@@ -30,7 +31,13 @@ public interface Repository {
 
     Ingredient getIngredient(int id);
 
-    List<MenuItem> getTopMenuItems(int topWhat);
+    Map<MenuItem, Double> getTopMenuItemsRevenue(int topWhat);
+
+    Map<MenuItem, Integer> getTopMenuItemsOrders(int topWhat);
+
+    Map<MenuItem, Double> getTopMenuItemsRevenue(Date from, Date to);
+
+    Map<MenuItem, Integer> getTopMenuItemsOrders(Date from, Date to);
 
     List<Ingredient> getIngredients(int menuItemID);
 

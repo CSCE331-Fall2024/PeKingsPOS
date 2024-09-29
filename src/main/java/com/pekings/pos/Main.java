@@ -1,13 +1,12 @@
 package com.pekings.pos;
 
-import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.storage.PersistentRepository;
 import com.pekings.pos.storage.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.Map;
 
 public class Main {
 
@@ -18,14 +17,14 @@ public class Main {
         ((PersistentRepository) repository).initialize();
 
         long now = System.currentTimeMillis();
-        Ingredient ingredient = repository.getIngredient(9);
+        double income = repository.getWeeklyIncome(LocalDate.parse("2024-01-01"));
         long after = System.currentTimeMillis();
-        System.out.println(ingredient.getName());
 
         System.out.println("Fetched! Took " + (after - now) + "ms");
+        System.out.println("Income " + income);
 
-        POSApp posApp = new POSApp();
-        posApp.initialize();
+        //POSApp posApp = new POSApp();
+        //posApp.initialize();
     }
 
     public Repository getRepository() {
