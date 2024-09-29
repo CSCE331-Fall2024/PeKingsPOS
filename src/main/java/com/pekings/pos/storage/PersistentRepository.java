@@ -314,6 +314,18 @@ public class PersistentRepository implements Repository {
         performNonFetchQuery(query);
     }
 
+    @Override
+    public Map<Ingredient, Integer> getTopIngredient(int topWhat) {
+        Map<Ingredient, Integer> topIngredients = new HashMap<>();
+        performFetchQuery("get_top_ingredients", resultSet -> {
+            int ingredientID = resultSet.getInt("ingredient_id");
+            Ingredient ingredient = getIngredient(ingredientID);
+            int usage = resultSet.getInt("total_usage");
+            topIngredients.put(ingredient, usage);
+        }, topWhat + "");
+        return topIngredients;
+    }
+
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String username = resultSet.getString("username");

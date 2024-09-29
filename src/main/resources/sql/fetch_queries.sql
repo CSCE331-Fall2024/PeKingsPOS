@@ -123,3 +123,15 @@ WHERE employees.id = '%s';
 UPDATE employees
 SET is_clockedin = true, last_clockin = NOW()
 WHERE employees.id = '%s';
+
+-- get_top_ingredients
+SELECT
+    i.id AS ingredient_id,
+    COUNT(oi.menu_item_id) AS total_usage
+FROM order_items oi
+         JOIN menu_ingredients mi ON oi.menu_item_id = mi.menu_item
+         JOIN inventory i ON mi.ingredient_id = i.id
+         JOIN orders o ON oi.order_id = o.id
+GROUP BY i.id, i.name
+ORDER BY total_usage DESC
+LIMIT '%s';

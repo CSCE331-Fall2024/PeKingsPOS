@@ -54,4 +54,6 @@ public interface Repository {
     void clockIn(int employeeID);
 
     void clockOut(int employeeID);
+
+    Map<Ingredient, Integer> getTopIngredient(int topWhat);
 }
