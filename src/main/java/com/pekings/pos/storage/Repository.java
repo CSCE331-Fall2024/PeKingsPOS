@@ -6,12 +6,13 @@ import com.pekings.pos.object.MenuItem;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface Repository {
 
     void addMenuItem(MenuItem menuItem);
 
-    void removeMenuItem(MenuItem menuItem);
+    MenuItem getMenuItem(int id);
 
     int getDailyIncome();
 
@@ -25,10 +26,12 @@ public interface Repository {
 
     List<Employee> getEmployees();
 
-    List<MenuItem> getMenuItems();
+    Set<MenuItem> getMenuItems();
 
     Ingredient getIngredient(int id);
 
     List<MenuItem> getTopMenuItems(int topWhat);
+
+    List<Ingredient> getIngredients(int menuItemID);
 
 }
