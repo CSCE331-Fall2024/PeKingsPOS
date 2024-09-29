@@ -3,6 +3,7 @@ package com.pekings.pos.storage;
 import com.pekings.pos.object.Employee;
 import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
+import com.pekings.pos.util.ThrowingConsumer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

@@ -1,4 +1,4 @@
-package com.pekings.pos.storage;
+package com.pekings.pos.util;
 
 @FunctionalInterface
 public interface ThrowingConsumer<T> {
