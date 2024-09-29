@@ -18,6 +18,9 @@ FROM
 -- add_menu_item
 INSERT INTO menu (name, price) VALUES ('%s', '%s');
 
+-- add_ingredient
+INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) VALUES('%s','%s','%s');
+
 -- get_menu_item
 SELECT * FROM menu WHERE id = '%s';
 

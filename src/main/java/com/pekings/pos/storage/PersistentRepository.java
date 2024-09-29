@@ -50,9 +50,8 @@ public class PersistentRepository implements Repository {
         queries.add(addItemQuery);
 
         for (Ingredient ingredient : menuItem.getIngredients()) {
-            String ingredientQuery =
-                    "INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) " +
-                            "VALUES( " + ingredient.getId() + "," + menuItem.getId() + "," + ingredient.getAmount() + ");";
+            String ingredientQuery = queryLoader.getQuery("add_ingredient")
+                    .formatted(ingredient.getId() + "", menuItem.getId() + "", ingredient.getAmount() + "");
             queries.add(ingredientQuery);
         }
 
