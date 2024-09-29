@@ -24,6 +24,9 @@ INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) VAL
 -- get_menu_item
 SELECT * FROM menu WHERE id = '%s';
 
+-- get_menu_item_order
+SELECT * FROM order_items WHERE order_id = '%s';
+
 -- get_ingredient
 SELECT * FROM inventory WHERE id = '%s';
 
@@ -88,3 +91,25 @@ FROM orders o
 GROUP BY o.payment_method
 ORDER BY total_orders DESC;
 
+-- get_most_valuable_customers_revenue
+SELECT
+    c.id AS customer_id,
+    SUM(o.price) AS money_spent
+FROM orders o JOIN customers c ON c.id = o.customer_id
+GROUP BY c.id
+ORDER BY money_spent DESC
+LIMIT '%s';
+
+-- get_most_valuable_customers_orders
+SELECT
+    c.id AS customer_id,
+    COUNT(o.employee_id) AS total_orders
+FROM orders o JOIN customers c ON c.id = o.customer_id
+GROUP BY c.id
+ORDER BY total_orders DESC
+LIMIT '%s';
+
+-- get_orders_from_customer
+SELECT *
+    FROM orders o
+WHERE o.customer_id = '%s';

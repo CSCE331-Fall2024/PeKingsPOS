@@ -1,35 +1,38 @@
 package com.pekings.pos.object;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
 
-    private final long id;
-    private final long customerID;
-    private final int price;
+    private final int id;
+    private final int customerID;
+    private final double price;
     private final String paymentMethod;
     private final Date purchaseTime;
     private final List<MenuItem> itemsSold;
+    private final long employeeID;
 
-    public Order(long id, long customerID, int price, String paymentMethod, Date purchaseTime, List<MenuItem> itemsSold) {
+    public Order(int id, int customerID, double price, String paymentMethod, Date purchaseTime, int employeeID) {
         this.id = id;
         this.customerID = customerID;
         this.price = price;
         this.paymentMethod = paymentMethod;
         this.purchaseTime = purchaseTime;
-        this.itemsSold = itemsSold;
+        this.employeeID = employeeID;
+        this.itemsSold = new ArrayList<>();
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public long getCustomerID() {
+    public int getCustomerID() {
         return customerID;
     }
 
-    public int getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -42,6 +45,14 @@ public class Order {
     }
 
     public List<MenuItem> getItemsSold() {
-        return itemsSold;
+        return new ArrayList<>(itemsSold);
+    }
+
+    public void addItem(MenuItem item) {
+        itemsSold.add(item);
+    }
+
+    public long getEmployeeID() {
+        return employeeID;
     }
 }

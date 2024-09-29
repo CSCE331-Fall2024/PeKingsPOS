@@ -1,8 +1,6 @@
 package com.pekings.pos.storage;
 
-import com.pekings.pos.object.Employee;
-import com.pekings.pos.object.Ingredient;
-import com.pekings.pos.object.MenuItem;
+import com.pekings.pos.object.*;
 import com.pekings.pos.util.ThrowingConsumer;
 
 import java.io.IOException;
@@ -72,6 +70,17 @@ public class PersistentRepository implements Repository {
         }, id + "");
 
         return menuItems.getFirst();
+    }
+
+    @Override
+    public List<MenuItem> getOrderItems(int orderID) {
+        List<MenuItem> menuItems = new ArrayList<>();
+        performFetchQuery("get_menu_item_order", resultSet -> {
+            int menuID = resultSet.getInt("menu_item_id");
+            MenuItem menuItem = getMenuItem(menuID);
+            menuItems.add(menuItem);
+        }, orderID + "");
+        return menuItems;
     }
 
     @Override
@@ -234,6 +243,61 @@ public class PersistentRepository implements Repository {
         });
 
         return map;
+    }
+
+    @Override
+    public Map<Customer, Double> getTopCustomersRevenue(int topWhat) {
+        Map<Customer, Double> revenueMap = new HashMap<>();
+        performFetchQuery("get_most_valuable_customers_revenue", resultSet -> {
+            int customerID = resultSet.getInt("customer_id");
+            double moneySpent = resultSet.getDouble("money_spent");
+
+            Customer customer = getCustomer(customerID);
+            revenueMap.put(customer, moneySpent);
+        }, topWhat + "");
+        return revenueMap;
+    }
+
+    @Override
+    public Map<Customer, Integer> getTopCustomersOrders(int topWhat) {
+        Map<Customer, Integer> totalOrders = new HashMap<>();
+        performFetchQuery("get_most_valuable_customers_revenue", resultSet -> {
+            int customerID = resultSet.getInt("customer_id");
+            int total_orders = resultSet.getInt("total_orders");
+
+            Customer customer = getCustomer(customerID);
+            totalOrders.put(customer, total_orders);
+        }, topWhat + "");
+        return totalOrders;
+    }
+
+    @Override
+    public List<Order> getOrders(int customerID) {
+        List<Order> orders = new ArrayList<>();
+        performFetchQuery("get_orders_from_customer", resultSet -> {
+            int orderID = resultSet.getInt("id");
+            int customerId = resultSet.getInt("customer_id");
+            double price = resultSet.getDouble("price");
+            String payment_method = resultSet.getString("payment_method");
+            int employeeID = resultSet.getInt("employee_id");
+            Date date = resultSet.getDate("order_time");
+
+            Order order = new Order(orderID, customerId, price, payment_method, date, employeeID);
+
+            List<MenuItem> menuItems = getOrderItems(orderID);
+            menuItems.forEach(order::addItem);
+
+            orders.add(order);
+        }, customerID + "");
+        return orders;
+    }
+
+    @Override
+    public Customer getCustomer(int customerID) {
+        Customer customer = new Customer(customerID);
+        List<Order> orders = getOrders(customerID);
+        orders.forEach(customer::addOrder);
+        return customer;
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
