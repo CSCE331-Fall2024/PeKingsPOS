@@ -1,26 +1,27 @@
 package com.pekings.pos.storage;
 
-import com.pekings.pos.object.Employee;
-import com.pekings.pos.object.Ingredient;
-import com.pekings.pos.object.MenuItem;
+import com.pekings.pos.object.*;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface Repository {
 
     void addMenuItem(MenuItem menuItem);
 
-    MenuItem getMenuItem(int id);
+    MenuItem getMenuItem(int itemID);
 
-    int getDailyIncome();
+    List<MenuItem> getOrderItems(int orderID);
 
-    int getWeeklyIncome();
+    double getDailyIncome(Date date);
 
-    int getMonthlyIncome();
+    double getWeeklyIncome(Date startOfWeek);
 
-    int getIncome(Date from, Date to);
+    double getMonthlyIncome(Date startOfMonth);
+
+    double getIncome(Date from, Date to);
 
     List<Employee> getActiveEmployees();
 
@@ -30,8 +31,29 @@ public interface Repository {
 
     Ingredient getIngredient(int id);
 
-    List<MenuItem> getTopMenuItems(int topWhat);
+    Map<MenuItem, Double> getTopMenuItemsRevenue(int topWhat);
+
+    Map<MenuItem, Integer> getTopMenuItemsOrders(int topWhat);
+
+    Map<MenuItem, Double> getTopMenuItemsRevenue(Date from, Date to);
+
+    Map<MenuItem, Integer> getTopMenuItemsOrders(Date from, Date to);
 
     List<Ingredient> getIngredients(int menuItemID);
 
+    Map<String, Integer> getTopPaymentMethods();
+
+    Map<Customer, Double> getTopCustomersRevenue(int topWhat);
+
+    Map<Customer, Integer> getTopCustomersOrders(int topWhat);
+
+    List<Order> getOrders(int customerID);
+
+    Customer getCustomer(int customerID);
+
+    void clockIn(int employeeID);
+
+    void clockOut(int employeeID);
+
+    Map<Ingredient, Integer> getTopIngredient(int topWhat);
 }
