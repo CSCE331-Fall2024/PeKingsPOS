@@ -1,9 +1,10 @@
 package com.pekings.pos;
 
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class POSApp extends Application {
     @Override

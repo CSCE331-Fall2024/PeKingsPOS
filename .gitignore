@@ -5,7 +5,11 @@ target/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
+.idea/sqldialects.xml
+.idea/dataSources.xml
+.idea/dataSources.local.xml
 .idea/jarRepositories.xml
+.idea/misc.xml
 .idea/compiler.xml
 .idea/libraries/
 *.iws

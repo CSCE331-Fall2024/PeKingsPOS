@@ -1,22 +1,21 @@
 package com.pekings.pos;
 
-
-import javafx.application.Application;
-
-//public class Main extends Application {
-//    @Override
-//    public void start(Stage primaryStage) throws Exception {
-//        primaryStage.setScene(new Scene(new CustomerController().getView()));
-//        primaryStage.show();
-//    }
-//}
-
-
+import com.pekings.pos.storage.PersistentRepository;
+import com.pekings.pos.storage.Repository;
 
 public class Main {
+
+    private static Repository repository;
+
     public static void main(String[] args) throws Exception {
+        repository = new PersistentRepository();
+        ((PersistentRepository) repository).initialize();
+
         POSApp posApp = new POSApp();
         posApp.initialize();
+    }
 
+    public Repository getRepository() {
+        return repository;
     }
 }
