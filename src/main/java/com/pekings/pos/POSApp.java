@@ -11,7 +11,7 @@ public class POSApp extends Application {
         window.setResizable(false);
         window.show();
     }
-
+/*Im making a comment so changes exist. YAY progress*/
     public void initialize() {
         launch();
     }
