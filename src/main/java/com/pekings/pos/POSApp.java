@@ -12,6 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -22,18 +23,18 @@ import static java.awt.Color.*;
 public class POSApp extends Application {
 
     Stage window;
-    Scene login;
+    Scene login, cashier;
 
     @Override
-    public void start(Stage PrimaryStage) throws Exception{
+    public void start(Stage PrimaryStage) throws Exception {
         window = PrimaryStage;
         window.setTitle("PeKings POS");
         window.setResizable(false);
         window.setWidth(1000);
         window.setHeight(700);
 
-        Group root = new Group();
-        Scene login = new Scene(root, 1000, 700);
+        Group rootLogin = new Group();
+        login = new Scene(rootLogin, 1000, 700);
         login.setFill(Color.web("#2F2E2E"));
 
         Text title = new Text("Employee\n   Login");
@@ -63,113 +64,67 @@ public class POSApp extends Application {
         passwordBox.setLayoutY(360);
 
         Button loginBtn = new Button("Log In");
-//        loginBtn.setTextFill(Color.WHITE);
         loginBtn.setLayoutX(440);
         loginBtn.setLayoutY(420);
 
 
-
-//        StackPane rootPane = new StackPane();
-//        login = new Scene(rootPane, 1000, 700);
-//        Pane titlePane = new Pane();
-//        Pane loginPane = new Pane();
-//        rootPane.getChildren().addAll(titlePane, loginPane);
-//
-//        Label title = new Label("Login");
-//        title.setAlignment(Pos.CENTER);
-//        titlePane.getChildren().add(title);
-//        titlePane.set
-
-
-
-//        GridPane grid1 = new GridPane();
-//        grid1.setPadding(new Insets(10, 10, 10, 10));
-//        grid1.setVgap(10);
-//        grid1.setHgap(2);
-
-//        Label title = new Label("Login");
-//        title.setStyle("-fx-font-size: 50px");
-//        GridPane.setConstraints(title, 0, 0);
-//
-//        Label usernameLabel = new Label("Username: ");
-//        GridPane.setConstraints(usernameLabel, 0, 5);
-//
-//        TextField usernameLogin = new TextField("");
-//        GridPane.setConstraints(usernameLogin, 2, 5);
-//
-//        Label passwordLabel = new Label("Password: ");
-//        GridPane.setConstraints(passwordLabel, 0, 6);
-//
-//        TextField passwordLogin = new TextField("");
-//        GridPane.setConstraints(passwordLogin, 2, 6);
-//
-//        grid1.getChildren().addAll(title, usernameLabel, usernameLogin, passwordLabel, passwordLogin);
-//        grid1.setAlignment(Pos.CENTER);
-
-//        login = new Scene(grid1, 1000, 700);
+        rootLogin.getChildren().addAll(title, usernameLabel, passwordLabel, usernameBox, passwordBox, loginBtn);
 //        window.setScene(login);
 
-        root.getChildren().addAll(title, usernameLabel, passwordLabel, usernameBox, passwordBox, loginBtn);
-        window.setScene(login);
+        Group rootCashier = new Group();
+        cashier = new Scene(rootCashier, 1000, 700);
+
+        Rectangle leftRect = new Rectangle();
+        leftRect.setX(0);
+        leftRect.setY(0);
+        leftRect.setWidth(150);
+        leftRect.setHeight(700);
+        leftRect.setFill(Color.web("#D9D9D9"));
+
+        Text cashierText = new Text("Cashier");
+        cashierText.setX(50);
+        cashierText.setY(640);
+        cashierText.setFill(Color.BLACK);
+
+        Button exit = new Button("Log\nOut");
+        exit.setPrefWidth(80);
+        exit.setPrefHeight(80);
+        exit.setStyle("-fx-background-color: Red");
+        // Change Font Weight
+        exit.setLayoutX(30);
+        exit.setLayoutY(30);
+
+        Button newOrder = new Button(" New\nOrder");
+        newOrder.setPrefWidth(80);
+        newOrder.setPrefHeight(80);
+        newOrder.setStyle("-fx-background-color: #36919E");
+        newOrder.setLayoutX(30);
+        newOrder.setLayoutY(170);
+
+        Button cancelOrder = new Button("Cancel\n Order");
+        cancelOrder.setPrefWidth(80);
+        cancelOrder.setPrefHeight(80);
+        cancelOrder.setStyle("-fx-background-color: #36919E");
+        cancelOrder.setLayoutX(30);
+        cancelOrder.setLayoutY(280);
+
+        Button viewPrevious = new Button(" View\nPrevious");
+        viewPrevious.setPrefWidth(80);
+        viewPrevious.setPrefHeight(80);
+        viewPrevious.setStyle("-fx-background-color: #36919E");
+        viewPrevious.setLayoutX(30);
+        viewPrevious.setLayoutY(390);
+
+
+        rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious);
+        window.setScene(cashier);
         window.show();
+
+
     }
 
     public void initialize() {
         launch();
     }
 
-//    private final StringProperty greeting = new SimpleStringProperty("");
-//    private final StringProperty name = new SimpleStringProperty("");
-//
-//    @Override
-//    public void start(Stage primaryStage){
-//        Scene scene = new Scene(createContents(), 1200, 700);
-//        scene.setFill(Color.web("#81c483"));
-//        primaryStage.setScene(scene);
-//        primaryStage.show();
-//    }
-//
-//    private Region createContents() {
-//        VBox results = new VBox(20, createText(), createInputRow(), createOutputLabel(), createButton());
-////        results.setAlignment(Pos.CENTER);
-//        String css = getClass().getResource("/css/application.css").toExternalForm();
-//        results.getStylesheets().add(css);
-//
-//        return results;
-//    }
-//
-//    private Text createText(){
-//        Text text = new Text("Manager \nLogin");
-//        text.getStyleClass().add("manager-text");
-////        text.setTextAlignment(TextAlignment.CENTER);
-//        return text;
-//    }
-//
-//    private Button createButton() {
-//        Button results = new Button("Hello");
-//        results.setOnAction(evt -> setGreeting());
-////        results.setAlignment(Pos.CENTER);
-//        return results;
-//    }
-//
-//    private HBox createInputRow() {
-//        TextField textField = new TextField("");
-//        textField.textProperty().bindBidirectional(name);
-//        Label namePrompt = new Label("Name:");
-//        namePrompt.getStyleClass().add("prompt-label");
-//        HBox hBox = new HBox(6, namePrompt, textField);
-//        hBox.setAlignment(Pos.CENTER);
-//        return hBox;
-//    }
-//
-//    private Node createOutputLabel() {
-//        Label results = new Label("");
-//        results.getStyleClass().add("greeting-label");
-//        results.textProperty().bind(greeting);
-//        return results;
-//    }
-//
-//    private void setGreeting() {
-//        greeting.set("Hello " + name.get());
-//    }
 }
