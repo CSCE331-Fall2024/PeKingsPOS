@@ -173,3 +173,6 @@ SELECT
 FROM orders o
 GROUP BY order_week
 ORDER BY order_week;
+
+-- update_ingredient_amount
+UPDATE inventory i SET amount = amount + '%s' WHERE i.id = '%s';

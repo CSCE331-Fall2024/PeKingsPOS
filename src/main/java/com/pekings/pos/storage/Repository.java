@@ -56,7 +56,7 @@ public interface Repository {
 
     void clockOut(int employeeID);
 
-    Map<Ingredient, Integer> getTopIngredient(int topWhat);
+    Map<Ingredient, Integer> getTopIngredients(int topWhat);
 
     Map<Date, Double> getTopDatesRevenue(int topWhat);
 
@@ -65,4 +65,8 @@ public interface Repository {
     List<SaleHistoryItem> getSalesHistory(int howManyHoursBack);
 
     List<SaleHistoryItem> getAllTimeSalesHistory();
+
+    void addIngredientStock(int ingredientID, int amount);
+
+    void removeIngredientStock(int ingredientID, int amount);
 }

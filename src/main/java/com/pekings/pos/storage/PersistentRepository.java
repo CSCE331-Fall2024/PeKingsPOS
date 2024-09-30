@@ -312,7 +312,7 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public Map<Ingredient, Integer> getTopIngredient(int topWhat) {
+    public Map<Ingredient, Integer> getTopIngredients(int topWhat) {
         Map<Ingredient, Integer> topIngredients = new HashMap<>();
         performFetchQuery("get_top_ingredients", resultSet -> {
             int ingredientID = resultSet.getInt("ingredient_id");
@@ -367,6 +367,18 @@ public class PersistentRepository implements Repository {
             salesHistory.add(saleHistoryItem);
         });
         return salesHistory;
+    }
+
+    @Override
+    public void addIngredientStock(int ingredientID, int amount) {
+        String query = queryLoader.getQuery("update_ingredient_amount")
+                .formatted(amount + "", ingredientID + "");
+        performNonFetchQuery(query);
+    }
+
+    @Override
+    public void removeIngredientStock(int ingredientID, int amount) {
+        addIngredientStock(ingredientID, -amount);
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
