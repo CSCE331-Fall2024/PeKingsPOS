@@ -1,16 +1,13 @@
 package com.pekings.pos.storage;
 
 import com.pekings.pos.object.*;
+import com.pekings.pos.util.SaleHistoryItem;
 import com.pekings.pos.util.ThrowingConsumer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
 public class PersistentRepository implements Repository {
@@ -315,7 +312,7 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public Map<Ingredient, Integer> getTopIngredient(int topWhat) {
+    public Map<Ingredient, Integer> getTopIngredients(int topWhat) {
         Map<Ingredient, Integer> topIngredients = new HashMap<>();
         performFetchQuery("get_top_ingredients", resultSet -> {
             int ingredientID = resultSet.getInt("ingredient_id");
@@ -324,6 +321,64 @@ public class PersistentRepository implements Repository {
             topIngredients.put(ingredient, usage);
         }, topWhat + "");
         return topIngredients;
+    }
+
+    @Override
+    public Map<Date, Double> getTopDatesRevenue(int topWhat) {
+        Map<Date, Double> revenueMap = new HashMap<>();
+        performFetchQuery("get_top_days_revenue", resultSet -> {
+            Date date = resultSet.getDate("order_day");
+            double total_orders = resultSet.getInt("revenue");
+        }, topWhat + "");
+        return revenueMap;
+    }
+
+    @Override
+    public Map<Date, Integer> getTopDatesTotalOrders(int topWhat) {
+        Map<Date, Integer> revenueMap = new HashMap<>();
+        performFetchQuery("get_top_days_revenue", resultSet -> {
+            Date date = resultSet.getDate("order_day");
+            int total_orders = resultSet.getInt("total_orders");
+        }, topWhat + "");
+        return revenueMap;
+    }
+
+    @Override
+    public List<SaleHistoryItem> getSalesHistory(int howManyHoursBack) {
+        List<SaleHistoryItem> salesHistory = new ArrayList<>();
+        performFetchQuery("get_sales_history", resultSet -> {
+            Timestamp timestamp = resultSet.getTimestamp("order_hour");
+            int total_orders = resultSet.getInt("total_orders");
+            double revenue = resultSet.getDouble("total_revenue");
+            SaleHistoryItem saleHistoryItem = new SaleHistoryItem(timestamp, total_orders, revenue);
+            salesHistory.add(saleHistoryItem);
+        }, howManyHoursBack + "");
+        return salesHistory;
+    }
+
+    @Override
+    public List<SaleHistoryItem> getAllTimeSalesHistory() {
+        List<SaleHistoryItem> salesHistory = new ArrayList<>();
+        performFetchQuery("get_all_time_sales_history", resultSet -> {
+            Timestamp timestamp = resultSet.getTimestamp("order_week");
+            int total_orders = resultSet.getInt("total_orders");
+            double revenue = resultSet.getDouble("total_revenue");
+            SaleHistoryItem saleHistoryItem = new SaleHistoryItem(timestamp, total_orders, revenue);
+            salesHistory.add(saleHistoryItem);
+        });
+        return salesHistory;
+    }
+
+    @Override
+    public void addIngredientStock(int ingredientID, int amount) {
+        String query = queryLoader.getQuery("update_ingredient_amount")
+                .formatted(amount + "", ingredientID + "");
+        performNonFetchQuery(query);
+    }
+
+    @Override
+    public void removeIngredientStock(int ingredientID, int amount) {
+        addIngredientStock(ingredientID, -amount);
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {

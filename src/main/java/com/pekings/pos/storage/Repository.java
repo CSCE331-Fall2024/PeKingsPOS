@@ -1,6 +1,7 @@
 package com.pekings.pos.storage;
 
 import com.pekings.pos.object.*;
+import com.pekings.pos.util.SaleHistoryItem;
 
 import java.sql.Date;
 import java.util.List;
@@ -55,5 +56,17 @@ public interface Repository {
 
     void clockOut(int employeeID);
 
-    Map<Ingredient, Integer> getTopIngredient(int topWhat);
+    Map<Ingredient, Integer> getTopIngredients(int topWhat);
+
+    Map<Date, Double> getTopDatesRevenue(int topWhat);
+
+    Map<Date, Integer> getTopDatesTotalOrders(int topWhat);
+
+    List<SaleHistoryItem> getSalesHistory(int howManyHoursBack);
+
+    List<SaleHistoryItem> getAllTimeSalesHistory();
+
+    void addIngredientStock(int ingredientID, int amount);
+
+    void removeIngredientStock(int ingredientID, int amount);
 }
