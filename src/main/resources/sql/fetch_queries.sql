@@ -143,14 +143,33 @@ SELECT
 FROM orders o
 GROUP BY order_day
 ORDER BY revenue DESC
-LIMIT '%s';;
+LIMIT '%s';
 
 -- get_top_days_total_orders
 SELECT
-    DATE(o.order_time) AS order_day,
+    DATE(o.order_time) AS order_date,
+    EXTRACT(HOUR FROM o.order_time) AS order_hour,
     COUNT(o.id) AS total_orders
 FROM orders o
-GROUP BY order_day
-ORDER BY total_orders DESC
+GROUP BY order_hour, o.order_time
+ORDER BY order_date DESC
+LIMIT 10;
+
+-- get_sales_history
+SELECT
+    DATE_TRUNC('hour', o.order_time) AS order_hour,
+    COUNT(o.id) AS total_orders,
+    SUM(o.price) AS total_revenue
+FROM orders o
+GROUP BY order_hour
+ORDER BY order_hour DESC
 LIMIT '%s';
 
+-- get_all_time_sales_history
+SELECT
+    DATE_TRUNC('week', o.order_time) AS order_week,
+    COUNT(o.id) AS total_orders,
+    SUM(o.price) AS total_revenue
+FROM orders o
+GROUP BY order_week
+ORDER BY order_week;

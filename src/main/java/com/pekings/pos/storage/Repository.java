@@ -1,6 +1,7 @@
 package com.pekings.pos.storage;
 
 import com.pekings.pos.object.*;
+import com.pekings.pos.util.SaleHistoryItem;
 
 import java.sql.Date;
 import java.util.List;
@@ -60,4 +61,8 @@ public interface Repository {
     Map<Date, Double> getTopDatesRevenue(int topWhat);
 
     Map<Date, Integer> getTopDatesTotalOrders(int topWhat);
+
+    List<SaleHistoryItem> getSalesHistory(int howManyHoursBack);
+
+    List<SaleHistoryItem> getAllTimeSalesHistory();
 }
