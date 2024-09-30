@@ -56,4 +56,8 @@ public interface Repository {
     void clockOut(int employeeID);
 
     Map<Ingredient, Integer> getTopIngredient(int topWhat);
+
+    Map<Date, Double> getTopDatesRevenue(int topWhat);
+
+    Map<Date, Integer> getTopDatesTotalOrders(int topWhat);
 }

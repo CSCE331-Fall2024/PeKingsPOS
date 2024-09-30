@@ -135,3 +135,22 @@ FROM order_items oi
 GROUP BY i.id, i.name
 ORDER BY total_usage DESC
 LIMIT '%s';
+
+-- get_top_days_revenue
+SELECT
+    DATE(o.order_time) AS order_day,
+    SUM(o.price) AS revenue
+FROM orders o
+GROUP BY order_day
+ORDER BY revenue DESC
+LIMIT '%s';;
+
+-- get_top_days_total_orders
+SELECT
+    DATE(o.order_time) AS order_day,
+    COUNT(o.id) AS total_orders
+FROM orders o
+GROUP BY order_day
+ORDER BY total_orders DESC
+LIMIT '%s';
+

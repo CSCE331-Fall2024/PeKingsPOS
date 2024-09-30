@@ -326,6 +326,26 @@ public class PersistentRepository implements Repository {
         return topIngredients;
     }
 
+    @Override
+    public Map<Date, Double> getTopDatesRevenue(int topWhat) {
+        Map<Date, Double> revenueMap = new HashMap<>();
+        performFetchQuery("get_top_days_revenue", resultSet -> {
+            Date date = resultSet.getDate("order_day");
+            double total_orders = resultSet.getInt("revenue");
+        }, topWhat + "");
+        return revenueMap;
+    }
+
+    @Override
+    public Map<Date, Integer> getTopDatesTotalOrders(int topWhat) {
+        Map<Date, Integer> revenueMap = new HashMap<>();
+        performFetchQuery("get_top_days_revenue", resultSet -> {
+            Date date = resultSet.getDate("order_day");
+            int total_orders = resultSet.getInt("total_orders");
+        }, topWhat + "");
+        return revenueMap;
+    }
+
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String username = resultSet.getString("username");
