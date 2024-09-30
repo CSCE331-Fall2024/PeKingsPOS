@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -35,11 +36,11 @@ public class POSApp extends Application {
         Scene login = new Scene(root, 1000, 700);
         login.setFill(Color.web("#2F2E2E"));
 
-        Text title = new Text("Employee Login");
+        Text title = new Text("Employee\n   Login");
         title.setStyle("-fx-font-size: 50px");
         title.setFill(Color.WHITE);
-        title.setX(290);
-        title.setY(250);
+        title.setX(360);
+        title.setY(200);
 
         Label usernameLabel = new Label("Username: ");
         usernameLabel.setLayoutX(310);
@@ -60,6 +61,11 @@ public class POSApp extends Application {
         TextField passwordBox = new TextField("");
         passwordBox.setLayoutX(460);
         passwordBox.setLayoutY(360);
+
+        Button loginBtn = new Button("Log In");
+//        loginBtn.setTextFill(Color.WHITE);
+        loginBtn.setLayoutX(440);
+        loginBtn.setLayoutY(420);
 
 
 
@@ -103,7 +109,7 @@ public class POSApp extends Application {
 //        login = new Scene(grid1, 1000, 700);
 //        window.setScene(login);
 
-        root.getChildren().addAll(title, usernameLabel, passwordLabel, usernameBox, passwordBox);
+        root.getChildren().addAll(title, usernameLabel, passwordLabel, usernameBox, passwordBox, loginBtn);
         window.setScene(login);
         window.show();
     }
