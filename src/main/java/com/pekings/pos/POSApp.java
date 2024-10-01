@@ -7,15 +7,19 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.awt.Color.*;
@@ -24,9 +28,21 @@ public class POSApp extends Application {
 
     Stage window;
     Scene login, cashier;
+    List<String> menuItems = new ArrayList<>();
+    int currOrder = 0;
 
     @Override
     public void start(Stage PrimaryStage) throws Exception {
+        //Fills menuItems
+        for(int i = 0; i < 40; i++){
+            if(i % 2 == 0){
+                menuItems.add("Chickem");
+            }else{
+                menuItems.add("Beef");
+            }
+        }
+
+
         window = PrimaryStage;
         window.setTitle("PeKings POS");
         window.setResizable(false);
@@ -99,28 +115,101 @@ public class POSApp extends Application {
         newOrder.setPrefHeight(80);
         newOrder.setStyle("-fx-background-color: #36919E");
         newOrder.setLayoutX(30);
-        newOrder.setLayoutY(170);
+        newOrder.setLayoutY(160);
 
         Button cancelOrder = new Button("Cancel\n Order");
         cancelOrder.setPrefWidth(80);
         cancelOrder.setPrefHeight(80);
         cancelOrder.setStyle("-fx-background-color: #36919E");
         cancelOrder.setLayoutX(30);
-        cancelOrder.setLayoutY(280);
+        cancelOrder.setLayoutY(255);
 
-        Button viewPrevious = new Button(" View\nPrevious");
+        Button viewPrevious = new Button("  View\nPrevious");
         viewPrevious.setPrefWidth(80);
         viewPrevious.setPrefHeight(80);
         viewPrevious.setStyle("-fx-background-color: #36919E");
         viewPrevious.setLayoutX(30);
-        viewPrevious.setLayoutY(390);
+        viewPrevious.setLayoutY(350);
+
+        Button memoBtn = new Button("Memo");
+        memoBtn.setPrefWidth(80);
+        memoBtn.setPrefHeight(80);
+        memoBtn.setStyle("-fx-background-color: #1E3A63");
+        memoBtn.setTextFill(Color.BLACK);
+        memoBtn.setLayoutX(30);
+        memoBtn.setLayoutY(455);
+
+        Rectangle rectRight = new Rectangle();
+        rectRight.setX(700);
+        rectRight.setY(0);
+        rectRight.setWidth(300);
+        rectRight.setHeight(700);
+        rectRight.setFill(Color.web("#D9D9D9"));
+
+        Line orderBorderLeft = new Line();
+        orderBorderLeft.setStartX(700);
+        orderBorderLeft.setStartY(0);
+        orderBorderLeft.setEndX(700);
+        orderBorderLeft.setEndY(700);
+        orderBorderLeft.setStrokeWidth(4);
+
+        Line paymentBorderTop = new Line();
+        paymentBorderTop.setStartX(700);
+        paymentBorderTop.setStartY(450);
+        paymentBorderTop.setEndX(1000);
+        paymentBorderTop.setEndY(450);
+        paymentBorderTop.setStrokeWidth(2);
+
+        Rectangle paymentRect = new Rectangle();
+        paymentRect.setX(700);
+        paymentRect.setY(450);
+        paymentRect.setWidth(300);
+        paymentRect.setHeight(250);
+        paymentRect.setFill(Color.web("#8c8c8c"));
 
 
-        rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious);
+        //Menu section
+        ScrollPane pane = new ScrollPane();
+        pane.setLayoutX(150);
+        pane.setLayoutY(0);
+        pane.setMaxWidth(600);
+        pane.setMaxHeight(700);
+
+        TilePane menuPane = new TilePane();
+        pane.setContent(menuPane);
+
+        menuPane.setPrefColumns(4);
+        menuPane.setPadding(new Insets(30));
+        menuPane.setHgap(30);
+        menuPane.setVgap(30);
+        menuPane.setLayoutX(180);
+        menuPane.setLayoutY(25);
+        menuPane.setMaxWidth(600);
+        menuPane.setMaxHeight(550);
+
+        //Adds menu items
+        for(String i : menuItems){
+            menuPane.getChildren().add(createMenuBtn(i));
+        }
+
+        Text orderNum = new Text("Order #");
+
+
+        rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect, orderBorderLeft, paymentBorderTop);
+        rootCashier.getChildren().add(pane);
         window.setScene(cashier);
         window.show();
 
 
+    }
+
+    Button createMenuBtn(String item){
+        Button btn = new Button(item);
+        btn.setPrefWidth(100);
+        btn.setPrefHeight(100);
+        btn.setStyle("-fx-background-color: #BA6433");
+
+        return btn;
     }
 
     public void initialize() {
