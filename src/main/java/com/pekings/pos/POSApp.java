@@ -29,7 +29,7 @@ public class POSApp extends Application {
     Stage window;
     Scene login, cashier;
     List<String> menuItems = new ArrayList<>();
-    int currOrder = 0;
+    String currOrder = "0";
 
     @Override
     public void start(Stage PrimaryStage) throws Exception {
@@ -169,14 +169,14 @@ public class POSApp extends Application {
 
 
         //Menu section
-        ScrollPane pane = new ScrollPane();
-        pane.setLayoutX(150);
-        pane.setLayoutY(0);
-        pane.setMaxWidth(600);
-        pane.setMaxHeight(700);
+        ScrollPane menuScroll = new ScrollPane();
+        menuScroll.setLayoutX(150);
+        menuScroll.setLayoutY(0);
+        menuScroll.setMaxWidth(600);
+        menuScroll.setMaxHeight(700);
 
         TilePane menuPane = new TilePane();
-        pane.setContent(menuPane);
+        menuScroll.setContent(menuPane);
 
         menuPane.setPrefColumns(4);
         menuPane.setPadding(new Insets(30));
@@ -192,11 +192,54 @@ public class POSApp extends Application {
             menuPane.getChildren().add(createMenuBtn(i));
         }
 
-        Text orderNum = new Text("Order #");
+        Text orderNumTitle = new Text("Order #");
+        orderNumTitle.setStyle("-fx-font-size: 30px");
+        orderNumTitle.setX(790);
+        orderNumTitle.setY(40);
+        Text orderNum = new Text(currOrder);
+        orderNum.setStyle("-fx-font-size: 40px");
+        orderNum.setX(825);
+        orderNum.setY(90);
+
+        Line orderNumLine = new Line();
+        orderNumLine.setStartX(700);
+        orderNumLine.setStartY(110);
+        orderNumLine.setEndX(1000);
+        orderNumLine.setEndY(110);
+        orderNumLine.setStrokeWidth(5);
 
 
-        rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect, orderBorderLeft, paymentBorderTop);
-        rootCashier.getChildren().add(pane);
+        //Displays items on current order
+        ScrollPane orderScroll = new ScrollPane();
+        orderScroll.setLayoutX(700);
+        orderScroll.setLayoutY(110);
+        orderScroll.setMaxHeight(340);
+        orderScroll.setMaxWidth(400);
+
+        TilePane orderPane = new TilePane();
+//        orderPane.setLayoutY(50);
+        orderPane.setPadding(new Insets(20, 0, 10, 20));
+        orderScroll.setContent(orderPane);
+
+        orderPane.setStyle("-fx-background-color: #D9D9D9");
+        orderPane.setPrefColumns(2);
+        orderPane.setHgap(103);
+        orderPane.setVgap(15);
+        for(int i = 0; i < 50; i++) {
+            Text txt = new Text("BURGERRRRRR");
+            orderPane.getChildren().add(txt);
+
+            txt = new Text("$3.99");
+            orderPane.getChildren().add(txt);
+        }
+
+
+
+
+        rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect);
+        rootCashier.getChildren().add(menuScroll);
+        rootCashier.getChildren().addAll(orderNumTitle, orderNum, orderNumLine, orderScroll);
+        rootCashier.getChildren().addAll(orderBorderLeft, paymentBorderTop);
         window.setScene(cashier);
         window.show();
 
