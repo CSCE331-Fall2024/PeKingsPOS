@@ -233,13 +233,32 @@ public class POSApp extends Application {
             orderPane.getChildren().add(txt);
         }
 
+        double sub = 10.99;
+//        String subTotal = "Sub-Total: " + sub;
+        Text subTotalTxt = new Text("Sub-Total: " + sub);
+        subTotalTxt.setX(730);
+        subTotalTxt.setY(490);
+        subTotalTxt.setStyle("-fx-font-size: 15px");
+
+        Text taxTxt = new Text("Tax: " + (Math.round((sub*0.0625) * 100) / 100.00));
+        taxTxt.setX(730);
+        taxTxt.setY(520);
+        taxTxt.setStyle("-fx-font-size: 15px");
+
+        Text totalTxt = new Text("Total: " + (Math.round((sub*1.0625) * 100) / 100.00));
+        totalTxt.setX(730);
+        totalTxt.setY(600);
+        totalTxt.setStyle("-fx-font-size: 30px");
+
+
+
 
 
 
         rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect);
         rootCashier.getChildren().add(menuScroll);
         rootCashier.getChildren().addAll(orderNumTitle, orderNum, orderNumLine, orderScroll);
-        rootCashier.getChildren().addAll(orderBorderLeft, paymentBorderTop);
+        rootCashier.getChildren().addAll(orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt);
         window.setScene(cashier);
         window.show();
 
