@@ -21,14 +21,6 @@ public class MenuItem {
         return new ArrayList<>(ingredients);
     }
 
-    public void addIngredient(Ingredient ingredient) {
-        ingredients.add(ingredient);
-    }
-
-    public void removeIngredient(Ingredient ingredient) {
-        ingredients.remove(ingredient);
-    }
-
     public long getId() {
         return id;
     }
