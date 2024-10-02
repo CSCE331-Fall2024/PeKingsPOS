@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -48,6 +49,7 @@ public class POSApp extends Application {
         window.setResizable(false);
         window.setWidth(1000);
         window.setHeight(700);
+//        window.getIcons().add(new Image("file:icon.png"));
 
         Group rootLogin = new Group();
         login = new Scene(rootLogin, 1000, 700);
