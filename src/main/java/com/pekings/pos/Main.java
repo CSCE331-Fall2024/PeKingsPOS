@@ -13,7 +13,7 @@ public class Main  {
 
     public static void main(String[] args) throws SQLException, IOException, URISyntaxException {
         repository = new PersistentRepository();
-        //((PersistentRepository) repository).initialize();
+        ((PersistentRepository) repository).initialize();
 
         POSApp obj = new POSApp();
         obj.initialize();

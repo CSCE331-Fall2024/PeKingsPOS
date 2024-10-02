@@ -1,5 +1,7 @@
 package com.pekings.pos;
 
+import com.pekings.pos.object.MenuItem;
+import com.pekings.pos.storage.Repository;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,6 +24,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static java.awt.Color.*;
 
@@ -29,19 +32,26 @@ public class POSApp extends Application {
 
     Stage window;
     Scene login, cashier;
-    List<String> menuItems = new ArrayList<>();
+    Set<MenuItem> menuItems;
     String currOrder = "0";
+    private Repository repo;
 
     @Override
     public void start(Stage PrimaryStage) throws Exception {
+        repo = Main.getRepository();
+        menuItems = repo.getMenuItems();
+
         //Fills menuItems
-        for(int i = 0; i < 40; i++){
-            if(i % 2 == 0){
-                menuItems.add("Chickem");
-            }else{
-                menuItems.add("Beef");
-            }
-        }
+//        for (MenuItem item : menuItems) {
+//            item.
+//        }
+//        for(int i = 0; i < 40; i++){
+//            if(i % 2 == 0){
+//                menuItems.add("Chickem");
+//            }else{
+//                menuItems.add("Beef");
+//            }
+//        }
 
 
         window = PrimaryStage;
@@ -190,8 +200,9 @@ public class POSApp extends Application {
         menuPane.setMaxHeight(550);
 
         //Adds menu items
-        for(String i : menuItems){
-            menuPane.getChildren().add(createMenuBtn(i));
+        for (MenuItem i : menuItems) {
+            MenuButton MenuItemButton = new MenuButton(i);
+            menuPane.getChildren().add(MenuItemButton.createMenuBtn());
         }
 
         Text orderNumTitle = new Text("Order #");
@@ -227,7 +238,7 @@ public class POSApp extends Application {
         orderPane.setPrefColumns(2);
         orderPane.setHgap(103);
         orderPane.setVgap(15);
-        for(int i = 0; i < 50; i++) {
+        for (int i = 0; i < 50; i++) {
             Text txt = new Text("BURGERRRRRR");
             orderPane.getChildren().add(txt);
 
@@ -242,19 +253,15 @@ public class POSApp extends Application {
         subTotalTxt.setY(490);
         subTotalTxt.setStyle("-fx-font-size: 15px");
 
-        Text taxTxt = new Text("Tax: " + (Math.round((sub*0.0625) * 100) / 100.00));
+        Text taxTxt = new Text("Tax: " + (Math.round((sub * 0.0625) * 100) / 100.00));
         taxTxt.setX(730);
         taxTxt.setY(520);
         taxTxt.setStyle("-fx-font-size: 15px");
 
-        Text totalTxt = new Text("Total: " + (Math.round((sub*1.0625) * 100) / 100.00));
+        Text totalTxt = new Text("Total: " + (Math.round((sub * 1.0625) * 100) / 100.00));
         totalTxt.setX(730);
         totalTxt.setY(600);
         totalTxt.setStyle("-fx-font-size: 30px");
-
-
-
-
 
 
         rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect);
@@ -265,15 +272,6 @@ public class POSApp extends Application {
         window.show();
 
 
-    }
-
-    Button createMenuBtn(String item){
-        Button btn = new Button(item);
-        btn.setPrefWidth(100);
-        btn.setPrefHeight(100);
-        btn.setStyle("-fx-background-color: #BA6433");
-
-        return btn;
     }
 
     public void initialize() {
