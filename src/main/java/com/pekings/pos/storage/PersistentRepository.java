@@ -279,11 +279,9 @@ public class PersistentRepository implements Repository {
             int employeeID = resultSet.getInt("employee_id");
             Date date = resultSet.getDate("order_time");
 
-            Order order = new Order(orderID, customerId, price, payment_method, date, employeeID);
-
             List<MenuItem> menuItems = getOrderItems(orderID);
-            menuItems.forEach(order::addItem);
 
+            Order order = new Order(orderID, customerId, menuItems, price, payment_method, date, employeeID);
             orders.add(order);
         }, customerID + "");
         return orders;
@@ -379,6 +377,74 @@ public class PersistentRepository implements Repository {
     @Override
     public void removeIngredientStock(int ingredientID, int amount) {
         addIngredientStock(ingredientID, -amount);
+    }
+
+    @Override
+    public List<Order> getOrdersBefore(Date date, int limit) {
+        List<Order> orders = new ArrayList<>();
+        performFetchQuery("get_previous_orders", resultSet -> {
+            int orderID = resultSet.getInt("order_id");
+            int customerID = resultSet.getInt("customer_id");
+            double price = resultSet.getDouble("price");
+            int employeeID = resultSet.getInt("employee_id");
+            Date orderTime = resultSet.getDate("order_time");
+            String paymentMethod = resultSet.getString("payment_method");
+
+            List<MenuItem> itemsSold = getOrderItems(orderID);
+            Order order = new Order(orderID, customerID, itemsSold, price, paymentMethod, orderTime, employeeID);
+            orders.add(order);
+        });
+
+        return orders;
+    }
+
+    @Override
+    public List<Order> getOrders(Date from, Date to) {
+        List<Order> orders = new ArrayList<>();
+        performFetchQuery("get_orders_timeframe", resultSet -> {
+            int orderID = resultSet.getInt("order_id");
+            int customerID = resultSet.getInt("customer_id");
+            double price = resultSet.getDouble("price");
+            int employeeID = resultSet.getInt("employee_id");
+            Date orderTime = resultSet.getDate("order_time");
+            String paymentMethod = resultSet.getString("payment_method");
+
+            List<MenuItem> itemsSold = getOrderItems(orderID);
+            Order order = new Order(orderID, customerID, itemsSold, price, paymentMethod, orderTime, employeeID);
+            orders.add(order);
+        });
+
+        return orders;
+    }
+
+    @Override
+    public void addOrder(Order order) {
+        List<String> queries = new ArrayList<>();
+
+        String addOrderQuery = queryLoader.getQuery("add_order")
+                .formatted(order.getCustomerID(), order.getPrice() + "", order.getPaymentMethod(),
+                                    order.getEmployeeID() + "", order.getPurchaseTime().toString());
+        queries.add(addOrderQuery);
+
+        for (MenuItem menuItem : order.getItemsSold()) {
+            String addItemSold = queryLoader.getQuery("add_item_sold")
+                    .formatted(order.getId() + "", menuItem.getId());
+
+            queries.add(addItemSold);
+
+            for (Ingredient ingredient : menuItem.getIngredients()) {
+                String addIngredient = queryLoader.getQuery("add_ingredient")
+                        .formatted(order.getId() + "", ingredient.getId());
+
+                String removeInventoryIngredient = queryLoader.getQuery("update_ingredient_amount")
+                        .formatted(ingredient.getAmount() * (-1), ingredient.getId() + "");
+
+                queries.add(addIngredient);
+                queries.add(removeInventoryIngredient);
+            }
+        }
+
+        performNonFetchQuery(queries.toArray(String[]::new));
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {

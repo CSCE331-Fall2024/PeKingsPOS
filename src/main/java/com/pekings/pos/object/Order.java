@@ -14,14 +14,14 @@ public class Order {
     private final List<MenuItem> itemsSold;
     private final long employeeID;
 
-    public Order(int id, int customerID, double price, String paymentMethod, Date purchaseTime, int employeeID) {
+    public Order(int id, int customerID, List<MenuItem> itemsSold, double price, String paymentMethod, Date purchaseTime, int employeeID) {
         this.id = id;
         this.customerID = customerID;
         this.price = price;
         this.paymentMethod = paymentMethod;
         this.purchaseTime = purchaseTime;
         this.employeeID = employeeID;
-        this.itemsSold = new ArrayList<>();
+        this.itemsSold = itemsSold;
     }
 
     public int getId() {
@@ -46,10 +46,6 @@ public class Order {
 
     public List<MenuItem> getItemsSold() {
         return new ArrayList<>(itemsSold);
-    }
-
-    public void addItem(MenuItem item) {
-        itemsSold.add(item);
     }
 
     public long getEmployeeID() {

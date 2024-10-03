@@ -69,4 +69,10 @@ public interface Repository {
     void addIngredientStock(int ingredientID, int amount);
 
     void removeIngredientStock(int ingredientID, int amount);
+
+    List<Order> getOrdersBefore(Date date, int limit);
+
+    List<Order> getOrders(Date from, Date to);
+
+    void addOrder(Order order);
 }
