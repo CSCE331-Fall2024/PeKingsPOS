@@ -462,9 +462,9 @@ public class PersistentRepository implements Repository {
         String username = resultSet.getString("username");
         String pass = resultSet.getString("pass");
         String position = resultSet.getString("position");
-        Date date = resultSet.getDate("last_clockin");
+        Time time = resultSet.getTime("last_clockin");
         boolean b = resultSet.getBoolean("is_clockedin");
-        return new Employee(id, username, pass, position, date, b);
+        return new Employee(id, username, pass, position, time, b);
     }
 
     public Ingredient makeIngredient(ResultSet resultSet) throws SQLException {
