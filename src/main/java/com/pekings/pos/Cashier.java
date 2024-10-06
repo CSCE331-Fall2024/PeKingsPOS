@@ -3,25 +3,28 @@ package com.pekings.pos;
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.storage.Repository;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+//import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.TilePane;
+//import javafx.scene.layout.VBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
-//import jdk.dynalink.Operation;
-
-import java.rmi.server.Operation;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Callable;
 
 
 
@@ -119,6 +122,49 @@ public class Cashier {
         memoBtn.setTextFill(Color.BLACK);
         memoBtn.setLayoutX(30);
         memoBtn.setLayoutY(455);
+
+        Popup memo = new Popup();
+        memo.setX(200);
+        memo.setY(200);
+
+        Rectangle memoBox = new Rectangle();
+
+        Text memoTxt = new Text("Enter memo :");
+        memoTxt.setLayoutX(210);
+        memoTxt.setLayoutY(235);
+
+        TextField memoField = new TextField();
+        memoField.setLayoutX(210);
+        memoField.setLayoutY(240);
+        memoField.setPrefWidth(200);
+        memoField.setOnKeyPressed(e -> {
+            if (e.getCode().toString().equals("ENTER")){
+                finishMemo(memoField, memo);
+            }
+        });
+
+        Button closePop = new Button("X");
+        closePop.setLayoutX(420);
+        closePop.setLayoutY(210);
+        closePop.setOnAction(e -> memo.hide());
+
+        Button memoFinish = new Button("Done");
+        memoFinish.setLayoutX(310);
+        memoFinish.setLayoutY(285);
+        memoFinish.setOnAction(e -> finishMemo(memoField, memo));
+
+        memoBox.setLayoutX(200);
+        memoBox.setLayoutY(200);
+        memoBox.setWidth(250);
+        memoBox.setHeight(125);
+        memoBox.setFill(Color.WHITE);
+        memoBox.setStroke(Color.BLACK);
+
+        memo.getContent().addAll(memoBox, memoTxt, memoField, closePop, memoFinish);
+
+        memoBtn.setOnAction(e -> memo.show(PrimaryStage));
+
+
 
         Button removeItem = new Button("Delete Selected Item");
         removeItem.setLayoutX(702);
@@ -284,6 +330,11 @@ public class Cashier {
 
     public Scene getScene(){
         return cashier;
+    }
+
+    private void finishMemo(TextField memoField, Popup memo){
+        String input = memoField.getText();
+        memo.hide();
     }
 
     private void deleteItems(){
