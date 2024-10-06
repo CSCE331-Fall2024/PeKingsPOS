@@ -40,7 +40,7 @@ public class POSApp extends Application {
 
         Group rootManager = new Group(); // root node
         Scene Manager; //background
-        Manager = new Scene(rootManager, 1000, 700); // Style set to 1000x700
+        Manager = new Scene(rootManager, 1000, 700); // Style set to 1000x700 WxH
 
 
         // Create text for text box/buttons etc...
@@ -57,11 +57,34 @@ public class POSApp extends Application {
         // Create login/out button that is rectangle
         // This rectangle will be in the top left, in front of a gray background rectangle scene
         // create new scene
-        Rectangle r = new Rectangle(15,15,150,670);
+        Rectangle r = new Rectangle(15,15, 150, 670);
+        r.widthProperty().bind(Manager.widthProperty().multiply(0.15));
+
+        r.heightProperty().bind(Manager.heightProperty().multiply(0.957));
         r.setFill(Color.LIGHTGRAY);
 
+        Rectangle r2 = new Rectangle(200,25, 100, 100);
+        r2.widthProperty().bind(Manager.widthProperty().multiply(0.375));  // 50% of parent's width
+        r2.heightProperty().bind(Manager.heightProperty().multiply(0.45));
+        r2.setFill(Color.LIGHTGRAY);
 
-        rootManager.getChildren().add(r);
+        Rectangle r3 = new Rectangle(600,25, 100, 100);
+        r3.widthProperty().bind(Manager.widthProperty().multiply(0.375));  // 50% of parent's width
+        r3.heightProperty().bind(Manager.heightProperty().multiply(0.45));
+        r3.setFill(Color.LIGHTGRAY);
+
+        Rectangle r4 = new Rectangle(200,355, 100, 100);
+        r4.widthProperty().bind(Manager.widthProperty().multiply(0.375));  // 50% of parent's width
+        r4.heightProperty().bind(Manager.heightProperty().multiply(0.45));
+        r4.setFill(Color.LIGHTGRAY);
+
+        Rectangle r5 = new Rectangle(600,355, 100, 100);
+        r5.widthProperty().bind(Manager.widthProperty().multiply(0.375));  // 50% of parent's width
+        r5.heightProperty().bind(Manager.heightProperty().multiply(0.45));
+        r5.setFill(Color.LIGHTGRAY);
+
+
+        rootManager.getChildren().addAll(r,r2,r3,r4,r5);
         createPieChart(rootManager);
         createBtns(rootManager, stage);
         rootManager.getChildren().add(text);
@@ -69,7 +92,6 @@ public class POSApp extends Application {
         stage.setScene(Manager);
         stage.show();
     }
-
 
     private Popup createLogOutPopup(Stage popStage){
         Popup popup = new Popup();
@@ -88,13 +110,13 @@ public class POSApp extends Application {
         Button noBtn = new Button("Cashier");
 
         // Handle the Yes button (close the app or return to login screen)
-        yesBtn.setOnAction(event -> {
+        yesBtn.setOnAction(Lambda -> {
             popStage.close(); // Close the application
             popup.hide();  // Hide the popup
         });
 
         // Handle the No button (just hide the popup)
-        noBtn.setOnAction(event -> popup.hide());
+        noBtn.setOnAction(Lambda -> popup.hide());
 
         // Create a layout for buttons
         HBox buttonBox = new HBox(10, yesBtn, noBtn);
@@ -111,69 +133,13 @@ public class POSApp extends Application {
     }
 
     private void createBtns (Group manager, Stage stage) {
-        Rectangle rec1 = new Rectangle(80, 40);
-        Rectangle rec2 = new Rectangle(80, 40);
-        Rectangle rec3 = new Rectangle(80, 40);
-        Rectangle rec4 = new Rectangle(80, 40);
-        rec1.setFill(Color.MAROON);
-        rec2.setFill(Color.DARKCYAN);
-        rec3.setFill(Color.DARKCYAN);
-        rec4.setFill(Color.DARKCYAN);
-
-
-        rec3.setOnMouseEntered(event -> rec3.setFill(Color.DARKGRAY));
-        rec3.setOnMouseExited(event -> rec3.setFill(Color.DARKCYAN));
-        rec4.setOnMouseEntered(event -> rec4.setFill(Color.DARKGRAY));
-        rec4.setOnMouseExited(event -> rec4.setFill(Color.DARKCYAN));
-
-
-//        Button logOutBtn = btnTemplate(1,"_Log Out");
-//        logOutBtn.setStyle("-fx-background-color: maroon;");
-//        logOutBtn.setTextFill(Color.WHITE);
-//        rec1.setOnMouseEntered(event -> {
-//            rec1.setFill(Color.DARKGRAY);
-//            logOutBtn.setStyle(
-//                    "-fx-background-color: darkgray;" +
-//                            "-fx-min-width: 80px;" +
-//                            "-fx-min-height: 40px;"
-//            );
-//        });
-//        logOutBtn.setOnMouseEntered(event -> {
-//            rec1.setFill(Color.DARKGRAY);
-//            logOutBtn.setStyle(
-//                    "-fx-background-color: darkgray;" +
-//                            "-fx-min-width: 80px;" +
-//                            "-fx-min-height: 40px;"
-//            );
-//        });
-//
-//        rec1.setOnMouseExited(event -> {
-//            rec1.setFill(Color.DARKCYAN);
-//            logOutBtn.setStyle(
-//                    "-fx-background-color: maroon;" +
-//                            "-fx-min-width: 80px;" +
-//                            "-fx-min-height: 40px;"
-//            );
-//        });
-//        logOutBtn.setOnMouseExited(event -> {
-//            rec1.setFill(Color.DARKCYAN);
-//            logOutBtn.setStyle(
-//                    "-fx-background-color: maroon;" +
-//                    "-fx-min-width: 80px;" +
-//                    "-fx-min-height: 40px;"
-//            );
-//        });
 
         StackPane stackPane = btnTemplate(1, 50, 55,"_Log Out", stage);
-
-        StackPane stackPane2 = btnTemplate(2, 50, 155,"_Clock IN \n OUT", stage);
-
-        StackPane stackPane3 = btnTemplate(2, 50, 195, "_Statistics", stage);
-
-        StackPane stackPane4 = btnTemplate(2, 50, 255, "_Inventory", stage);
+        StackPane stackPane2 = btnTemplate(2, 50, 155," _Clock \nIN/OUT", stage);
+        StackPane stackPane3 = btnTemplate(2, 50, 210, "_Statistics", stage);
+        StackPane stackPane4 = btnTemplate(2, 50, 275, "_Inventory", stage);
 
         manager.getChildren().addAll(stackPane,stackPane2,stackPane3,stackPane4);
-
     }
     // Button template to make button changes simple
     private StackPane btnTemplate(int num, int x, int y, String s, Stage stage){
@@ -185,7 +151,7 @@ public class POSApp extends Application {
             Button Btn = new Button(s);
             Btn.setStyle("-fx-background-color: dark cyan;");
             Btn.setTextFill(Color.WHITE);
-            rec2.setOnMouseEntered(event -> {
+            rec2.setOnMouseEntered(Lambda -> {
                 rec2.setFill(Color.DARKGRAY);
                 Btn.setStyle(
                         "-fx-background-color: darkgray;" +
@@ -193,7 +159,7 @@ public class POSApp extends Application {
                                 "-fx-min-height: 40px;"
                 );
             });
-            Btn.setOnMouseEntered(event -> {
+            Btn.setOnMouseEntered(Lambda -> {
                 rec2.setFill(Color.DARKGRAY);
                 Btn.setStyle(
                         "-fx-background-color: darkgray;" +
@@ -201,8 +167,7 @@ public class POSApp extends Application {
                                 "-fx-min-height: 40px;"
                 );
             });
-
-            rec2.setOnMouseExited(event -> {
+            rec2.setOnMouseExited(Lambda -> {
                 rec2.setFill(Color.DARKCYAN);
                 Btn.setStyle(
                         "-fx-background-color: darkcyan;" +
@@ -210,7 +175,7 @@ public class POSApp extends Application {
                                 "-fx-min-height: 40px;"
                 );
             });
-            Btn.setOnMouseExited(event -> {
+            Btn.setOnMouseExited(Lambda -> {
                 rec2.setFill(Color.DARKCYAN);
                 Btn.setStyle(
                         "-fx-background-color: darkcyan;" +
@@ -230,7 +195,7 @@ public class POSApp extends Application {
             Button Btn = new Button(s);
             Btn.setStyle("-fx-background-color: maroon;");
             Btn.setTextFill(Color.WHITE);
-            rec2.setOnMouseEntered(event -> {
+            rec2.setOnMouseEntered(Lambda -> {
                 rec2.setFill(Color.DARKGRAY);
                 Btn.setStyle(
                         "-fx-background-color: darkgray;" +
@@ -238,7 +203,7 @@ public class POSApp extends Application {
                                 "-fx-min-height: 40px;"
                 );
             });
-            Btn.setOnMouseEntered(event -> {
+            Btn.setOnMouseEntered(Lambda -> {
                 rec2.setFill(Color.DARKGRAY);
                 Btn.setStyle(
                         "-fx-background-color: darkgray;" +
@@ -247,7 +212,7 @@ public class POSApp extends Application {
                 );
             });
 
-            rec2.setOnMouseExited(event -> {
+            rec2.setOnMouseExited(Lambda -> {
                 rec2.setFill(Color.MAROON);
                 Btn.setStyle(
                         "-fx-background-color: maroon;" +
@@ -255,7 +220,7 @@ public class POSApp extends Application {
                                 "-fx-min-height: 40px;"
                 );
             });
-            Btn.setOnMouseExited(event -> {
+            Btn.setOnMouseExited(Lambda -> {
                 rec2.setFill(Color.MAROON);
                 Btn.setStyle(
                         "-fx-background-color: maroon;" +
@@ -268,7 +233,7 @@ public class POSApp extends Application {
             stackPane.setLayoutY(y);
             stackPane.getChildren().addAll(rec2, Btn);
             Popup logOutPopup = createLogOutPopup(stage);
-            Btn.setOnAction(event -> logOutPopup.show(stage));
+            Btn.setOnAction(Lambda -> logOutPopup.show(stage));
 
             return stackPane;
         }
