@@ -33,9 +33,8 @@ import static java.awt.Color.*;
 
 public class POSApp extends Application {
 
-    Stage loginStage, cashierStage;
+    Stage loginStage;
     Scene login, cashier;
-//    Repository repo;
 
 
     @Override

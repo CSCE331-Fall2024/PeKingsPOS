@@ -16,12 +16,15 @@ import javafx.stage.Stage;
 //import jdk.dynalink.Operation;
 
 import java.rmi.server.Operation;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class Cashier {
-    String currOrder = "0";
-    Set<MenuItem> menuItems;
+    static int currOrder = 0;
+//    Set<MenuItem> menuItems;
+    List<MenuItem> menuItems;
     private Repository repo;
     Scene cashier, login;
 
@@ -32,10 +35,10 @@ public class Cashier {
 
 
     public Cashier(Stage PrimaryStage){
-//        this.repo = repo;
         login = PrimaryStage.getScene();
         repo = Main.getRepository();
-        menuItems = repo.getMenuItems();
+        menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
+        currOrder++;
 
         Group rootCashier = new Group();
         cashier = new Scene(rootCashier, 1000, 700);
@@ -149,7 +152,7 @@ public class Cashier {
         orderNumTitle.setStyle("-fx-font-size: 30px");
         orderNumTitle.setX(790);
         orderNumTitle.setY(40);
-        Text orderNum = new Text(currOrder);
+        Text orderNum = new Text(String.valueOf(currOrder));
         orderNum.setStyle("-fx-font-size: 40px");
         orderNum.setX(825);
         orderNum.setY(90);
