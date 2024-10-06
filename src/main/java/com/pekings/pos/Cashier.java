@@ -22,6 +22,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+
+
+// Payment options are "credit_card" or "cash"
+// use random number 1 and 1000 for customerID
+// use -1 for id
 public class Cashier {
     static int currOrder = 0;
     List<MenuItem> menuItems;

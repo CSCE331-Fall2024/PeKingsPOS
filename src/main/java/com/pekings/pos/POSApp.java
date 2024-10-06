@@ -1,5 +1,6 @@
 package com.pekings.pos;
 
+import com.pekings.pos.object.Employee;
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.storage.Repository;
 import javafx.application.Application;
@@ -8,10 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -36,10 +34,21 @@ public class POSApp extends Application {
     Stage loginStage;
     Scene login, cashier;
 
+    Repository repo;
+    List<Employee> Employees;
+
 
     @Override
     public void start(Stage PrimaryStage) throws Exception {
-//        repo = Main.getRepository();
+        repo = Main.getRepository();
+
+        Employees = repo.getEmployees();
+
+        for(Employee emp : Employees){
+            System.out.println(emp.getUsername() + " : " + emp.getPassword() + " : " + emp.getPosition());
+        }
+
+
 
         loginStage = PrimaryStage;
         loginStage.setTitle("PeKings POS");
@@ -65,7 +74,7 @@ public class POSApp extends Application {
         usernameLabel.setStyle("-fx-font-size: 30px");
         usernameLabel.setTextFill(Color.WHITE);
 
-        TextField usernameBox = new TextField("");
+        TextField usernameBox = new TextField();
         usernameBox.setLayoutX(460);
         usernameBox.setLayoutY(310);
 
@@ -75,7 +84,7 @@ public class POSApp extends Application {
         passwordLabel.setStyle("-fx-font-size: 30px");
         passwordLabel.setTextFill(Color.WHITE);
 
-        TextField passwordBox = new TextField("");
+        PasswordField passwordBox = new PasswordField();
         passwordBox.setLayoutX(460);
         passwordBox.setLayoutY(360);
 
@@ -86,20 +95,35 @@ public class POSApp extends Application {
         loginBtn.setLayoutX(440);
         loginBtn.setLayoutY(420);
         loginBtn.setOnAction(e -> {
-            Cashier cash = new Cashier(PrimaryStage);
-            cashier = cash.getScene();
-            loginStage.setScene(cashier);
+            String username = usernameBox.getText();
+            String password = passwordBox.getText();
+
+            for(Employee emp : Employees){
+                if((username.equals(emp.getUsername())) && (password.equals(emp.getPassword()))){
+                    if(emp.getPosition().equals("employee")){
+                        Cashier cash = new Cashier(PrimaryStage);
+                        cashier = cash.getScene();
+                        loginStage.setScene(cashier);
+                    }else{
+                        System.out.println("Manager Login");
+                    }
+                    break;
+                }
+                if(emp == Employees.getLast()){
+                    System.out.println("Username or Password was not recognized, please try again.");
+                }
+            }
+            usernameBox.clear();
+            passwordBox.clear();
         });
 
         rootLogin.getChildren().addAll(title, usernameLabel, passwordLabel, usernameBox, passwordBox, loginBtn);
 
         loginStage.setScene(login);
         loginStage.show();
-    }
 
-//    public void switchSceneLogin(){
-//        loginStage.setScene(login);
-//    }
+
+    }
 
     public void initialize() {
         launch();
