@@ -1,6 +1,8 @@
 package com.pekings.pos;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -8,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -20,6 +23,11 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.chart.PieChart;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 
 public class POSApp extends Application {
@@ -52,31 +60,12 @@ public class POSApp extends Application {
         Rectangle r = new Rectangle(15,15,150,670);
         r.setFill(Color.LIGHTGRAY);
 
-        Button logOutBtn = new Button("_Log Out");
-        logOutBtn.setLayoutX(60);
-        logOutBtn.setLayoutY(55);
 
-        Button statsBtn= new Button("_Statistics");
-        statsBtn.setLayoutX(60);
-        statsBtn.setLayoutY(155);
-
-        Button clockInOutBtn = new Button("  _Clock \n In/Out  ");
-        clockInOutBtn.setLayoutX(60);
-        clockInOutBtn.setLayoutY(195);
-
-        Button inventoryBtn = new Button("_Inventory");
-        inventoryBtn.setLayoutX(60);
-        inventoryBtn.setLayoutY(255);
-
-        //Popup for logout confirmation/switch to cashier
-        Popup logOutPopup = createLogOutPopup(stage);
-        logOutBtn.setOnAction(event -> logOutPopup.show(stage));
-
-        //rootManager.getChildren().add();
         rootManager.getChildren().add(r);
-        rootManager.getChildren().addAll(logOutBtn,statsBtn,clockInOutBtn,inventoryBtn);
+        createPieChart(rootManager);
+        createBtns(rootManager, stage);
         rootManager.getChildren().add(text);
-        //Set scene as Manager node.
+
         stage.setScene(Manager);
         stage.show();
     }
@@ -120,6 +109,190 @@ public class POSApp extends Application {
 
         return popup;
     }
+
+    private void createBtns (Group manager, Stage stage) {
+        Rectangle rec1 = new Rectangle(80, 40);
+        Rectangle rec2 = new Rectangle(80, 40);
+        Rectangle rec3 = new Rectangle(80, 40);
+        Rectangle rec4 = new Rectangle(80, 40);
+        rec1.setFill(Color.MAROON);
+        rec2.setFill(Color.DARKCYAN);
+        rec3.setFill(Color.DARKCYAN);
+        rec4.setFill(Color.DARKCYAN);
+
+
+        rec3.setOnMouseEntered(event -> rec3.setFill(Color.DARKGRAY));
+        rec3.setOnMouseExited(event -> rec3.setFill(Color.DARKCYAN));
+        rec4.setOnMouseEntered(event -> rec4.setFill(Color.DARKGRAY));
+        rec4.setOnMouseExited(event -> rec4.setFill(Color.DARKCYAN));
+
+
+//        Button logOutBtn = btnTemplate(1,"_Log Out");
+//        logOutBtn.setStyle("-fx-background-color: maroon;");
+//        logOutBtn.setTextFill(Color.WHITE);
+//        rec1.setOnMouseEntered(event -> {
+//            rec1.setFill(Color.DARKGRAY);
+//            logOutBtn.setStyle(
+//                    "-fx-background-color: darkgray;" +
+//                            "-fx-min-width: 80px;" +
+//                            "-fx-min-height: 40px;"
+//            );
+//        });
+//        logOutBtn.setOnMouseEntered(event -> {
+//            rec1.setFill(Color.DARKGRAY);
+//            logOutBtn.setStyle(
+//                    "-fx-background-color: darkgray;" +
+//                            "-fx-min-width: 80px;" +
+//                            "-fx-min-height: 40px;"
+//            );
+//        });
+//
+//        rec1.setOnMouseExited(event -> {
+//            rec1.setFill(Color.DARKCYAN);
+//            logOutBtn.setStyle(
+//                    "-fx-background-color: maroon;" +
+//                            "-fx-min-width: 80px;" +
+//                            "-fx-min-height: 40px;"
+//            );
+//        });
+//        logOutBtn.setOnMouseExited(event -> {
+//            rec1.setFill(Color.DARKCYAN);
+//            logOutBtn.setStyle(
+//                    "-fx-background-color: maroon;" +
+//                    "-fx-min-width: 80px;" +
+//                    "-fx-min-height: 40px;"
+//            );
+//        });
+
+        StackPane stackPane = btnTemplate(1, 50, 55,"_Log Out", stage);
+
+        StackPane stackPane2 = btnTemplate(2, 50, 155,"_Clock IN \n OUT", stage);
+
+        StackPane stackPane3 = btnTemplate(2, 50, 195, "_Statistics", stage);
+
+        StackPane stackPane4 = btnTemplate(2, 50, 255, "_Inventory", stage);
+
+        manager.getChildren().addAll(stackPane,stackPane2,stackPane3,stackPane4);
+
+    }
+    // Button template to make button changes simple
+    private StackPane btnTemplate(int num, int x, int y, String s, Stage stage){
+        StackPane dummy = new StackPane();
+        Rectangle rec2 = new Rectangle(80, 40);
+
+        if (num == 2) {
+            rec2.setFill(Color.DARKCYAN);
+            Button Btn = new Button(s);
+            Btn.setStyle("-fx-background-color: dark cyan;");
+            Btn.setTextFill(Color.WHITE);
+            rec2.setOnMouseEntered(event -> {
+                rec2.setFill(Color.DARKGRAY);
+                Btn.setStyle(
+                        "-fx-background-color: darkgray;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+            Btn.setOnMouseEntered(event -> {
+                rec2.setFill(Color.DARKGRAY);
+                Btn.setStyle(
+                        "-fx-background-color: darkgray;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+
+            rec2.setOnMouseExited(event -> {
+                rec2.setFill(Color.DARKCYAN);
+                Btn.setStyle(
+                        "-fx-background-color: darkcyan;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+            Btn.setOnMouseExited(event -> {
+                rec2.setFill(Color.DARKCYAN);
+                Btn.setStyle(
+                        "-fx-background-color: darkcyan;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+            StackPane stackPane = new StackPane();
+            stackPane.setLayoutX(x);
+            stackPane.setLayoutY(y);
+            stackPane.getChildren().addAll(rec2, Btn);
+
+            return stackPane;
+        }
+        if(num == 1){
+            rec2.setFill(Color.MAROON);
+            Button Btn = new Button(s);
+            Btn.setStyle("-fx-background-color: maroon;");
+            Btn.setTextFill(Color.WHITE);
+            rec2.setOnMouseEntered(event -> {
+                rec2.setFill(Color.DARKGRAY);
+                Btn.setStyle(
+                        "-fx-background-color: darkgray;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+            Btn.setOnMouseEntered(event -> {
+                rec2.setFill(Color.DARKGRAY);
+                Btn.setStyle(
+                        "-fx-background-color: darkgray;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+
+            rec2.setOnMouseExited(event -> {
+                rec2.setFill(Color.MAROON);
+                Btn.setStyle(
+                        "-fx-background-color: maroon;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+            Btn.setOnMouseExited(event -> {
+                rec2.setFill(Color.MAROON);
+                Btn.setStyle(
+                        "-fx-background-color: maroon;" +
+                                "-fx-min-width: 80px;" +
+                                "-fx-min-height: 40px;"
+                );
+            });
+            StackPane stackPane = new StackPane();
+            stackPane.setLayoutX(x);
+            stackPane.setLayoutY(y);
+            stackPane.getChildren().addAll(rec2, Btn);
+            Popup logOutPopup = createLogOutPopup(stage);
+            Btn.setOnAction(event -> logOutPopup.show(stage));
+
+            return stackPane;
+        }
+        return dummy;
+    }
+
+    private void createPieChart(Group root){
+
+        // Pull data from repository tomorrow
+        PieChart.Data slice1 = new PieChart.Data("Sweet and Sour Chicken", 25);
+        PieChart.Data slice2 = new PieChart.Data("Kung Pao Chicken", 25);
+        PieChart.Data slice3 = new PieChart.Data("Fried Rice", 25);
+        PieChart.Data slice4 = new PieChart.Data("Dumplings", 25);
+        PieChart pieChart = new PieChart();
+        pieChart.getData().addAll(slice1, slice2, slice3, slice4);
+
+        pieChart.setTranslateX(150);
+        pieChart.setTranslateY(50);
+        pieChart.setPrefSize(400,200);
+
+        // Add the pie chart to the root group
+        root.getChildren().add(pieChart);
+    }
+
 
     public void initialize(String[] args) {
         launch(args);
