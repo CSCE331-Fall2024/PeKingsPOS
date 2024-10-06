@@ -135,3 +135,74 @@ FROM order_items oi
 GROUP BY i.id, i.name
 ORDER BY total_usage DESC
 LIMIT '%s';
+
+-- get_top_days_revenue
+SELECT
+    DATE(o.order_time) AS order_day,
+    SUM(o.price) AS revenue
+FROM orders o
+GROUP BY order_day
+ORDER BY revenue DESC
+LIMIT '%s';
+
+-- get_top_days_total_orders
+SELECT
+    DATE(o.order_time) AS order_date,
+    EXTRACT(HOUR FROM o.order_time) AS order_hour,
+    COUNT(o.id) AS total_orders
+FROM orders o
+GROUP BY order_hour, o.order_time
+ORDER BY order_date DESC
+LIMIT 10;
+
+-- get_sales_history
+SELECT
+    DATE_TRUNC('hour', o.order_time) AS order_hour,
+    COUNT(o.id) AS total_orders,
+    SUM(o.price) AS total_revenue
+FROM orders o
+GROUP BY order_hour
+ORDER BY order_hour DESC
+LIMIT '%s';
+
+-- get_all_time_sales_history
+SELECT
+    DATE_TRUNC('week', o.order_time) AS order_week,
+    COUNT(o.id) AS total_orders,
+    SUM(o.price) AS total_revenue
+FROM orders o
+GROUP BY order_week
+ORDER BY order_week;
+
+-- update_ingredient_amount
+UPDATE inventory i SET amount = amount + '%s' WHERE i.id = '%s';
+
+-- get_previous_orders
+SELECT
+    *
+FROM orders o
+WHERE o.order_time BETWEEN '2024-01-01' AND '%s'
+GROUP BY o.id
+ORDER BY o.order_time DESC
+LIMIT '%s';
+
+-- get_orders_timeframe
+SELECT
+    *
+FROM orders o
+WHERE
+    o.order_time BETWEEN '%s' AND '%s'
+ORDER BY o.order_time DESC;
+
+-- add_order
+INSERT INTO orders (customer_id, price, payment_method, employee_id, order_time)
+VALUES ('%s', '%s', '%s', '%s', '%s');
+
+-- add_item_sold
+INSERT INTO order_items (order_id, menu_item_id)
+VALUES ('%s', '%s');
+
+-- add_order_inventory
+INSERT INTO order_inventory (order_id, inventory_id)
+VALUES ('%s', '%s');
+

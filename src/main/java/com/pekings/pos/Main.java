@@ -3,11 +3,13 @@ package com.pekings.pos;
 import com.pekings.pos.storage.PersistentRepository;
 import com.pekings.pos.storage.Repository;
 
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.sql.SQLException;
 
-public class Main  {
+public class Main {
 
     private static Repository repository;
 
@@ -15,8 +17,14 @@ public class Main  {
         repository = new PersistentRepository();
         ((PersistentRepository) repository).initialize();
 
-        POSApp obj = new POSApp();
-        obj.initialize();
+        POSApp posApp = new POSApp();
+        posApp.initialize();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                ((PersistentRepository) repository).shutdown();
+            } catch (SQLException ignored) {}
+        }));
     }
 
     public static Repository getRepository() {

@@ -1,16 +1,13 @@
 package com.pekings.pos.storage;
 
 import com.pekings.pos.object.*;
+import com.pekings.pos.util.SaleHistoryItem;
 import com.pekings.pos.util.ThrowingConsumer;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.Connection;
+import java.sql.*;
 import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 
 public class PersistentRepository implements Repository {
@@ -25,18 +22,28 @@ public class PersistentRepository implements Repository {
     private static final String DB_PORT = "5432";
 
     public void initialize() throws SQLException, IOException, URISyntaxException {
+        System.out.println("Initializing  DB connection...");
+
         Properties props = new Properties();
         props.setProperty("user", DB_USERNAME);
         props.setProperty("password", DB_PASSWORD);
+
         conn = DriverManager.getConnection(
                 "jdbc:" + "postgresql" + "://" +
                         DB_ADDRESS + ":" + DB_PORT + "/" + DB_NAME, props);
+
+        System.out.println("DB Connected");
 
         queryLoader = new QueryLoader();
         queryLoader.loadQueries();
 
         if (conn == null || queryLoader == null)
             throw new SQLException("Could not create connection with PostgreSQL server!");
+    }
+
+    public void shutdown() throws SQLException {
+        conn.close();
+        System.out.println("Closed DB connection");
     }
 
     @Override
@@ -282,11 +289,9 @@ public class PersistentRepository implements Repository {
             int employeeID = resultSet.getInt("employee_id");
             Date date = resultSet.getDate("order_time");
 
-            Order order = new Order(orderID, customerId, price, payment_method, date, employeeID);
-
             List<MenuItem> menuItems = getOrderItems(orderID);
-            menuItems.forEach(order::addItem);
 
+            Order order = new Order(orderID, customerId, menuItems, price, payment_method, date, employeeID);
             orders.add(order);
         }, customerID + "");
         return orders;
@@ -315,7 +320,7 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public Map<Ingredient, Integer> getTopIngredient(int topWhat) {
+    public Map<Ingredient, Integer> getTopIngredients(int topWhat) {
         Map<Ingredient, Integer> topIngredients = new HashMap<>();
         performFetchQuery("get_top_ingredients", resultSet -> {
             int ingredientID = resultSet.getInt("ingredient_id");
@@ -324,6 +329,132 @@ public class PersistentRepository implements Repository {
             topIngredients.put(ingredient, usage);
         }, topWhat + "");
         return topIngredients;
+    }
+
+    @Override
+    public Map<Date, Double> getTopDatesRevenue(int topWhat) {
+        Map<Date, Double> revenueMap = new HashMap<>();
+        performFetchQuery("get_top_days_revenue", resultSet -> {
+            Date date = resultSet.getDate("order_day");
+            double total_orders = resultSet.getInt("revenue");
+        }, topWhat + "");
+        return revenueMap;
+    }
+
+    @Override
+    public Map<Date, Integer> getTopDatesTotalOrders(int topWhat) {
+        Map<Date, Integer> revenueMap = new HashMap<>();
+        performFetchQuery("get_top_days_revenue", resultSet -> {
+            Date date = resultSet.getDate("order_day");
+            int total_orders = resultSet.getInt("total_orders");
+        }, topWhat + "");
+        return revenueMap;
+    }
+
+    @Override
+    public List<SaleHistoryItem> getSalesHistory(int howManyHoursBack) {
+        List<SaleHistoryItem> salesHistory = new ArrayList<>();
+        performFetchQuery("get_sales_history", resultSet -> {
+            Timestamp timestamp = resultSet.getTimestamp("order_hour");
+            int total_orders = resultSet.getInt("total_orders");
+            double revenue = resultSet.getDouble("total_revenue");
+            SaleHistoryItem saleHistoryItem = new SaleHistoryItem(timestamp, total_orders, revenue);
+            salesHistory.add(saleHistoryItem);
+        }, howManyHoursBack + "");
+        return salesHistory;
+    }
+
+    @Override
+    public List<SaleHistoryItem> getAllTimeSalesHistory() {
+        List<SaleHistoryItem> salesHistory = new ArrayList<>();
+        performFetchQuery("get_all_time_sales_history", resultSet -> {
+            Timestamp timestamp = resultSet.getTimestamp("order_week");
+            int total_orders = resultSet.getInt("total_orders");
+            double revenue = resultSet.getDouble("total_revenue");
+            SaleHistoryItem saleHistoryItem = new SaleHistoryItem(timestamp, total_orders, revenue);
+            salesHistory.add(saleHistoryItem);
+        });
+        return salesHistory;
+    }
+
+    @Override
+    public void addIngredientStock(int ingredientID, int amount) {
+        String query = queryLoader.getQuery("update_ingredient_amount")
+                .formatted(amount + "", ingredientID + "");
+        performNonFetchQuery(query);
+    }
+
+    @Override
+    public void removeIngredientStock(int ingredientID, int amount) {
+        addIngredientStock(ingredientID, -amount);
+    }
+
+    @Override
+    public List<Order> getOrdersBefore(Date date, int limit) {
+        List<Order> orders = new ArrayList<>();
+        performFetchQuery("get_previous_orders", resultSet -> {
+            int orderID = resultSet.getInt("order_id");
+            int customerID = resultSet.getInt("customer_id");
+            double price = resultSet.getDouble("price");
+            int employeeID = resultSet.getInt("employee_id");
+            Date orderTime = resultSet.getDate("order_time");
+            String paymentMethod = resultSet.getString("payment_method");
+
+            List<MenuItem> itemsSold = getOrderItems(orderID);
+            Order order = new Order(orderID, customerID, itemsSold, price, paymentMethod, orderTime, employeeID);
+            orders.add(order);
+        });
+
+        return orders;
+    }
+
+    @Override
+    public List<Order> getOrders(Date from, Date to) {
+        List<Order> orders = new ArrayList<>();
+        performFetchQuery("get_orders_timeframe", resultSet -> {
+            int orderID = resultSet.getInt("order_id");
+            int customerID = resultSet.getInt("customer_id");
+            double price = resultSet.getDouble("price");
+            int employeeID = resultSet.getInt("employee_id");
+            Date orderTime = resultSet.getDate("order_time");
+            String paymentMethod = resultSet.getString("payment_method");
+
+            List<MenuItem> itemsSold = getOrderItems(orderID);
+            Order order = new Order(orderID, customerID, itemsSold, price, paymentMethod, orderTime, employeeID);
+            orders.add(order);
+        });
+
+        return orders;
+    }
+
+    @Override
+    public void addOrder(Order order) {
+        List<String> queries = new ArrayList<>();
+
+        String addOrderQuery = queryLoader.getQuery("add_order")
+                .formatted(order.getCustomerID(), order.getPrice() + "", order.getPaymentMethod(),
+                                    order.getEmployeeID() + "", order.getPurchaseTime().toString());
+        queries.add(addOrderQuery);
+
+        for (MenuItem menuItem : order.getItemsSold()) {
+            String addItemSold = queryLoader.getQuery("add_item_sold")
+                    .formatted(order.getId() + "", menuItem.getId());
+
+            queries.add(addItemSold);
+
+            for (Ingredient ingredient : menuItem.getIngredients()) {
+                String addIngredient = queryLoader.getQuery("add_ingredient")
+                        .formatted(order.getId() + "", ingredient.getId());
+
+                String removeInventoryIngredient = queryLoader.getQuery("update_ingredient_amount")
+                        .formatted(ingredient.getAmount() * (-1), ingredient.getId() + "");
+
+                queries.add(addIngredient);
+                queries.add(removeInventoryIngredient);
+            }
+        }
+
+        performNonFetchQuery(queries.toArray(String[]::new));
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
@@ -356,7 +487,6 @@ public class PersistentRepository implements Repository {
                 forEachItem.accept(resultSet);
             }
 
-            conn.close();
             resultSet.close();
         } catch (Exception x) {
             throw new RuntimeException(x);
@@ -373,7 +503,6 @@ public class PersistentRepository implements Repository {
             statement.executeBatch();
 
             statement.close();
-            conn.close();
         } catch (Exception x) {
             throw new RuntimeException(x);
         }
