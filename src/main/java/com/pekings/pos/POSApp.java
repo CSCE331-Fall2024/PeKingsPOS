@@ -290,6 +290,7 @@ public class POSApp extends Application {
         pieChart.setPrefSize(400,200);
 
         // Add the pie chart to the root group
+
         root.getChildren().add(pieChart);
     }
 
