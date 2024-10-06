@@ -22,18 +22,28 @@ public class PersistentRepository implements Repository {
     private static final String DB_PORT = "5432";
 
     public void initialize() throws SQLException, IOException, URISyntaxException {
+        System.out.println("Initializing  DB connection...");
+
         Properties props = new Properties();
         props.setProperty("user", DB_USERNAME);
         props.setProperty("password", DB_PASSWORD);
+
         conn = DriverManager.getConnection(
                 "jdbc:" + "postgresql" + "://" +
                         DB_ADDRESS + ":" + DB_PORT + "/" + DB_NAME, props);
+
+        System.out.println("DB Connected");
 
         queryLoader = new QueryLoader();
         queryLoader.loadQueries();
 
         if (conn == null || queryLoader == null)
             throw new SQLException("Could not create connection with PostgreSQL server!");
+    }
+
+    public void shutdown() throws SQLException {
+        conn.close();
+        System.out.println("Closed DB connection");
     }
 
     @Override
@@ -477,7 +487,6 @@ public class PersistentRepository implements Repository {
                 forEachItem.accept(resultSet);
             }
 
-            conn.close();
             resultSet.close();
         } catch (Exception x) {
             throw new RuntimeException(x);
@@ -494,7 +503,6 @@ public class PersistentRepository implements Repository {
             statement.executeBatch();
 
             statement.close();
-            conn.close();
         } catch (Exception x) {
             throw new RuntimeException(x);
         }
