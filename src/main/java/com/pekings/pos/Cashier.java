@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 //import jdk.dynalink.Operation;
 
 import java.rmi.server.Operation;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +24,6 @@ import java.util.concurrent.Callable;
 
 public class Cashier {
     static int currOrder = 0;
-//    Set<MenuItem> menuItems;
     List<MenuItem> menuItems;
     private Repository repo;
     Scene cashier, login;
@@ -33,12 +33,25 @@ public class Cashier {
     Text taxTxt;
     Text totalTxt;
 
+    List<Text> deleteText;
+    TilePane orderPane;
+
+    Stage PrimaryStage;
+    static List<Cashier> Orders = new ArrayList<>();
+
+    List<MenuItem> orderItems = new ArrayList<>();
+    List<MenuItem> deleteOrderItems = new ArrayList<>();
+
 
     public Cashier(Stage PrimaryStage){
+        this.PrimaryStage = PrimaryStage;
         login = PrimaryStage.getScene();
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         currOrder++;
+        Orders.add(this);
+
+        deleteText = new ArrayList<Text>();
 
         Group rootCashier = new Group();
         cashier = new Scene(rootCashier, 1000, 700);
@@ -71,6 +84,7 @@ public class Cashier {
         newOrder.setStyle("-fx-background-color: #36919E");
         newOrder.setLayoutX(30);
         newOrder.setLayoutY(160);
+        newOrder.setOnAction(e -> openNewOrder());
 
         Button cancelOrder = new Button("Cancel\n Order");
         cancelOrder.setPrefWidth(80);
@@ -78,6 +92,10 @@ public class Cashier {
         cancelOrder.setStyle("-fx-background-color: #36919E");
         cancelOrder.setLayoutX(30);
         cancelOrder.setLayoutY(255);
+        cancelOrder.setOnAction(e -> {
+            Orders.remove(this);
+            openNewOrder();
+        });
 
         Button viewPrevious = new Button("  View\nPrevious");
         viewPrevious.setPrefWidth(80);
@@ -93,6 +111,14 @@ public class Cashier {
         memoBtn.setTextFill(Color.BLACK);
         memoBtn.setLayoutX(30);
         memoBtn.setLayoutY(455);
+
+        Button removeItem = new Button("Delete Selected Item");
+        removeItem.setLayoutX(702);
+        removeItem.setLayoutY(110);
+        removeItem.setPrefWidth(298);
+        removeItem.setPrefHeight(40);
+        removeItem.setStyle("-fx-background-color: Red");
+        removeItem.setOnAction(e -> deleteItems());
 
         Rectangle rectRight = new Rectangle();
         rectRight.setX(700);
@@ -142,12 +168,6 @@ public class Cashier {
         menuPane.setMaxWidth(600);
         menuPane.setMaxHeight(550);
 
-        //Adds menu items
-//        for (MenuItem i : menuItems) {
-//            MenuButton MenuItemButton = new MenuButton(i, PrimaryStage);
-//            menuPane.getChildren().add(MenuItemButton.createMenuBtn());
-//        }
-
         Text orderNumTitle = new Text("Order #");
         orderNumTitle.setStyle("-fx-font-size: 30px");
         orderNumTitle.setX(790);
@@ -168,14 +188,13 @@ public class Cashier {
         //Displays items on current order
         ScrollPane orderScroll = new ScrollPane();
         orderScroll.setLayoutX(700);
-        orderScroll.setLayoutY(110);
-        orderScroll.setMaxHeight(340);
+        orderScroll.setLayoutY(150);
+        orderScroll.setMaxHeight(290);
         orderScroll.setMaxWidth(400);
-        orderScroll.setMinHeight(340);
+        orderScroll.setMinHeight(290);
         orderScroll.setMinWidth(400);
 
-        TilePane orderPane = new TilePane();
-//        orderPane.setLayoutY(50);
+        orderPane = new TilePane();
         orderPane.setPadding(new Insets(20, 0, 10, 20));
         orderScroll.setContent(orderPane);
 
@@ -184,7 +203,7 @@ public class Cashier {
         orderPane.setHgap(20);
         orderPane.setVgap(15);
         orderPane.setPrefTileWidth(140);
-        orderPane.setMinHeight(340);
+        orderPane.setMinHeight(290);
 //        orderPane.setPrefTileWidth(80);
 //        for (int i = 0; i < 5; i++) {
 //            Text txt = new Text("BURGERRRRRR");
@@ -252,16 +271,57 @@ public class Cashier {
         rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect);
         rootCashier.getChildren().add(menuScroll);
         rootCashier.getChildren().addAll(orderNumTitle, orderNum, orderNumLine, orderScroll);
-        rootCashier.getChildren().addAll(payment, orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt);
+        rootCashier.getChildren().addAll(payment, orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt, removeItem);
     }
 
     public Scene getScene(){
         return cashier;
     }
 
-    private void switchScene(){
-//        cashier = cash.getScene();
-//        loginStage.setScene(cashier);
-//        loginStage.show();
+    private void deleteItems(){
+        for(Text txt : deleteText){
+            orderPane.getChildren().remove(txt);
+        }
+        for(MenuItem item : deleteOrderItems){
+            updateTotals(-1* item.getPrice());
+        }
+        deleteText.clear();
+        deleteOrderItems.clear();
+    }
+
+    private void openNewOrder(){
+        Cashier newCashier = new Cashier(PrimaryStage);
+        PrimaryStage.setScene(newCashier.getScene());
+    }
+
+    public void updateTotals(double cost){
+        sub += cost;
+
+        String subtotal = String.valueOf(sub);
+        int size = subtotal.length();
+        if(subtotal.charAt(size - 1) == '.'){
+            subtotal += "00";
+        }else if(subtotal.charAt(size - 2) == '.'){
+            subtotal += "0";
+        }
+        subTotalTxt.setText("Sub-Total: $" + subtotal);
+
+        String tax = String.valueOf((Math.round((sub * 0.0625) * 100) / 100.00));
+        size = tax.length();
+        if(tax.charAt(size - 1) == '.'){
+            tax += "00";
+        }else if(tax.charAt(size - 2) == '.'){
+            tax += "0";
+        }
+        taxTxt.setText("Tax: $" + tax);
+
+        String total = String.valueOf((Math.round((sub * 1.0625) * 100) / 100.00));
+        size = total.length();
+        if(total.charAt(size - 1) == '.'){
+            total += "00";
+        }else if(total.charAt(size - 2) == '.'){
+            total += "0";
+        }
+        totalTxt.setText("Total: $" + total);
     }
 }
