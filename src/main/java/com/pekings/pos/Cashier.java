@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 //import jdk.dynalink.Operation;
 
@@ -39,6 +40,7 @@ public class Cashier {
     Text totalTxt;
 
     List<Text> deleteText;
+    List<TextFlow> deleteTextHolder;
     TilePane orderPane;
 
     Stage PrimaryStage;
@@ -48,15 +50,16 @@ public class Cashier {
     List<MenuItem> deleteOrderItems = new ArrayList<>();
 
 
-    public Cashier(Stage PrimaryStage){
+    public Cashier(Stage PrimaryStage, Scene login){
         this.PrimaryStage = PrimaryStage;
-        login = PrimaryStage.getScene();
+        this.login = login;
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         currOrder++;
         Orders.add(this);
 
-        deleteText = new ArrayList<Text>();
+        deleteText = new ArrayList<>();
+        deleteTextHolder = new ArrayList<>();
 
         Group rootCashier = new Group();
         cashier = new Scene(rootCashier, 1000, 700);
@@ -287,15 +290,19 @@ public class Cashier {
         for(Text txt : deleteText){
             orderPane.getChildren().remove(txt);
         }
+        for(TextFlow txt : deleteTextHolder){
+            orderPane.getChildren().remove(txt);
+        }
         for(MenuItem item : deleteOrderItems){
             updateTotals(-1* item.getPrice());
         }
         deleteText.clear();
+        deleteTextHolder.clear();
         deleteOrderItems.clear();
     }
 
     private void openNewOrder(){
-        Cashier newCashier = new Cashier(PrimaryStage);
+        Cashier newCashier = new Cashier(PrimaryStage, login);
         PrimaryStage.setScene(newCashier.getScene());
     }
 

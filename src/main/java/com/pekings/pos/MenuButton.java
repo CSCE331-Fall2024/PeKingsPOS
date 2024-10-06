@@ -7,6 +7,7 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import static javafx.scene.text.TextAlignment.CENTER;
 
@@ -31,9 +32,11 @@ public class MenuButton {
         btn.setStyle("-fx-background-color: #BA6433");
 
         btn.setOnAction(e -> {
+            TextFlow textHolder = new TextFlow();
             Text txt = new Text(item.getName());
-//            txt.setStyle("-fx-background-color: Red");
-            pane.getChildren().add(txt);
+            textHolder.getChildren().add(txt);
+            textHolder.setPrefWidth(150);
+            pane.getChildren().add(textHolder);
 
             cashier.updateTotals(item.getPrice());
 
@@ -56,7 +59,7 @@ public class MenuButton {
                     txt.setFill(Color.DARKBLUE);
                     priceTxt.setFill(Color.DARKBLUE);
 
-                    cashier.deleteText.add(txt);
+                    cashier.deleteTextHolder.add(textHolder);
                     cashier.deleteText.add(priceTxt);
 
                     cashier.deleteOrderItems.add(item);
@@ -64,7 +67,7 @@ public class MenuButton {
                     txt.setFill(Color.BLACK);
                     priceTxt.setFill(Color.BLACK);
 
-                    cashier.deleteText.remove(txt);
+                    cashier.deleteTextHolder.remove(textHolder);
                     cashier.deleteText.remove(priceTxt);
 
                     cashier.deleteOrderItems.remove(item);
