@@ -14,7 +14,7 @@ public class MenuButton {
         this.item = item;
     }
 
-    Button createMenuBtn(){
+    public Button createMenuBtn(){
 
         Button btn = new Button(item.getName());
         btn.setTextAlignment(CENTER);
