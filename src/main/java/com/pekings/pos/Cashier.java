@@ -25,6 +25,11 @@ public class Cashier {
     private Repository repo;
     Scene cashier, login;
 
+    double sub = 0.00;
+    Text subTotalTxt;
+    Text taxTxt;
+    Text totalTxt;
+
 
     public Cashier(Stage PrimaryStage){
 //        this.repo = repo;
@@ -135,10 +140,10 @@ public class Cashier {
         menuPane.setMaxHeight(550);
 
         //Adds menu items
-        for (MenuItem i : menuItems) {
-            MenuButton MenuItemButton = new MenuButton(i);
-            menuPane.getChildren().add(MenuItemButton.createMenuBtn());
-        }
+//        for (MenuItem i : menuItems) {
+//            MenuButton MenuItemButton = new MenuButton(i, PrimaryStage);
+//            menuPane.getChildren().add(MenuItemButton.createMenuBtn());
+//        }
 
         Text orderNumTitle = new Text("Order #");
         orderNumTitle.setStyle("-fx-font-size: 30px");
@@ -163,6 +168,8 @@ public class Cashier {
         orderScroll.setLayoutY(110);
         orderScroll.setMaxHeight(340);
         orderScroll.setMaxWidth(400);
+        orderScroll.setMinHeight(340);
+        orderScroll.setMinWidth(400);
 
         TilePane orderPane = new TilePane();
 //        orderPane.setLayoutY(50);
@@ -171,38 +178,78 @@ public class Cashier {
 
         orderPane.setStyle("-fx-background-color: #D9D9D9");
         orderPane.setPrefColumns(2);
-        orderPane.setHgap(103);
+        orderPane.setHgap(20);
         orderPane.setVgap(15);
-        for (int i = 0; i < 50; i++) {
-            Text txt = new Text("BURGERRRRRR");
-            orderPane.getChildren().add(txt);
+        orderPane.setPrefTileWidth(140);
+        orderPane.setMinHeight(340);
+//        orderPane.setPrefTileWidth(80);
+//        for (int i = 0; i < 5; i++) {
+//            Text txt = new Text("BURGERRRRRR");
+//            orderPane.getChildren().add(txt);
+//
+//            txt = new Text("$3.99");
+//            orderPane.getChildren().add(txt);
+//        }
 
-            txt = new Text("$3.99");
-            orderPane.getChildren().add(txt);
+        //Adds the TilePane to every menu button
+        for (MenuItem i : menuItems) {
+            MenuButton MenuItemButton = new MenuButton(i, orderPane, this);
+            menuPane.getChildren().add(MenuItemButton.createMenuBtn());
         }
 
-        double sub = 10.99;
-        Text subTotalTxt = new Text("Sub-Total: " + sub);
+
+        String subtotal = String.valueOf(sub);
+        int size = subtotal.length();
+        if(subtotal.charAt(size - 1) == '.'){
+            subtotal += "00";
+        }else if(subtotal.charAt(size - 2) == '.'){
+            subtotal += "0";
+        }
+
+        subTotalTxt = new Text("Sub-Total: $" + subtotal);
         subTotalTxt.setX(730);
         subTotalTxt.setY(490);
         subTotalTxt.setStyle("-fx-font-size: 15px");
 
-        Text taxTxt = new Text("Tax: " + (Math.round((sub * 0.0625) * 100) / 100.00));
+
+        String tax = String.valueOf((Math.round((sub * 0.0625) * 100) / 100.00));
+        size = tax.length();
+        if(tax.charAt(size - 1) == '.'){
+            tax += "00";
+        }else if(tax.charAt(size - 2) == '.'){
+            tax += "0";
+        }
+
+        taxTxt = new Text("Tax: $" + tax);
         taxTxt.setX(730);
         taxTxt.setY(520);
         taxTxt.setStyle("-fx-font-size: 15px");
 
-        Text totalTxt = new Text("Total: " + (Math.round((sub * 1.0625) * 100) / 100.00));
+
+        String total = String.valueOf((Math.round((sub * 1.0625) * 100) / 100.00));
+        size = total.length();
+        if(total.charAt(size - 1) == '.'){
+            total += "00";
+        }else if(total.charAt(size - 2) == '.'){
+            total += "0";
+        }
+
+        totalTxt = new Text("Total: $" + total);
         totalTxt.setX(730);
         totalTxt.setY(600);
         totalTxt.setStyle("-fx-font-size: 30px");
+
+        Button payment = new Button("Payment");
+        payment.setLayoutX(700);
+        payment.setLayoutY(624);
+        payment.setPrefWidth(300);
+        payment.setPrefHeight(40);
 
 
         rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect);
         rootCashier.getChildren().add(menuScroll);
         rootCashier.getChildren().addAll(orderNumTitle, orderNum, orderNumLine, orderScroll);
-        rootCashier.getChildren().addAll(orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt);
-//        window.setScene(cashier);
+        rootCashier.getChildren().addAll(payment, orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt);
     }
 
     public Scene getScene(){
