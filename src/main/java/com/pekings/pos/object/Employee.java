@@ -1,6 +1,7 @@
 package com.pekings.pos.object;
 
 import java.sql.Date;
+import java.sql.Time;
 
 public class Employee {
 
@@ -8,10 +9,10 @@ public class Employee {
     private final String username;
     private final String password;
     private final String position;
-    private final Date lastClockIn;
+    private final Time lastClockIn;
     private final boolean clockedIn;
 
-    public Employee(long id, String username, String password, String position, Date lastClockIn, boolean clockedIn) {
+    public Employee(long id, String username, String password, String position, Time lastClockIn, boolean clockedIn) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -36,7 +37,7 @@ public class Employee {
         return position;
     }
 
-    public Date getLastClockIn() {
+    public Time getLastClockIn() {
         return lastClockIn;
     }
 
