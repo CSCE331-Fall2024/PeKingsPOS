@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.sql.Date;
+import java.util.Random;
 
+import static javafx.scene.text.TextAlignment.CENTER;
 
 
 // Payment options are "credit_card" or "cash"
@@ -35,6 +37,8 @@ import java.sql.Date;
 // use -1 for id
 public class Cashier {
     static int currOrder = 0;
+
+    int orderNumber;
     List<MenuItem> menuItems;
     private Repository repo;
     Scene cashier, login;
@@ -70,6 +74,7 @@ public class Cashier {
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         currOrder++;
+        orderNumber = currOrder;
         Orders.add(this);
 
         deleteText = new ArrayList<>();
@@ -125,6 +130,7 @@ public class Cashier {
         viewPrevious.setStyle("-fx-background-color: #36919E");
         viewPrevious.setLayoutX(30);
         viewPrevious.setLayoutY(350);
+        viewPrevious.setOnAction(e -> viewPreviousOrders());
 
         Button memoBtn = new Button("Memo");
         memoBtn.setPrefWidth(80);
@@ -344,6 +350,31 @@ public class Cashier {
         return cashier;
     }
 
+    private void viewPreviousOrders(){
+        TilePane previousOrders = new TilePane();
+        previousOrders.setPrefColumns(4);
+        previousOrders.setPadding(new Insets(30));
+        previousOrders.setHgap(30);
+        previousOrders.setVgap(30);
+        previousOrders.setLayoutX(180);
+        previousOrders.setLayoutY(25);
+        previousOrders.setMaxWidth(600);
+        previousOrders.setMaxHeight(550);
+
+        for(Cashier cash : Orders){
+            Button btn = new Button(String.valueOf(cash.orderNumber));
+            btn.setTextAlignment(CENTER);
+            btn.setPrefWidth(100);
+            btn.setPrefHeight(100);
+            btn.setStyle("-fx-background-color: #BA6433");
+            btn.setOnAction(e -> PrimaryStage.setScene(cash.getScene()));
+
+            previousOrders.getChildren().add(btn);
+        }
+
+        centerScroll.setContent(previousOrders);
+    }
+
     private void finishOrder(){
 //        Group content = new Group();
 
@@ -359,19 +390,18 @@ public class Cashier {
         cash.setPrefHeight(150);
         cash.setStyle("-fx-background-color: lightgreen");
         cash.setOnAction(e -> {
-            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "" +
-                    "cash", new Date(System.currentTimeMillis()), employeeID);
+            Random random = new Random();
+            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(System.currentTimeMillis()), (int) employeeID));
         });
-//        cash.setOnAction(e -> {
-//            for(MenuItem item : orderItems){
-//                System.out.println(item.getName());
-//            }
-//        });
         
         Button card = new Button("Card");
         card.setPrefWidth(150);
         card.setPrefHeight(150);
         card.setStyle("-fx-background-color: orange");
+        card.setOnAction(e -> {
+            Random random = new Random();
+            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(System.currentTimeMillis()), (int) employeeID));
+        });
 
         // Create HBox for top buttons
         HBox topHBox = new HBox(20); // 20 pixels spacing
