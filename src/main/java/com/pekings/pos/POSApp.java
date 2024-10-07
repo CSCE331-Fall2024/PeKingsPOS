@@ -33,7 +33,7 @@ public class POSApp extends Application {
 
     @Override
     public void start(Stage PrimaryStage) throws Exception {
-        Login login = new Login(PrimaryStage);
+        new Login(PrimaryStage);
     }
 
     public void initialize() {
