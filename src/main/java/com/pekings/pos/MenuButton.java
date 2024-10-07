@@ -32,6 +32,7 @@ public class MenuButton {
         btn.setStyle("-fx-background-color: #BA6433");
 
         btn.setOnAction(e -> {
+            cashier.edited = true;
             TextFlow textHolder = new TextFlow();
             Text txt = new Text(item.getName());
             textHolder.getChildren().add(txt);

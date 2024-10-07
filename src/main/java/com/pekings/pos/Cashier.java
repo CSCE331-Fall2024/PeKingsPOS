@@ -23,11 +23,10 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+
+import java.util.*;
 import java.sql.Date;
-import java.util.Random;
+import java.util.Calendar;
 
 import static javafx.scene.text.TextAlignment.CENTER;
 
@@ -64,7 +63,10 @@ public class Cashier {
     ScrollPane centerScroll = new ScrollPane();
     TilePane menuPane;
 
+    Button originalBtn;
     Button exit;
+
+    boolean edited = false;
 
 
 
@@ -72,7 +74,10 @@ public class Cashier {
         this.PrimaryStage = PrimaryStage;
         this.login = login;
         this.employeeID = employeeID;
-        exit = backBtn;
+        originalBtn = backBtn;
+
+        exit = new Button(originalBtn.getText());
+        exit.setOnAction(originalBtn.getOnAction());
 
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
@@ -124,7 +129,11 @@ public class Cashier {
         cancelOrder.setLayoutY(255);
         cancelOrder.setOnAction(e -> {
             Orders.remove(this);
-            openNewOrder();
+            if(edited) {
+                openNewOrder();
+            }else{
+                PrimaryStage.setScene(Orders.getLast().getScene());
+            }
         });
 
         Button viewPrevious = new Button("  View\nPrevious");
@@ -379,8 +388,6 @@ public class Cashier {
     }
 
     private void finishOrder(){
-//        Group content = new Group();
-
         Button cancel = new Button("Cancel");
         cancel.setPrefWidth(250);
         cancel.setPrefHeight(125);
@@ -394,7 +401,7 @@ public class Cashier {
         cash.setStyle("-fx-background-color: lightgreen");
         cash.setOnAction(e -> {
             Random random = new Random();
-            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(System.currentTimeMillis()), (int) employeeID));
+            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
         });
         
         Button card = new Button("Card");
@@ -403,7 +410,7 @@ public class Cashier {
         card.setStyle("-fx-background-color: orange");
         card.setOnAction(e -> {
             Random random = new Random();
-            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(System.currentTimeMillis()), (int) employeeID));
+            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
         });
 
         // Create HBox for top buttons
