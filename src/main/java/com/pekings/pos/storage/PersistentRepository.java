@@ -438,13 +438,13 @@ public class PersistentRepository implements Repository {
 
         for (MenuItem menuItem : order.getItemsSold()) {
             String addItemSold = queryLoader.getQuery("add_item_sold")
-                    .formatted(order.getId() + "", menuItem.getId());
+                    .formatted(order.getId() + "", menuItem.getId() + "");
 
             queries.add(addItemSold);
 
             for (Ingredient ingredient : menuItem.getIngredients()) {
                 String addIngredient = queryLoader.getQuery("add_ingredient")
-                        .formatted(order.getId() + "", ingredient.getId());
+                        .formatted(order.getId() + "", ingredient.getId() + "");
 
                 String removeInventoryIngredient = queryLoader.getQuery("update_ingredient_amount")
                         .formatted(ingredient.getAmount() * (-1), ingredient.getId() + "");
