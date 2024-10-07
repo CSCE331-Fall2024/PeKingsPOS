@@ -1,31 +1,32 @@
 package com.pekings.pos;
 
 import com.pekings.pos.object.MenuItem;
+import com.pekings.pos.object.Order;
 import com.pekings.pos.storage.Repository;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 //import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.TilePane;
+import javafx.scene.layout.*;
 //import javafx.scene.layout.VBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.sql.Date;
 
 
 
@@ -37,6 +38,7 @@ public class Cashier {
     List<MenuItem> menuItems;
     private Repository repo;
     Scene cashier, login;
+    long employeeID;
 
     double sub = 0.00;
     Text subTotalTxt;
@@ -55,11 +57,16 @@ public class Cashier {
     List<MenuItem> orderItems = new ArrayList<>();
     List<MenuItem> deleteOrderItems = new ArrayList<>();
 
+    ScrollPane centerScroll = new ScrollPane();
+    TilePane menuPane;
 
 
-    public Cashier(Stage PrimaryStage, Scene login){
+
+    public Cashier(Stage PrimaryStage, Scene login, long employeeID){
         this.PrimaryStage = PrimaryStage;
         this.login = login;
+        this.employeeID = employeeID;
+
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         currOrder++;
@@ -211,14 +218,18 @@ public class Cashier {
 
 
         //Menu section
-        ScrollPane menuScroll = new ScrollPane();
-        menuScroll.setLayoutX(150);
-        menuScroll.setLayoutY(0);
-        menuScroll.setMaxWidth(600);
-        menuScroll.setMaxHeight(700);
+        centerScroll.setLayoutX(150);
+        centerScroll.setLayoutY(0);
+        centerScroll.setPrefWidth(550);
+        centerScroll.setPrefHeight(700);
+//        centerScroll.setMaxWidth(500);
+//        centerScroll.setMaxHeight(700);
+//        centerScroll.setMinWidth(500);
+//        centerScroll.setMinHeight(700);
 
-        TilePane menuPane = new TilePane();
-        menuScroll.setContent(menuPane);
+
+        menuPane = new TilePane();
+//        centerScroll.setContent(menuPane);
 
         menuPane.setPrefColumns(4);
         menuPane.setPadding(new Insets(30));
@@ -319,16 +330,68 @@ public class Cashier {
         payment.setLayoutY(624);
         payment.setPrefWidth(300);
         payment.setPrefHeight(40);
+        payment.setOnAction(e -> finishOrder());
 
 
         rootCashier.getChildren().addAll(leftRect, cashierText, exit, newOrder, cancelOrder, viewPrevious, memoBtn, rectRight, paymentRect);
-        rootCashier.getChildren().add(menuScroll);
+        rootCashier.getChildren().add(centerScroll);
         rootCashier.getChildren().addAll(orderNumTitle, orderNum, orderNumLine, orderScroll);
         rootCashier.getChildren().addAll(payment, orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt, removeItem);
     }
 
     public Scene getScene(){
+        centerScroll.setContent(menuPane);
         return cashier;
+    }
+
+    private void finishOrder(){
+//        Group content = new Group();
+
+        Button cancel = new Button("Cancel");
+        cancel.setPrefWidth(250);
+        cancel.setPrefHeight(125);
+        cancel.setStyle("-fx-background-color: RED");
+        cancel.setOnAction(e -> centerScroll.setContent(menuPane));
+
+        // Create buttons
+        Button cash = new Button("Cash");
+        cash.setPrefWidth(150);
+        cash.setPrefHeight(150);
+        cash.setStyle("-fx-background-color: lightgreen");
+        cash.setOnAction(e -> {
+            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "" +
+                    "cash", new Date(System.currentTimeMillis()), employeeID);
+        });
+//        cash.setOnAction(e -> {
+//            for(MenuItem item : orderItems){
+//                System.out.println(item.getName());
+//            }
+//        });
+        
+        Button card = new Button("Card");
+        card.setPrefWidth(150);
+        card.setPrefHeight(150);
+        card.setStyle("-fx-background-color: orange");
+
+        // Create HBox for top buttons
+        HBox topHBox = new HBox(20); // 20 pixels spacing
+        topHBox.setPadding(new Insets(200, 0, 0, 65));
+        topHBox.getChildren().addAll(cash);
+        HBox.setMargin(card, new Insets(0, 0, 0, 100)); // Adjust margin for spacing
+        topHBox.getChildren().addAll(card);
+
+        // Create VBox for the bottom button
+        VBox bottomVBox = new VBox();
+        bottomVBox.setPadding(new Insets(75, 0, 0, 150));
+        bottomVBox.getChildren().add(cancel);
+
+        // Create a BorderPane to combine everything
+        BorderPane borderPane = new BorderPane();
+        borderPane.setTop(topHBox);
+        borderPane.setCenter(bottomVBox);
+
+//        content.getChildren().addAll(cancel);
+        centerScroll.setContent(borderPane);
     }
 
     private void finishMemo(TextField memoField, Popup memo){
@@ -362,6 +425,7 @@ public class Cashier {
             orderPane.getChildren().remove(txt);
         }
         for(MenuItem item : deleteOrderItems){
+            orderItems.remove(item);
             updateTotals(-1* item.getPrice());
         }
         deleteText.clear();
@@ -370,7 +434,7 @@ public class Cashier {
     }
 
     private void openNewOrder(){
-        Cashier newCashier = new Cashier(PrimaryStage, login);
+        Cashier newCashier = new Cashier(PrimaryStage, login, employeeID);
         PrimaryStage.setScene(newCashier.getScene());
     }
 

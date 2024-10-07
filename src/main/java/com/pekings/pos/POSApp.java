@@ -122,31 +122,31 @@ public class POSApp extends Application {
     }
 
     private void checkLogin(){
-//        String username = usernameBox.getText();
-//        String password = passwordBox.getText();
-//
-//        for(Employee emp : Employees){
-//            if((username.equals(emp.getUsername())) && (password.equals(emp.getPassword()))){
-//                if(emp.getPosition().equals("employee")){
-//                    Cashier cash = new Cashier(PrimaryStage, login);
-//                    cashier = cash.getScene();
-//                    PrimaryStage.setScene(cashier);
-//                }else{
-//                    System.out.println("Manager Login");
-//                }
-//                error.setText("");
-//                break;
-//            }
-//            if(emp == Employees.getLast()){
-//                error.setText("Username or Password was not recognized, please try again.");
-//            }
-//        }
-//        usernameBox.clear();
-//        passwordBox.clear();
+        String username = usernameBox.getText();
+        String password = passwordBox.getText();
 
-        Cashier cash = new Cashier(PrimaryStage, login);
-        cashier = cash.getScene();
-        PrimaryStage.setScene(cashier);
+        for(Employee emp : Employees){
+            if((username.equals(emp.getUsername())) && (password.equals(emp.getPassword()))){
+                if(emp.getPosition().equals("employee")){
+                    Cashier cash = new Cashier(PrimaryStage, login, emp.getId());
+                    cashier = cash.getScene();
+                    PrimaryStage.setScene(cashier);
+                }else{
+                    System.out.println("Manager Login");
+                }
+                error.setText("");
+                break;
+            }
+            if(emp == Employees.getLast()){
+                error.setText("Username or Password was not recognized, please try again.");
+            }
+        }
+        usernameBox.clear();
+        passwordBox.clear();
+
+//        Cashier cash = new Cashier(PrimaryStage, login);
+//        cashier = cash.getScene();
+//        PrimaryStage.setScene(cashier);
     }
 
     public void initialize() {
