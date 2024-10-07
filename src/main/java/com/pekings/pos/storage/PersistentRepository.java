@@ -429,32 +429,46 @@ public class PersistentRepository implements Repository {
 
     @Override
     public void addOrder(Order order) {
-        List<String> queries = new ArrayList<>();
 
-        String addOrderQuery = queryLoader.getQuery("add_order")
-                .formatted(order.getCustomerID(), order.getPrice() + "", order.getPaymentMethod(),
-                                    order.getEmployeeID() + "", order.getPurchaseTime().toString());
-        queries.add(addOrderQuery);
+        performNonFetchQuery(statement -> {
+            String addOrderQuery = queryLoader.getQuery("add_order")
+                    .formatted(order.getCustomerID(), order.getPrice() + "", order.getPaymentMethod(),
+                            order.getEmployeeID() + "", order.getPurchaseTime().toString());
+            statement.executeUpdate(addOrderQuery);
 
-        for (MenuItem menuItem : order.getItemsSold()) {
-            String addItemSold = queryLoader.getQuery("add_item_sold")
-                    .formatted(order.getId() + "", menuItem.getId() + "");
-
-            queries.add(addItemSold);
-
-            for (Ingredient ingredient : menuItem.getIngredients()) {
-                String addIngredient = queryLoader.getQuery("add_ingredient")
-                        .formatted(order.getId() + "", ingredient.getId() + "");
-
-                String removeInventoryIngredient = queryLoader.getQuery("update_ingredient_amount")
-                        .formatted(ingredient.getAmount() * (-1), ingredient.getId() + "");
-
-                queries.add(addIngredient);
-                queries.add(removeInventoryIngredient);
+            ResultSet resultSet = statement.getGeneratedKeys();
+            int orderID = -1;
+            while (resultSet.next()) {
+                orderID = resultSet.getInt(1);
             }
-        }
 
-        performNonFetchQuery(queries.toArray(String[]::new));
+            if (orderID == -1) {
+                System.out.println("Failed to add order!");
+                return;
+            }
+
+            List<String> queries = new ArrayList<>();
+
+            for (MenuItem menuItem : order.getItemsSold()) {
+                String addItemSold = queryLoader.getQuery("add_item_sold")
+                        .formatted(orderID + "", menuItem.getId() + "");
+
+                queries.add(addItemSold);
+
+                for (Ingredient ingredient : menuItem.getIngredients()) {
+                    String addIngredient = queryLoader.getQuery("add_order_inventory")
+                            .formatted(order.getId() + "", ingredient.getId() + "");
+
+                    String removeInventoryIngredient = queryLoader.getQuery("update_ingredient_amount")
+                            .formatted(ingredient.getAmount() * (-1), ingredient.getId() + "");
+
+                    queries.add(addIngredient);
+                    queries.add(removeInventoryIngredient);
+                }
+            }
+
+            performNonFetchQuery(queries.toArray(String[]::new));
+        });
     }
 
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
@@ -502,6 +516,16 @@ public class PersistentRepository implements Repository {
 
             statement.executeBatch();
 
+            statement.close();
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    private void performNonFetchQuery(ThrowingConsumer<Statement> consumer) {
+        try {
+            Statement statement = conn.createStatement();
+            consumer.accept(statement);
             statement.close();
         } catch (Exception x) {
             throw new RuntimeException(x);
