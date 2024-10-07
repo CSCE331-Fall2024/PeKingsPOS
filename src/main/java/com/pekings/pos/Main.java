@@ -7,7 +7,6 @@ import com.pekings.pos.storage.Repository;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.sql.SQLException;
 
 public class Main {
 
