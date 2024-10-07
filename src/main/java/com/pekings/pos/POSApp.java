@@ -128,7 +128,9 @@ public class POSApp extends Application {
         for(Employee emp : Employees){
             if((username.equals(emp.getUsername())) && (password.equals(emp.getPassword()))){
                 if(emp.getPosition().equals("employee")){
-                    Cashier cash = new Cashier(PrimaryStage, login, emp.getId());
+                    Button btn = new Button("Log\nOut");
+                    btn.setOnAction(e -> PrimaryStage.setScene(login));
+                    Cashier cash = new Cashier(PrimaryStage, btn, emp.getId());
                     cashier = cash.getScene();
                     PrimaryStage.setScene(cashier);
                 }else{

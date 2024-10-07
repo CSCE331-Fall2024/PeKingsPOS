@@ -64,12 +64,15 @@ public class Cashier {
     ScrollPane centerScroll = new ScrollPane();
     TilePane menuPane;
 
+    Button exit;
 
 
-    public Cashier(Stage PrimaryStage, Scene login, long employeeID){
+
+    public Cashier(Stage PrimaryStage, Button backBtn, long employeeID){
         this.PrimaryStage = PrimaryStage;
         this.login = login;
         this.employeeID = employeeID;
+        exit = backBtn;
 
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
@@ -95,15 +98,15 @@ public class Cashier {
         cashierText.setY(640);
         cashierText.setFill(Color.BLACK);
 
-        Button exit = new Button("Log\nOut");
-        exit.setText("Log\nOut");
+//        Button exit = new Button("Log\nOut");
+//        exit.setText("Log\nOut");
         exit.setPrefWidth(80);
         exit.setPrefHeight(80);
         exit.setStyle("-fx-background-color: Red");
         // Change Font Weight
         exit.setLayoutX(30);
         exit.setLayoutY(30);
-        exit.setOnAction(e -> PrimaryStage.setScene(login));
+//        exit.setOnAction(e -> PrimaryStage.setScene(login));
 
         Button newOrder = new Button(" New\nOrder");
         newOrder.setPrefWidth(80);
@@ -464,7 +467,7 @@ public class Cashier {
     }
 
     private void openNewOrder(){
-        Cashier newCashier = new Cashier(PrimaryStage, login, employeeID);
+        Cashier newCashier = new Cashier(PrimaryStage, exit, employeeID);
         PrimaryStage.setScene(newCashier.getScene());
     }
 
