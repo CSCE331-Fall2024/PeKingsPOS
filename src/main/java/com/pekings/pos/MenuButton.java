@@ -51,6 +51,8 @@ public class MenuButton {
             Text priceTxt = new Text(price);
             pane.getChildren().add(priceTxt);
 
+//            row.getChildren().addAll(textHolder, priceTxt);
+
             cashier.orderItems.add(item);
 
             txt.setOnMouseClicked(m ->
@@ -58,6 +60,7 @@ public class MenuButton {
                 if(!clicked) {
                     txt.setFill(Color.DARKBLUE);
                     priceTxt.setFill(Color.DARKBLUE);
+//                    row.setStyle("-fx-background-color: BLUE");
 
                     cashier.deleteTextHolder.add(textHolder);
                     cashier.deleteText.add(priceTxt);

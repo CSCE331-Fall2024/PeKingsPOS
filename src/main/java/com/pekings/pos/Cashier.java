@@ -19,6 +19,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -49,8 +50,11 @@ public class Cashier {
     Stage PrimaryStage;
     static List<Cashier> Orders = new ArrayList<>();
 
+    Text memoError = new Text();
+
     List<MenuItem> orderItems = new ArrayList<>();
     List<MenuItem> deleteOrderItems = new ArrayList<>();
+
 
 
     public Cashier(Stage PrimaryStage, Scene login){
@@ -123,6 +127,10 @@ public class Cashier {
         memoBtn.setLayoutX(30);
         memoBtn.setLayoutY(455);
 
+        memoError.setFill(Color.RED);
+        memoError.setX(210);
+        memoError.setY(280);
+
         Popup memo = new Popup();
         memo.setX(200);
         memo.setY(200);
@@ -137,16 +145,15 @@ public class Cashier {
         memoField.setLayoutX(210);
         memoField.setLayoutY(240);
         memoField.setPrefWidth(200);
-        memoField.setOnKeyPressed(e -> {
-            if (e.getCode().toString().equals("ENTER")){
-                finishMemo(memoField, memo);
-            }
-        });
 
         Button closePop = new Button("X");
         closePop.setLayoutX(420);
         closePop.setLayoutY(210);
-        closePop.setOnAction(e -> memo.hide());
+        closePop.setOnAction(e -> {
+            memo.hide();
+            memoField.clear();
+            memoError.setText("");
+        });
 
         Button memoFinish = new Button("Done");
         memoFinish.setLayoutX(310);
@@ -160,7 +167,7 @@ public class Cashier {
         memoBox.setFill(Color.WHITE);
         memoBox.setStroke(Color.BLACK);
 
-        memo.getContent().addAll(memoBox, memoTxt, memoField, closePop, memoFinish);
+        memo.getContent().addAll(memoBox, memoTxt, memoField, closePop, memoFinish, memoError);
 
         memoBtn.setOnAction(e -> memo.show(PrimaryStage));
 
@@ -258,14 +265,6 @@ public class Cashier {
         orderPane.setVgap(15);
         orderPane.setPrefTileWidth(140);
         orderPane.setMinHeight(290);
-//        orderPane.setPrefTileWidth(80);
-//        for (int i = 0; i < 5; i++) {
-//            Text txt = new Text("BURGERRRRRR");
-//            orderPane.getChildren().add(txt);
-//
-//            txt = new Text("$3.99");
-//            orderPane.getChildren().add(txt);
-//        }
 
         //Adds the TilePane to every menu button
         for (MenuItem i : menuItems) {
@@ -334,11 +333,29 @@ public class Cashier {
 
     private void finishMemo(TextField memoField, Popup memo){
         String input = memoField.getText();
-        memo.hide();
+        if(input.length() > 25){
+            memoError.setText("Error: Maximum memo size: 25 characters");
+        }else if(input.isEmpty()){
+            memoError.setText("Error: Empty Memo");
+        }else{
+            int size = orderPane.getChildren().size();
+            if ((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof TextFlow)) {
+                orderPane.getChildren().addAll(new Text(input), new Text(""));
+                memo.hide();
+                memoField.clear();
+                memoError.setText("");
+            }else{
+                memoError.setText("Error: Nothing to memo");
+            }
+        }
     }
 
     private void deleteItems(){
         for(Text txt : deleteText){
+            int index = orderPane.getChildren().indexOf(txt);
+            if( (index + 2 < orderPane.getChildren().size()) && (orderPane.getChildren().get(index + 2) instanceof Text) && (((Text) orderPane.getChildren().get(index + 2)).getText().equals(""))){
+                orderPane.getChildren().remove(index + 1, index + 3);
+            }
             orderPane.getChildren().remove(txt);
         }
         for(TextFlow txt : deleteTextHolder){
