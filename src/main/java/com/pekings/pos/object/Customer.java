@@ -1,34 +1,28 @@
 package com.pekings.pos.object;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Customer {
 
     private final long id;
-    private final String phoneNumber;
-    private final String email;
-    private final Date lastPurchase;
+    private final List<Order> orders;
 
-    public Customer(long id, String phoneNumber, String email, Date lastPurchase) {
+    public Customer(long id) {
         this.id = id;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.lastPurchase = lastPurchase;
+        this.orders = new ArrayList<>();
     }
 
     public long getId() {
         return id;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    public void addOrder(Order order) {
+        orders.add(order);
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public Date getLastPurchase() {
-        return lastPurchase;
+    public List<Order> getOrders() {
+        return new ArrayList<>(orders);
     }
 }
