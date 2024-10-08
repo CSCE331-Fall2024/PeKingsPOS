@@ -64,6 +64,12 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
+    public void deleteMenuItem(int id) {
+        String query = queryLoader.getQuery("delete_menu_item");
+        performNonFetchQuery(query);
+    }
+
+    @Override
     public MenuItem getMenuItem(int id) {
         // We need an atomic reference or something weird to create an object that isn't
         // inside the consumer, so just make a list and get the first (and only) element
@@ -236,6 +242,17 @@ public class PersistentRepository implements Repository {
 
             ingredients.add(ingredient);
         }, menuItemID + "");
+
+        return ingredients;
+    }
+
+    @Override
+    public List<Ingredient> getAllIngredients() {
+        List<Ingredient> ingredients = new ArrayList<>();
+        performFetchQuery("get_all_ingredients", resultSet -> {
+            Ingredient ingredient = makeIngredient(resultSet);
+            ingredients.add(ingredient);
+        });
 
         return ingredients;
     }
