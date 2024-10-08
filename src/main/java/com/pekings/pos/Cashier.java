@@ -48,8 +48,8 @@ public class Cashier {
     Text taxTxt;
     Text totalTxt;
 
-    List<Text> deleteText;
-    List<TextFlow> deleteTextHolder;
+    public List<Text> deleteText;
+    public List<TextFlow> deleteTextHolder;
     TilePane orderPane;
 
     Stage PrimaryStage;
@@ -57,8 +57,8 @@ public class Cashier {
 
     Text memoError = new Text();
 
-    List<MenuItem> orderItems = new ArrayList<>();
-    List<MenuItem> deleteOrderItems = new ArrayList<>();
+    public List<MenuItem> orderItems = new ArrayList<>();
+    public List<MenuItem> deleteOrderItems = new ArrayList<>();
 
     ScrollPane centerScroll = new ScrollPane();
     TilePane menuPane;

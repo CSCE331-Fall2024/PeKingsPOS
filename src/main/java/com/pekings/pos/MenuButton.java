@@ -1,6 +1,7 @@
 package com.pekings.pos;
 
 import com.pekings.pos.object.MenuItem;
+import com.pekings.pos.util.OrderText;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.TilePane;
@@ -15,7 +16,7 @@ public class MenuButton {
     MenuItem item;
     TilePane pane;
     Cashier cashier;
-    boolean clicked = false;
+
 
     public MenuButton(MenuItem item, TilePane pane, Cashier cashier){
         this.item = item;
@@ -33,51 +34,7 @@ public class MenuButton {
 
         btn.setOnAction(e -> {
             cashier.edited = true;
-            TextFlow textHolder = new TextFlow();
-            Text txt = new Text(item.getName());
-            textHolder.getChildren().add(txt);
-            textHolder.setPrefWidth(150);
-            pane.getChildren().add(textHolder);
-
-            cashier.updateTotals(item.getPrice());
-
-            String price = String.valueOf(item.getPrice());
-            int size = price.length();
-            if(price.charAt(size - 1) == '.'){
-                price += "00";
-            }else if(price.charAt(size - 2) == '.'){
-                price += "0";
-            }
-            price = "$" + price;
-            Text priceTxt = new Text(price);
-            pane.getChildren().add(priceTxt);
-
-//            row.getChildren().addAll(textHolder, priceTxt);
-
-            cashier.orderItems.add(item);
-
-            txt.setOnMouseClicked(m ->
-            {
-                if(!clicked) {
-                    txt.setFill(Color.DARKBLUE);
-                    priceTxt.setFill(Color.DARKBLUE);
-//                    row.setStyle("-fx-background-color: BLUE");
-
-                    cashier.deleteTextHolder.add(textHolder);
-                    cashier.deleteText.add(priceTxt);
-
-                    cashier.deleteOrderItems.add(item);
-                }else{
-                    txt.setFill(Color.BLACK);
-                    priceTxt.setFill(Color.BLACK);
-
-                    cashier.deleteTextHolder.remove(textHolder);
-                    cashier.deleteText.remove(priceTxt);
-
-                    cashier.deleteOrderItems.remove(item);
-                }
-                clicked = !clicked;
-            });
+            new OrderText(cashier, item, pane);
         });
 
         return btn;
