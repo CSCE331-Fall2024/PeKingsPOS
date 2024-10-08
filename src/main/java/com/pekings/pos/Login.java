@@ -110,7 +110,7 @@ public class Login {
         String password = passwordBox.getText();
 
         for (Employee emp : Employees) {
-            if ((username.equals(emp.getUsername())) && (password.equals(emp.getPassword()))) {
+            if ((username.equalsIgnoreCase(emp.getUsername())) && (password.equals(emp.getPassword()))) {
                 if (emp.getPosition().equals("employee")) {
                     Button btn = new Button("Log\nOut");
                     btn.setOnAction(e -> PrimaryStage.setScene(login));
