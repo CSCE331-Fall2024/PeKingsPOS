@@ -33,7 +33,7 @@ public class Main {
         }));
     }
 
-    public Repository getRepository() {
+    public static Repository getRepository() {
         return repository;
     }
 }

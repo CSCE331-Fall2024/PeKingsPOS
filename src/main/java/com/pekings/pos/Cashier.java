@@ -72,7 +72,7 @@ public class Cashier {
 
     public Cashier(Stage PrimaryStage, Button backBtn, long employeeID){
         this.PrimaryStage = PrimaryStage;
-        this.login = login;
+//        this.login = login;
         this.employeeID = employeeID;
         originalBtn = backBtn;
 
