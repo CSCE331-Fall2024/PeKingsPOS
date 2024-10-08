@@ -240,15 +240,9 @@ public class Cashier {
         centerScroll.setLayoutY(0);
         centerScroll.setPrefWidth(550);
         centerScroll.setPrefHeight(700);
-//        centerScroll.setMaxWidth(500);
-//        centerScroll.setMaxHeight(700);
-//        centerScroll.setMinWidth(500);
-//        centerScroll.setMinHeight(700);
 
 
         menuPane = new TilePane();
-//        centerScroll.setContent(menuPane);
-
         menuPane.setPrefColumns(4);
         menuPane.setPadding(new Insets(30));
         menuPane.setHgap(30);
