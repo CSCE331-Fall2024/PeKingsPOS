@@ -129,7 +129,7 @@ public class Cashier {
         cancelOrder.setLayoutY(255);
         cancelOrder.setOnAction(e -> {
             Orders.remove(this);
-            if(edited) {
+            if(edited || Orders.isEmpty()) {
                 openNewOrder();
             }else{
                 PrimaryStage.setScene(Orders.getLast().getScene());
