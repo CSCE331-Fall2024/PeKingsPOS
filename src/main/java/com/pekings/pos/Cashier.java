@@ -394,6 +394,9 @@ public class Cashier {
         cash.setPrefHeight(150);
         cash.setStyle("-fx-background-color: lightgreen");
         cash.setOnAction(e -> {
+//            for(MenuItem item : orderItems){
+//                System.out.println(item.getName());
+//            }
             Random random = new Random();
             repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
         });
