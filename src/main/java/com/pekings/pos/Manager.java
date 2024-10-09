@@ -1,26 +1,17 @@
 package com.pekings.pos;
 
-//import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.Employee;
 import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.storage.Repository;
-//import com.pekings.pos.object.Order;
-//import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.*;
-//import javafx.scene.control.TableColumn;
-//import javafx.scene.control.TableView;
-//import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
-//import javafx.scene.layout.TilePane;
 import javafx.scene.shape.Rectangle;
-//import javafx.scene.Group;
 import javafx.scene.Scene;
-//import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -34,7 +25,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
-//import java.awt.*;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.*;

@@ -1,6 +1,5 @@
 package com.pekings.pos.object;
 
-import java.sql.Date;
 
 public class Ingredient {
 

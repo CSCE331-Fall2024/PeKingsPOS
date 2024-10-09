@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
-
 public class Login {
     Stage PrimaryStage;
     Scene login, cashier;

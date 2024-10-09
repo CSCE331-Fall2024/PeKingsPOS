@@ -4,23 +4,17 @@ import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.object.Order;
 import com.pekings.pos.storage.Repository;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-//import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-//import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
-import javafx.stage.Modality;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
@@ -29,7 +23,6 @@ import java.sql.Date;
 import java.util.Calendar;
 
 import static javafx.scene.text.TextAlignment.CENTER;
-
 
 // Payment options are "credit_card" or "cash"
 // use random number 1 and 1000 for customerID
