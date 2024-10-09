@@ -11,8 +11,8 @@ public class POSApp extends Application {
 
     private Repository repo;
 
-    public void initialize() {
-        launch();
+    public void initialize(String[] args) {
+        launch(args);
     }
 
     public void start(Stage stage) throws Exception {
@@ -25,6 +25,5 @@ public class POSApp extends Application {
         stage.setResizable(false);
         stage.show();
     }
-
 }
 
