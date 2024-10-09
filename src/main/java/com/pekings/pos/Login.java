@@ -117,7 +117,8 @@ public class Login {
                     cashier = cash.getScene();
                     PrimaryStage.setScene(cashier);
                 } else {
-                    System.out.println("Manager Login");
+                    Manager manager = new Manager(PrimaryStage, login, repo);
+                    PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
                 }
                 error.setText("");
                 break;
