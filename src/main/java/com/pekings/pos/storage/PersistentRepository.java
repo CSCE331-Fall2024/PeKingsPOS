@@ -65,8 +65,18 @@ public class PersistentRepository implements Repository {
 
     @Override
     public void deleteMenuItem(int id) {
-        String query = queryLoader.getQuery("delete_menu_item");
-        performNonFetchQuery(query);
+        List<String> queries = new ArrayList<>();
+
+        String query = queryLoader.getQuery("delete_menu_item")
+                .formatted(id + "");
+
+        String ingredientQuery = queryLoader.getQuery("delete_menu_ingredient_menu_item")
+                .formatted(id + "");
+
+        queries.add(ingredientQuery);
+        queries.add(query);
+
+        performNonFetchQuery(queries.toArray(String[]::new));
     }
 
     @Override
@@ -176,7 +186,7 @@ public class PersistentRepository implements Repository {
         // inside the consumer, so just make a list and get the first (and only) element
         List<Ingredient> ingredients = new ArrayList<>();
         performFetchQuery("get_ingredient", resultSet ->
-                        ingredients.add(makeIngredient(resultSet)),
+                ingredients.add(makeIngredient(resultSet)),
                 id + "");
         return ingredients.getFirst();
     }

@@ -18,6 +18,12 @@ FROM
 -- add_menu_item
 INSERT INTO menu (name, price) VALUES ('%s', '%s');
 
+-- delete_menu_item
+DELETE FROM menu WHERE id = '%s';
+
+-- delete_menu_ingredient_menu_item
+DELETE FROM menu_ingredients mi WHERE mi.menu_item = '%s';
+
 -- add_ingredient
 INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) VALUES('%s','%s','%s');
 
@@ -205,4 +211,7 @@ VALUES ('%s', '%s');
 -- add_order_inventory
 INSERT INTO order_inventory (order_id, inventory_id)
 VALUES ('%s', '%s');
+
+-- get_all_ingredients
+SELECT * FROM inventory;
 

@@ -12,7 +12,7 @@ public interface Repository {
 
     void addMenuItem(MenuItem menuItem);
 
-    void deleteMenuItem(int id);
+    void deleteMenuItem(int menuItemID);
 
     MenuItem getMenuItem(int itemID);
 
