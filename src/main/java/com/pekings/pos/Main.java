@@ -2,7 +2,6 @@ package com.pekings.pos;
 
 import com.pekings.pos.storage.PersistentRepository;
 import com.pekings.pos.storage.Repository;
-
 import java.sql.SQLException;
 
 public class Main {

@@ -8,51 +8,56 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.*;
-import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.control.TextField;
 import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import org.postgresql.jdbc.TimestampUtils;
 
 import java.sql.Time;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.sql.Date;
 import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 public class Manager {
+    Stage PrimaryStage;
+    Scene loginScreen;
 
     List<MenuItem> menuItemList;
     List<Employee> employeeList;
-
+//    List<Ingredient> ingredientList;
 
     private Repository repo;
     private Pane rootManager;
     ScrollPane centerScroll = new ScrollPane();
     Rectangle r = new Rectangle();
     Text text = new Text("Manager");
+
     Button logOut = new Button();
+
     Button menuItems = createButton(30, 160, "_Menu\nItems", "-fx-background-color: #36919E");
     Button inventory = createButton(30, 255, "_Inventory", "-fx-background-color: #36919E");
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
+    boolean deleteBool = false;
 
-
-    public Manager(Repository repo) {
+    public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
+        this.PrimaryStage = PrimaryStage;
+        this.loginScreen = loginScreen;
         this.repo = repo;
         rootManager = new Pane();
     }
@@ -132,21 +137,22 @@ public class Manager {
                     String newName = nameField.getText();
                     float newPrice = Float.parseFloat(priceField.getText());
 
-                    if(!Objects.equals(newName, item.getName()) || (int)newPrice != item.getPrice()) {
-                        int tempIdHold = (int) item.getId();
-                        List<Ingredient> tempIngredients = repo.getIngredients((int) item.getId());
-                        repo.removeMenuItem((int) item.getId());
-                        menuItemsContainer.getChildren().remove(itemRow);
-                        MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients);
-                        repo.addMenuItem(newOne);
-                    }
+                    // now update the database with edited information
+                    // delete current menu item then add the edited version in
+                    // void addMenuItem(MenuItem menuItem);
+                    //
+                    //repo.addMenuItem(new MenuItem(-1, newName, newPrice, ingredients));
+
+//                    updateMenuItem((int) item.getId(), newName, newPrice);
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
                 });
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
-                    Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
+                    Popup dlt = createDeletePopup(menuItemsContainer,itemRow);
                     dlt.show(stage);
+                    //menuItemsContainer.getChildren().remove(itemRow);
+
 
                 });
 
@@ -176,14 +182,6 @@ public class Manager {
                 // newMenuItem = new MenuItem(-1, newName, newPrice,)
                 //repo.addMenuItem(newName, newPrice);
                 // Refresh the list (you might want to just add the new item instead of refreshing everything)
-                // Change
-                List<Ingredient> ingredients = repo.getAllIngredients();
-                List<String> ingredientNames = ingredients.stream().map(Ingredient::getName)
-                        .toList();
-                List<String> addMenuPop = createAddMenuItemPopup(ingredientNames);
-                VBox header = new VBox(10);
-
-//                repo.addMenuItem();
                 menuItems.fire(); // This will refresh the entire list
             });
 
@@ -262,8 +260,8 @@ public class Manager {
                     // now update the database with edited information
                     // delete current menu item then add the edited version in
                     // void addMenuItem(MenuItem menuItem);
-                    Ingredient newIngredient = new Ingredient(ingredient.getId(),newName, ingredient.getPrice(), (int)newQuantity, (ingredient.getPrice() * newQuantity));
-                    repo.updateIngredientInventory(newIngredient);
+
+//                    updateMenuItem(ingredient.getId(), newName, newQuantity);
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
                 });
@@ -271,7 +269,8 @@ public class Manager {
                     // Remove from database here
                     Popup dltIngredient = createDeletePopupIngredient(inventoryItemsContainer,itemRow);
                     dltIngredient.show(stage);
-
+                    //TODO Add remove Ingredient method once added to repo
+                    //repo.removeIngredientStock((int)ingredient.getId(),ingredient.getAmount());
                 });
 
                 itemRow.getChildren().addAll(nameField, idField, quantityField, editButton, saveButton, deleteButton);
@@ -283,29 +282,25 @@ public class Manager {
             TextField newNameField = new TextField();
             TextField newIdField = new TextField();
             newIdField.setEditable(false);
-            TextField newPriceField = new TextField();
-
             TextField newquantityField = new TextField();
             Button addButton = new Button("Add Item");
 
             newNameField.setPromptText("New item name");
             newquantityField.setPromptText("quantity");
             newNameField.setPrefWidth(200);
-            newIdField.setPromptText("Auto Generated ID");
+            newIdField.setPromptText("Generated ID");
             newquantityField.setPrefWidth(200);
-            newPriceField.setPromptText("Set Price");
-            newPriceField.setPrefWidth(100);
 
             addButton.setOnAction(_ -> {
                 String newName = newNameField.getText();
-                int newPrice = Integer.valueOf(newPriceField.getText());
                 int newQuantity = Integer.parseInt(newquantityField.getText());
-                addIngredient(newName,newPrice, newQuantity);
+                //repo.addIngredient(newName, newQuantity);
+                menuItems.fire(); // This will refresh the entire list
 
-                inventory.fire(); // This will refresh the entire list
             });
 
-            newItemRow.getChildren().addAll(newNameField, newIdField, newquantityField, newPriceField, addButton);
+
+            newItemRow.getChildren().addAll(newNameField, newIdField, newquantityField, addButton);
             inventoryItemsContainer.getChildren().add(newItemRow);
 
             ScrollPane scrollPane = new ScrollPane(inventoryItemsContainer);
@@ -385,20 +380,25 @@ public class Manager {
                     usernameField.setEditable(true);
                     passwordField.setEditable(true);
                     clockedInOut.setVisible(true);
-
+                    updateEmployee(employee.getId(), usernameField.getText(), passwordField.getText(), employee.getPosition(), employee.getLastClockIn(), employee.isClockedIn());
                 });
 
                 saveButton.setOnAction(_ -> {
                     String newName = usernameField.getText();
+
+                    // now update the database with edited information
+                    // delete current menu item then add the edited version in
+                    // void addMenuItem(MenuItem menuItem);
+                    //
+                    //updateMenuItem((int)item.getId(), newName, );
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
-                    updateEmployee(employee.getId(), usernameField.getText(), passwordField.getText(), employee.getPosition(), employee.getLastClockIn(), employee.isClockedIn());
                 });
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
-                    Popup employeePopup = createDeletePopupEmployee(employeeContainer, itemRow, employee);
-                    employeePopup.show(stage);
 
+                    //removeMenuItem((int) item.getId());
+                    employeeContainer.getChildren().remove(itemRow);
                 });
 
 
@@ -432,11 +432,8 @@ public class Manager {
                 String newUser = newUsernameField.getText();
                 String newPass = newPasswordField.getText();
 
-                // Add to database here user, pass, pos, lastClockIn, clockedIn = false
-                Time lstIn = new Time(0,0,0);
-
-                Employee newGuy = new Employee((employeeList.getLast().getId()+1),newUser,newPass,"Employee",lstIn, false);
-                repo.addEmployee(newGuy);
+                // Add to database here
+                //addNewEmployee((-1), newUser, newPass,);
                 // Refresh the list (you might want to just add the new item instead of refreshing everything)
                 menuItems.fire(); // This will refresh the entire list
             });
@@ -503,6 +500,8 @@ public class Manager {
         dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart()));
 
         buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn);
+        buttonBox.setAlignment(Pos.CENTER);
+
         contentBox.getChildren().add(buttonBox);
 
         mainScrollPane.setContent(contentBox);
@@ -566,6 +565,9 @@ public class Manager {
         xAxis.setLabel("Date");
         yAxis.setLabel("Revenue $");
 
+        yAxis.setLowerBound(0); // minimum revenue value
+        yAxis.setUpperBound(1000); // maximum revenue value
+
         // Create a LineChart
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Revenue for Last 30 Days");
@@ -580,9 +582,12 @@ public class Manager {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-
+        System.out.println("Get Data");
+        //revenueData is probably enpty :(
         for (Map.Entry<Date, Double> entry : revenueData.entrySet()) {
             String dateStr = dateFormat.format(entry.getKey());
+            System.out.println("Date: " + dateStr);
+
             Double revenue = entry.getValue();
             series.getData().add(new XYChart.Data<>(dateStr, revenue));
         }
@@ -601,39 +606,18 @@ public class Manager {
 
 
     // update remove and add functions
-//    private void updateMenuItem(long id, String newName, float newPrice) {
-//        Popup menuItemPopup = new Popup();
-//        VBox popupContent = new VBox(10);
-//        popupContent.setPadding(new Insets(10));
-//        popupContent.setPrefSize(800, 700);
-//        popupContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2px;");
-//
-//
-//        Label prompt = new Label("Select all ingredients from list for new Menu Item");
-//        prompt.setFont(Font.font(14));
-//
-//
-//
-//
-//        Button done = new Button("Done");
-//        Button noBtn = new Button("Cancel");
-//
-//
-//        noBtn.setOnAction(_ ->{
-//            menuItemPopup.hide(); // Hide the popup
-//
-//        });
-//
-//
-//        VBox buttonBox = new VBox(10, ingredientText, noBtn);
-//        buttonBox.setAlignment(Pos.CENTER);
-//
-//        popupContent.getChildren().addAll(prompt, buttonBox);
-//        popupContent.setAlignment(Pos.CENTER);
-//
-//        makeList.getContent().add(popupContent);
-//
-//    }
+    private void updateMenuItem(long id, String newName, float newPrice, List<Ingredient> ingredients) {
+        // Update the menu item in the database
+        // You need to implement this method based on your database structure
+        //updateMenuItem(item.getId(), newName, newPrice);
+
+        //Will need removeMenuItem and addItem to update
+        // TODO Needs updateMenuItem(), deletion and add shouldn't be necessary if update is implemented
+        // TODO: Function obsolete if it calls a repo function and just passes in current arguments
+//        repo.removeMenuItem(id);
+//        repo.addMenuItem(new MenuItem(id, newName, newPrice, ingredients));
+//        repo.updateMenuItem(id, newName, newPrice);
+    }
 // TODO Finish Popup for AddMenuItem Ingredient list
 //    private List<Ingredient> createNewIngredientList(){
 //        List<Ingredient> newList;
@@ -657,8 +641,8 @@ public class Manager {
 //        noBtn.setOnAction(_ ->
 //            makeList.hide()  // Hide the popup
 //        );
-
-
+//
+//
 //        VBox buttonBox = new VBox(10, ingredientText, noBtn);
 //        buttonBox.setAlignment(Pos.CENTER);
 //
@@ -666,28 +650,25 @@ public class Manager {
 //        popupContent.setAlignment(Pos.CENTER);
 //
 //        makeList.getContent().add(popupContent);
-        //done.setOnAction(_ -> {
-
-            //makeList.hide();
+//        done.setOnAction(_ -> {
+//            makeList.hide();
 //            String parse = ingredientText.getText();
-//
+//            // Assuming `parse` is the input string
 //            String[] words = parse.split(",\\s*");  // Split by comma followed by any number of spaces
 //
+//            // Create an ArrayList to store the words
 //            List<String> wordList = new ArrayList<>(Arrays.asList(words));
-//
-////            public Ingredient(long id, String name, float price, int amount, float batchPrice)
+//            //public Ingredient(long id, String name, float price, int amount, float batchPrice)
 //            for(int i = 0; i < wordList.size(); i++){
 //                if(wordList.isEmpty()){
 //                    break;
 //                }
-////                Ingredient newIngredient = new Ingredient(-1, )
-////                newList.get(i) = wordList.get(i);
+//                //Ingredient newIngredient = new Ingredient(-1, wordList.get(i), )
+//                //newList.get(i) = wordList.get(i);
 //            }
-
-
-
-
-
+//
+//
+//
 //        });
 //
 //        return newList;
@@ -697,16 +678,36 @@ public class Manager {
     private long addIngredient(String name, float price, int quantity) {
         Ingredient ingredient = new Ingredient(-1, name, price, quantity, (price * quantity));
 //        repo.addIngredientStock(ID, quantity)
+//        repo.addNewIngredient(ingredient);
 
         return -1;
     }
 
     // TODO Once 2 repo functions are implemented, add them to update Employee
     private void updateEmployee(long id, String username, String password, String position, Time lastClockIn, boolean clockedIn) {
-        Employee newguy = new Employee(id, username, password, position, lastClockIn, clockedIn);
-        repo.updateEmployee(newguy);
+        //Function to be implemented
+        // Employee newEmployee = new Employee(id, username, password, position,lastClockIn,clockedIn);
+        //repo.removeEmployee(id)
+        // AND repo.addEmployee(newEmployee)
+
+        deleteEmployee(id);
+//        repo.addEmployee(id, username, password, position, false);
     }
 
+    // TODO add addEmployee(Employee newEmployee) in repo
+    private void addNewEmployee(String username, String password, String position) {
+        // long id = -1;
+        // boolean clockedIn = false;
+        // Employee newEmployee = new Employee(id, username, password,position,lastClockIn,clockedIn);
+        // Same here: repo.addEmployee(newEmployee)
+
+//        repo.addEmployee(-1, username, password, position, false);
+    }
+
+    // TODO add removeEmployee(id) in repo
+    private void deleteEmployee(long id) {
+//        repo.removeEmployee(id);
+    }
 
     private Button createLogOutButton(Stage stage) {
         Button logOut = new Button("_Log\nOut");
@@ -732,9 +733,8 @@ public class Manager {
         return logOut;
     }
 
-    private Popup createDeletePopup(VBox container, HBox itemRow, MenuItem item){
+    private Popup createDeletePopup(VBox container, HBox itemRow){
         Popup popup = new Popup();
-
 
         // Create VBox for popup
         VBox popupContent = new VBox(10);
@@ -753,7 +753,7 @@ public class Manager {
 
         done.setOnAction(_ -> {
             if (Objects.equals(deleteMsg.getText(), "DELETE")) {
-                repo.deleteMenuItem((int) item.getId());
+                //repo.deleteMenuItem((int) item.getId());
                 container.getChildren().remove(itemRow);
                 popup.hide();
             }
@@ -826,83 +826,6 @@ public class Manager {
 
         return popup;
     }
-    private Popup createDeletePopupEmployee(VBox container, HBox itemRow, Employee item){
-        Popup popup = new Popup();
-
-        // Create VBox for popup
-        VBox popupContent = new VBox(10);
-        popupContent.setPadding(new Insets(10));
-        popupContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2px;");
-
-
-        Label confirmationLabel = new Label("Completely delete this entry?");
-        confirmationLabel.setFont(Font.font(14));
-
-
-        TextField deleteMsg = new TextField();
-        deleteMsg.setPromptText("Type DELETE");
-        Button noBtn = new Button("Cancel");
-        Button done = new Button("Done");
-
-        done.setOnAction(_ -> {
-            if (Objects.equals(deleteMsg.getText(), "DELETE")) {
-                repo.removeEmployee((int) item.getId());
-                container.getChildren().remove(itemRow);
-                popup.hide();
-            }
-            else{
-                deleteMsg.clear();
-                confirmationLabel.setText("Incorrect Input");
-            }
-        });
-
-        noBtn.setOnAction(_ -> popup.hide());
-
-        HBox box = new HBox(10,done, noBtn);
-        box.setAlignment(Pos.CENTER);
-
-        VBox buttonBox = new VBox(10, deleteMsg, box);
-        buttonBox.setAlignment(Pos.CENTER);
-
-        popupContent.getChildren().addAll(confirmationLabel, buttonBox, box);
-        popupContent.setAlignment(Pos.CENTER);
-
-        popup.getContent().add(popupContent);
-
-        return popup;
-    }
-
-    private List<String> createAddMenuItemPopup(List<String> ingredientNames) {
-        Popup popup = new Popup();
-        List<String> newIngrList = new ArrayList<>();
-        popup.setHeight(500);
-        popup.setWidth(500);
-        // Create VBox for popup
-        VBox popupContent = new VBox(10);
-        popupContent.setPadding(new Insets(10));
-        popupContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2px;");
-
-
-        for(String ingr : ingredientNames){
-            ingredientText ingredient = new ingredientText(ingr, this, newIngrList);
-            popupContent.getChildren().add(ingredient.getText());
-        }
-        Button done = new Button();
-        Button clear = new Button();
-
-        done.setOnAction(_ ->{
-
-        });
-        HBox buttonBox = new HBox(10,done, clear);
-        buttonBox.setAlignment(Pos.CENTER);
-
-        popupContent.getChildren().addAll(buttonBox);
-        popupContent.setAlignment(Pos.CENTER);
-
-        popup.getContent().add(popupContent);
-
-        return newIngrList;
-    }
 
     private Popup createLogOutPopup(Stage popStage) {
         Popup popup = new Popup();
@@ -920,9 +843,8 @@ public class Manager {
         Button yesBtn = new Button("Log Out");
         Button noBtn = new Button("Cancel");
 
-
         yesBtn.setOnAction(_ -> {
-            popStage.close(); // Close the application
+            PrimaryStage.setScene(loginScreen);
             popup.hide();  // Hide the popup
         });
 
