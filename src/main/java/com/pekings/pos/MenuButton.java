@@ -33,7 +33,6 @@ public class MenuButton {
         btn.setStyle("-fx-background-color: #BA6433");
 
         btn.setOnAction(e -> {
-            cashier.edited = true;
             new OrderText(cashier, item, pane);
         });
 
