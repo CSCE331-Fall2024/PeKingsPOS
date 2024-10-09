@@ -79,4 +79,19 @@ public interface Repository {
     List<Order> getOrders(Date from, Date to);
 
     void addOrder(Order order);
+
+    void addNewIngredientInventory(Ingredient ingredient);
+
+    void updateIngredientInventory(Ingredient ingredient);
+
+    void deleteIngredientInventory(int ingredientID);
+
+    void addEmployee(Employee employee);
+
+    void removeEmployee(int id);
+
+    void updateEmployee(Employee employee);
+
+    void removeMenuItem(int id);
+
 }
