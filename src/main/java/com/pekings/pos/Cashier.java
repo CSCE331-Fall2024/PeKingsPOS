@@ -17,16 +17,13 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-
 import java.util.*;
 import java.sql.Date;
 import java.util.Calendar;
 
 import static javafx.scene.text.TextAlignment.CENTER;
 
-// Payment options are "credit_card" or "cash"
-// use random number 1 and 1000 for customerID
-// use -1 for id
+
 public class Cashier {
     static int currOrder = 0;
 
@@ -59,13 +56,10 @@ public class Cashier {
     Button originalBtn;
     Button exit;
 
-    boolean edited = false;
-
 
 
     public Cashier(Stage PrimaryStage, Button backBtn, long employeeID){
         this.PrimaryStage = PrimaryStage;
-//        this.login = login;
         this.employeeID = employeeID;
         originalBtn = backBtn;
 
@@ -96,15 +90,12 @@ public class Cashier {
         cashierText.setY(640);
         cashierText.setFill(Color.BLACK);
 
-//        Button exit = new Button("Log\nOut");
-//        exit.setText("Log\nOut");
         exit.setPrefWidth(80);
         exit.setPrefHeight(80);
         exit.setStyle("-fx-background-color: Red");
         // Change Font Weight
         exit.setLayoutX(30);
         exit.setLayoutY(30);
-//        exit.setOnAction(e -> PrimaryStage.setScene(login));
 
         Button newOrder = new Button(" New\nOrder");
         newOrder.setPrefWidth(80);
@@ -122,7 +113,7 @@ public class Cashier {
         cancelOrder.setLayoutY(255);
         cancelOrder.setOnAction(e -> {
             Orders.remove(this);
-            if(edited || Orders.isEmpty()) {
+            if(Orders.isEmpty()) {
                 openNewOrder();
             }else{
                 PrimaryStage.setScene(Orders.getLast().getScene());
@@ -187,7 +178,12 @@ public class Cashier {
 
         memo.getContent().addAll(memoBox, memoTxt, memoField, closePop, memoFinish, memoError);
 
-        memoBtn.setOnAction(e -> memo.show(PrimaryStage));
+        memoBtn.setOnAction(e -> {
+            if((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(orderPane.getChildren().size() - 2) instanceof Text)){
+                memoField.setText(((Text) orderPane.getChildren().get(orderPane.getChildren().size() - 2)).getText());
+            }
+            memo.show(PrimaryStage);
+        });
 
 
 
@@ -199,6 +195,7 @@ public class Cashier {
         removeItem.setStyle("-fx-background-color: Red");
         removeItem.setOnAction(e -> deleteItems());
 
+        // Background rectangle covering right side of screen
         Rectangle rectRight = new Rectangle();
         rectRight.setX(700);
         rectRight.setY(0);
@@ -206,6 +203,7 @@ public class Cashier {
         rectRight.setHeight(700);
         rectRight.setFill(Color.web("#D9D9D9"));
 
+        // Sepearates the center screen and the right side of the screen
         Line orderBorderLeft = new Line();
         orderBorderLeft.setStartX(700);
         orderBorderLeft.setStartY(0);
@@ -213,6 +211,7 @@ public class Cashier {
         orderBorderLeft.setEndY(700);
         orderBorderLeft.setStrokeWidth(4);
 
+        // Line separates the payment box from the order items box
         Line paymentBorderTop = new Line();
         paymentBorderTop.setStartX(700);
         paymentBorderTop.setStartY(450);
@@ -220,6 +219,7 @@ public class Cashier {
         paymentBorderTop.setEndY(450);
         paymentBorderTop.setStrokeWidth(2);
 
+        //Bottom right rectangle
         Rectangle paymentRect = new Rectangle();
         paymentRect.setX(700);
         paymentRect.setY(450);
@@ -234,7 +234,7 @@ public class Cashier {
         centerScroll.setPrefWidth(550);
         centerScroll.setPrefHeight(700);
 
-
+        //Holds all the buttons
         menuPane = new TilePane();
         menuPane.setPrefColumns(4);
         menuPane.setPadding(new Insets(30));
@@ -245,6 +245,7 @@ public class Cashier {
         menuPane.setMaxWidth(600);
         menuPane.setMaxHeight(550);
 
+
         Text orderNumTitle = new Text("Order #");
         orderNumTitle.setStyle("-fx-font-size: 30px");
         orderNumTitle.setX(790);
@@ -254,6 +255,7 @@ public class Cashier {
         orderNum.setX(825);
         orderNum.setY(90);
 
+        // Sets the line under the order number
         Line orderNumLine = new Line();
         orderNumLine.setStartX(700);
         orderNumLine.setStartY(110);
@@ -282,7 +284,7 @@ public class Cashier {
         orderPane.setPrefTileWidth(140);
         orderPane.setMinHeight(290);
 
-        //Adds the TilePane to every menu button
+        //Adds the menu buttons to the menu TilePane
         for (MenuItem i : menuItems) {
             MenuButton MenuItemButton = new MenuButton(i, orderPane, this);
             menuPane.getChildren().add(MenuItemButton.createMenuBtn());
@@ -344,10 +346,12 @@ public class Cashier {
         rootCashier.getChildren().addAll(payment, orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt, removeItem);
     }
 
+
     public Scene getScene(){
         centerScroll.setContent(menuPane);
         return cashier;
     }
+
 
     private void viewPreviousOrders(){
         TilePane previousOrders = new TilePane();
@@ -374,74 +378,94 @@ public class Cashier {
         centerScroll.setContent(previousOrders);
     }
 
+
     private void finishOrder(){
-        Button cancel = new Button("Cancel");
-        cancel.setPrefWidth(250);
-        cancel.setPrefHeight(125);
-        cancel.setStyle("-fx-background-color: RED");
-        cancel.setOnAction(e -> centerScroll.setContent(menuPane));
+        if(!orderItems.isEmpty()) {
+            Button cancel = new Button("Cancel");
+            cancel.setPrefWidth(250);
+            cancel.setPrefHeight(125);
+            cancel.setStyle("-fx-background-color: RED");
+            cancel.setOnAction(e -> centerScroll.setContent(menuPane));
 
-        // Create buttons
-        Button cash = new Button("Cash");
-        cash.setPrefWidth(150);
-        cash.setPrefHeight(150);
-        cash.setStyle("-fx-background-color: lightgreen");
-        cash.setOnAction(e -> {
-//            for(MenuItem item : orderItems){
-//                System.out.println(item.getName());
-//            }
-            Random random = new Random();
-            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
-        });
-        
-        Button card = new Button("Card");
-        card.setPrefWidth(150);
-        card.setPrefHeight(150);
-        card.setStyle("-fx-background-color: orange");
-        card.setOnAction(e -> {
-            Random random = new Random();
-            repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
-        });
+            // Create buttons
+            Button cash = new Button("Cash");
+            cash.setPrefWidth(150);
+            cash.setPrefHeight(150);
+            cash.setStyle("-fx-background-color: lightgreen");
+            cash.setOnAction(e -> {
+                Random random = new Random();
+                repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
+            });
 
-        // Create HBox for top buttons
-        HBox topHBox = new HBox(20); // 20 pixels spacing
-        topHBox.setPadding(new Insets(200, 0, 0, 65));
-        topHBox.getChildren().addAll(cash);
-        HBox.setMargin(card, new Insets(0, 0, 0, 100)); // Adjust margin for spacing
-        topHBox.getChildren().addAll(card);
+            Button card = new Button("Card");
+            card.setPrefWidth(150);
+            card.setPrefHeight(150);
+            card.setStyle("-fx-background-color: orange");
+            card.setOnAction(e -> {
+                Random random = new Random();
+                repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
+            });
 
-        // Create VBox for the bottom button
-        VBox bottomVBox = new VBox();
-        bottomVBox.setPadding(new Insets(75, 0, 0, 150));
-        bottomVBox.getChildren().add(cancel);
+            // Create HBox for top buttons
+            HBox topHBox = new HBox(20); // 20 pixels spacing
+            topHBox.setPadding(new Insets(200, 0, 0, 65));
+            topHBox.getChildren().addAll(cash);
+            HBox.setMargin(card, new Insets(0, 0, 0, 100)); // Adjust margin for spacing
+            topHBox.getChildren().addAll(card);
 
-        // Create a BorderPane to combine everything
-        BorderPane borderPane = new BorderPane();
-        borderPane.setTop(topHBox);
-        borderPane.setCenter(bottomVBox);
+            // Create VBox for the bottom button
+            VBox bottomVBox = new VBox();
+            bottomVBox.setPadding(new Insets(75, 0, 0, 150));
+            bottomVBox.getChildren().add(cancel);
 
-//        content.getChildren().addAll(cancel);
-        centerScroll.setContent(borderPane);
+            // Create a BorderPane to combine everything
+            BorderPane borderPane = new BorderPane();
+            borderPane.setTop(topHBox);
+            borderPane.setCenter(bottomVBox);
+
+            //        content.getChildren().addAll(cancel);
+            centerScroll.setContent(borderPane);
+        }
     }
 
+
     private void finishMemo(TextField memoField, Popup memo){
+        int size = orderPane.getChildren().size();
         String input = memoField.getText();
-        if(input.length() > 25){
-            memoError.setText("Error: Maximum memo size: 25 characters");
-        }else if(input.isEmpty()){
-            memoError.setText("Error: Empty Memo");
-        }else{
-            int size = orderPane.getChildren().size();
-            if ((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof TextFlow)) {
-                orderPane.getChildren().addAll(new Text(input), new Text(""));
-                memo.hide();
-                memoField.clear();
-                memoError.setText("");
+
+        if((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof Text)){
+            if(input.length() > 25){
+                memoError.setText("Error: Maximum memo size: 25 characters");
+            }else if(input.isEmpty()){
+                memoError.setText("Error: Empty Memo");
             }else{
-                memoError.setText("Error: Nothing to memo");
+                if ((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof Text)) {
+                    ((Text) orderPane.getChildren().get(size - 2)).setText(input);
+                    memo.hide();
+                    memoField.clear();
+                    memoError.setText("");
+                }else{
+                    memoError.setText("Error: Nothing to memo");
+                }
+            }
+        }else{
+            if (input.length() > 25) {
+                memoError.setText("Error: Maximum memo size: 25 characters");
+            } else if (input.isEmpty()) {
+                memoError.setText("Error: Empty Memo");
+            } else {
+                if ((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof TextFlow)) {
+                    orderPane.getChildren().addAll(new Text(input), new Text(""));
+                    memo.hide();
+                    memoField.clear();
+                    memoError.setText("");
+                } else {
+                    memoError.setText("Error: Nothing to memo");
+                }
             }
         }
     }
+
 
     private void deleteItems(){
         for(Text txt : deleteText){
@@ -463,10 +487,12 @@ public class Cashier {
         deleteOrderItems.clear();
     }
 
+
     private void openNewOrder(){
         Cashier newCashier = new Cashier(PrimaryStage, exit, employeeID);
         PrimaryStage.setScene(newCashier.getScene());
     }
+
 
     public void updateTotals(double cost){
         sub += cost;

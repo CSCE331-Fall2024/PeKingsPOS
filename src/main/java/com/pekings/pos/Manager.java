@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Manager {
+    Stage PrimaryStage;
+    Scene loginScreen;
 
     List<MenuItem> menuItemList;
     List<Employee> employeeList;
@@ -44,14 +46,18 @@ public class Manager {
     ScrollPane centerScroll = new ScrollPane();
     Rectangle r = new Rectangle();
     Text text = new Text("Manager");
+
     Button logOut = new Button();
+
     Button menuItems = createButton(30, 160, "_Menu\nItems", "-fx-background-color: #36919E");
     Button inventory = createButton(30, 255, "_Inventory", "-fx-background-color: #36919E");
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
     boolean deleteBool = false;
 
-    public Manager(Repository repo) {
+    public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
+        this.PrimaryStage = PrimaryStage;
+        this.loginScreen = loginScreen;
         this.repo = repo;
         rootManager = new Pane();
     }
@@ -137,7 +143,7 @@ public class Manager {
                     //
                     //repo.addMenuItem(new MenuItem(-1, newName, newPrice, ingredients));
 
-                    updateMenuItem((int) item.getId(), newName, newPrice);
+//                    updateMenuItem((int) item.getId(), newName, newPrice);
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
                 });
@@ -255,7 +261,7 @@ public class Manager {
                     // delete current menu item then add the edited version in
                     // void addMenuItem(MenuItem menuItem);
 
-                    updateMenuItem(ingredient.getId(), newName, newQuantity);
+//                    updateMenuItem(ingredient.getId(), newName, newQuantity);
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
                 });
@@ -494,6 +500,8 @@ public class Manager {
         dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart()));
 
         buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn);
+        buttonBox.setAlignment(Pos.CENTER);
+
         contentBox.getChildren().add(buttonBox);
 
         mainScrollPane.setContent(contentBox);
@@ -557,6 +565,9 @@ public class Manager {
         xAxis.setLabel("Date");
         yAxis.setLabel("Revenue $");
 
+        yAxis.setLowerBound(0); // minimum revenue value
+        yAxis.setUpperBound(1000); // maximum revenue value
+
         // Create a LineChart
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Revenue for Last 30 Days");
@@ -571,9 +582,12 @@ public class Manager {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-
+        System.out.println("Get Data");
+        //revenueData is probably enpty :(
         for (Map.Entry<Date, Double> entry : revenueData.entrySet()) {
             String dateStr = dateFormat.format(entry.getKey());
+            System.out.println("Date: " + dateStr);
+
             Double revenue = entry.getValue();
             series.getData().add(new XYChart.Data<>(dateStr, revenue));
         }
@@ -592,7 +606,7 @@ public class Manager {
 
 
     // update remove and add functions
-    private void updateMenuItem(long id, String newName, float newPrice) {
+    private void updateMenuItem(long id, String newName, float newPrice, List<Ingredient> ingredients) {
         // Update the menu item in the database
         // You need to implement this method based on your database structure
         //updateMenuItem(item.getId(), newName, newPrice);
@@ -600,7 +614,9 @@ public class Manager {
         //Will need removeMenuItem and addItem to update
         // TODO Needs updateMenuItem(), deletion and add shouldn't be necessary if update is implemented
         // TODO: Function obsolete if it calls a repo function and just passes in current arguments
-
+//        repo.removeMenuItem(id);
+//        repo.addMenuItem(new MenuItem(id, newName, newPrice, ingredients));
+//        repo.updateMenuItem(id, newName, newPrice);
     }
 // TODO Finish Popup for AddMenuItem Ingredient list
 //    private List<Ingredient> createNewIngredientList(){
@@ -662,6 +678,7 @@ public class Manager {
     private long addIngredient(String name, float price, int quantity) {
         Ingredient ingredient = new Ingredient(-1, name, price, quantity, (price * quantity));
 //        repo.addIngredientStock(ID, quantity)
+//        repo.addNewIngredient(ingredient);
 
         return -1;
     }
@@ -672,19 +689,24 @@ public class Manager {
         // Employee newEmployee = new Employee(id, username, password, position,lastClockIn,clockedIn);
         //repo.removeEmployee(id)
         // AND repo.addEmployee(newEmployee)
+
+        deleteEmployee(id);
+//        repo.addEmployee(id, username, password, position, false);
     }
 
     // TODO add addEmployee(Employee newEmployee) in repo
-    private void addNewEmployee(String username, String password, String position, Time lastClockIn) {
+    private void addNewEmployee(String username, String password, String position) {
         // long id = -1;
         // boolean clockedIn = false;
         // Employee newEmployee = new Employee(id, username, password,position,lastClockIn,clockedIn);
         // Same here: repo.addEmployee(newEmployee)
+
+//        repo.addEmployee(-1, username, password, position, false);
     }
 
     // TODO add removeEmployee(id) in repo
     private void deleteEmployee(long id) {
-
+//        repo.removeEmployee(id);
     }
 
     private Button createLogOutButton(Stage stage) {
@@ -821,9 +843,8 @@ public class Manager {
         Button yesBtn = new Button("Log Out");
         Button noBtn = new Button("Cancel");
 
-
         yesBtn.setOnAction(_ -> {
-            popStage.close(); // Close the application
+            PrimaryStage.setScene(loginScreen);
             popup.hide();  // Hide the popup
         });
 
