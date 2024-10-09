@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Manager {
+    Stage PrimaryStage;
+    Scene loginScreen;
 
     List<MenuItem> menuItemList;
     List<Employee> employeeList;
@@ -54,14 +56,18 @@ public class Manager {
     ScrollPane centerScroll = new ScrollPane();
     Rectangle r = new Rectangle();
     Text text = new Text("Manager");
+
     Button logOut = new Button();
+
     Button menuItems = createButton(30, 160, "_Menu\nItems", "-fx-background-color: #36919E");
     Button inventory = createButton(30, 255, "_Inventory", "-fx-background-color: #36919E");
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
     boolean deleteBool = false;
 
-    public Manager(Repository repo) {
+    public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
+        this.PrimaryStage = PrimaryStage;
+        this.loginScreen = loginScreen;
         this.repo = repo;
         rootManager = new Pane();
     }
@@ -831,9 +837,8 @@ public class Manager {
         Button yesBtn = new Button("Log Out");
         Button noBtn = new Button("Cancel");
 
-
         yesBtn.setOnAction(_ -> {
-            popStage.close(); // Close the application
+            PrimaryStage.setScene(loginScreen);
             popup.hide();  // Hide the popup
         });
 
