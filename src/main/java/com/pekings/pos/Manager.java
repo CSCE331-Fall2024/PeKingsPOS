@@ -575,6 +575,9 @@ public class Manager {
         xAxis.setLabel("Date");
         yAxis.setLabel("Revenue $");
 
+        yAxis.setLowerBound(0); // minimum revenue value
+        yAxis.setUpperBound(1000); // maximum revenue value
+
         // Create a LineChart
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Revenue for Last 30 Days");
@@ -589,9 +592,12 @@ public class Manager {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-
+        System.out.println("Get Data");
+        //revenueData is probably enpty :(
         for (Map.Entry<Date, Double> entry : revenueData.entrySet()) {
             String dateStr = dateFormat.format(entry.getKey());
+            System.out.println("Date: " + dateStr);
+
             Double revenue = entry.getValue();
             series.getData().add(new XYChart.Data<>(dateStr, revenue));
         }
