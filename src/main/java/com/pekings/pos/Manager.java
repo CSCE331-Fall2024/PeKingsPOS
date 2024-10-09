@@ -494,12 +494,14 @@ public class Manager {
         Button topMenuItemsRevenueBtn = new Button("Top Menu Items (Total Revenue)");
         Button topMenuItemsOrdersBtn = new Button("Top Menu Items (# of Orders)");
         Button dailyIncomeBtn = new Button("Daily Income");
+        Button timeIncomeBtn = new Button("Product Usage");
 
         topMenuItemsRevenueBtn.setOnAction(_ -> updateChart(createTopMenuItemsRevenueChart()));
         topMenuItemsOrdersBtn.setOnAction(_ -> updateChart(createTopMenuItemsOrdersChart()));
         dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart()));
+        timeIncomeBtn.setOnAction(_ -> updateChart(createTimeIncomeChart()));
 
-        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn);
+        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn, timeIncomeBtn);
         buttonBox.setAlignment(Pos.CENTER);
 
         contentBox.getChildren().add(buttonBox);
@@ -540,8 +542,15 @@ public class Manager {
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Top 5 Menu Items by Number of Orders");
 
-        // Retrieve the top menu items by number of orders
-        Map<MenuItem, Integer> topItems = repo.getTopMenuItemsOrders(5);
+        Map<MenuItem, Integer> topItems = repo.getTopMenuItemsOrders(5).entrySet()
+                .stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // Sorting in descending order
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1, // If there are duplicate keys, keep the first one (though duplicates shouldn't happen here)
+                        LinkedHashMap::new // Collecting into a LinkedHashMap to preserve order
+                ));
 
         // Create a data series for the chart
         XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -597,6 +606,34 @@ public class Manager {
         return lineChart;
     }
 
+    private LineChart<String, Number> createTimeIncomeChart() {
+        // Create the axes for the LineChart
+        CategoryAxis xAxis = new CategoryAxis();  // Menu items on X-axis
+        NumberAxis yAxis = new NumberAxis();      // Number of orders on Y-axis
+        xAxis.setLabel("Menu Item");
+        yAxis.setLabel("Number of Orders");
+
+        // Create the LineChart
+        LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setTitle("Top 5 Menu Items by Number of Orders");
+
+        // Retrieve the top menu items by number of orders
+        Map<MenuItem, Integer> topItems = repo.getTopMenuItemsOrders(5);
+
+        // Create a data series for the chart
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Number of Orders");
+
+        // Populate the series with the data from the map
+        topItems.forEach((item, orders) ->
+                series.getData().add(new XYChart.Data<>(item.getName(), orders))
+        );
+
+        // Add the series to the chart
+        lineChart.getData().add(series);
+
+        return lineChart;
+    }
 
     private String formatDate(Date date) {
         Calendar cal = Calendar.getInstance();
