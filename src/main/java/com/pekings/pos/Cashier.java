@@ -194,7 +194,12 @@ public class Cashier {
 
         memo.getContent().addAll(memoBox, memoTxt, memoField, closePop, memoFinish, memoError);
 
-        memoBtn.setOnAction(e -> memo.show(PrimaryStage));
+        memoBtn.setOnAction(e -> {
+            if((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(orderPane.getChildren().size() - 2) instanceof Text)){
+                memoField.setText(((Text) orderPane.getChildren().get(orderPane.getChildren().size() - 2)).getText());
+            }
+            memo.show(PrimaryStage);
+        });
 
 
 
@@ -394,9 +399,6 @@ public class Cashier {
         cash.setPrefHeight(150);
         cash.setStyle("-fx-background-color: lightgreen");
         cash.setOnAction(e -> {
-//            for(MenuItem item : orderItems){
-//                System.out.println(item.getName());
-//            }
             Random random = new Random();
             repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
         });
@@ -432,20 +434,38 @@ public class Cashier {
     }
 
     private void finishMemo(TextField memoField, Popup memo){
+        int size = orderPane.getChildren().size();
         String input = memoField.getText();
-        if(input.length() > 25){
-            memoError.setText("Error: Maximum memo size: 25 characters");
-        }else if(input.isEmpty()){
-            memoError.setText("Error: Empty Memo");
-        }else{
-            int size = orderPane.getChildren().size();
-            if ((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof TextFlow)) {
-                orderPane.getChildren().addAll(new Text(input), new Text(""));
-                memo.hide();
-                memoField.clear();
-                memoError.setText("");
+
+        if((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof Text)){
+            if(input.length() > 25){
+                memoError.setText("Error: Maximum memo size: 25 characters");
+            }else if(input.isEmpty()){
+                memoError.setText("Error: Empty Memo");
             }else{
-                memoError.setText("Error: Nothing to memo");
+                if ((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof Text)) {
+                    ((Text) orderPane.getChildren().get(size - 2)).setText(input);
+                    memo.hide();
+                    memoField.clear();
+                    memoError.setText("");
+                }else{
+                    memoError.setText("Error: Nothing to memo");
+                }
+            }
+        }else{
+            if (input.length() > 25) {
+                memoError.setText("Error: Maximum memo size: 25 characters");
+            } else if (input.isEmpty()) {
+                memoError.setText("Error: Empty Memo");
+            } else {
+                if ((!(orderPane.getChildren().isEmpty())) && (orderPane.getChildren().get(size - 2) instanceof TextFlow)) {
+                    orderPane.getChildren().addAll(new Text(input), new Text(""));
+                    memo.hide();
+                    memoField.clear();
+                    memoError.setText("");
+                } else {
+                    memoError.setText("Error: Nothing to memo");
+                }
             }
         }
     }
