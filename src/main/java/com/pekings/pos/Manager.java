@@ -242,7 +242,7 @@ public class Manager {
 
                 });
 
-
+        //Edit line
                 saveButton.setOnAction(_ -> {
                     String newName = nameField.getText();
                     float newQuantity = Integer.parseInt(quantityField.getText());
