@@ -176,7 +176,7 @@ public class Manager {
                 // newMenuItem = new MenuItem(-1, newName, newPrice,)
                 //repo.addMenuItem(newName, newPrice);
                 // Refresh the list (you might want to just add the new item instead of refreshing everything)
-
+                // Change
                 List<Ingredient> ingredients = repo.getAllIngredients();
                 List<String> ingredientNames = ingredients.stream().map(Ingredient::getName)
                         .toList();
