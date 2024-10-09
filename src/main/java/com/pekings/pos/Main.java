@@ -14,7 +14,7 @@ public class Main {
         ((PersistentRepository) repository).initialize();
 
         POSApp posApp = new POSApp();
-        posApp.initialize();
+        posApp.initialize(args);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
@@ -23,8 +23,7 @@ public class Main {
         }));
     }
 
-    public Repository getRepository() {
+    public static Repository getRepository() {
         return repository;
-        posApp.initialize(args);
     }
 }
