@@ -215,3 +215,37 @@ VALUES ('%s', '%s');
 -- get_all_ingredients
 SELECT * FROM inventory;
 
+-- add_new_ingredient_inventory
+INSERT INTO inventory(name, serving_price, amount, price_batch)
+VALUES ('%s', '%s', '%s', '%s');
+
+-- remove_ingredient_inventory
+DELETE FROM inventory WHERE inventory.id = '%s';
+
+-- remove_menu_item
+DELETE FROM menu WHERE menu.id = '%s';
+
+-- remove_menu_ingredients_menu_id
+DELETE FROM menu_ingredients WHERE menu_ingredients.menu_item = '%s';
+
+-- edit_ingredient_inventory
+UPDATE inventory SET serving_price = '%s', amount = '%s', price_batch = '%s', name = '%s'
+WHERE id = '%s';
+
+-- remove_menu_item
+DELETE FROM menu WHERE menu.id = '%s';
+
+-- remove_menu_ingredient
+DELETE FROM menu_ingredients WHERE menu_ingredients.menu_item = '%s';
+
+-- update_employee
+UPDATE employees SET username = '%s', pass = '%s', position = '%s', is_clockedin = '%s'
+WHERE id = '%s';
+
+-- add_employee
+INSERT INTO employees(username, pass, position, is_clockedin)
+VALUES ('%s', '%s', '%s', '%s');
+
+-- remove_employee
+DELETE FROM employees WHERE employees.id = '%s';
+
