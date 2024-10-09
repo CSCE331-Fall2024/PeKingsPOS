@@ -38,7 +38,7 @@ public class Manager {
 
     List<MenuItem> menuItemList;
     List<Employee> employeeList;
-//    List<Ingredient> ingredientList;
+
 
     private Repository repo;
     private Pane rootManager;
@@ -50,7 +50,7 @@ public class Manager {
     Button inventory = createButton(30, 255, "_Inventory", "-fx-background-color: #36919E");
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
-    boolean deleteBool = false;
+
 
     public Manager(Repository repo) {
         this.repo = repo;
@@ -176,10 +176,14 @@ public class Manager {
                 // newMenuItem = new MenuItem(-1, newName, newPrice,)
                 //repo.addMenuItem(newName, newPrice);
                 // Refresh the list (you might want to just add the new item instead of refreshing everything)
+
                 List<Ingredient> ingredients = repo.getAllIngredients();
                 List<String> ingredientNames = ingredients.stream().map(Ingredient::getName)
                         .toList();
-                //Text
+                List<String> addMenuPop = createAddMenuItemPopup(ingredientNames);
+                VBox header = new VBox(10);
+
+//                repo.addMenuItem();
                 menuItems.fire(); // This will refresh the entire list
             });
 
@@ -866,6 +870,38 @@ public class Manager {
         popup.getContent().add(popupContent);
 
         return popup;
+    }
+
+    private List<String> createAddMenuItemPopup(List<String> ingredientNames) {
+        Popup popup = new Popup();
+        List<String> newIngrList = new ArrayList<>();
+        popup.setHeight(500);
+        popup.setWidth(500);
+        // Create VBox for popup
+        VBox popupContent = new VBox(10);
+        popupContent.setPadding(new Insets(10));
+        popupContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2px;");
+
+
+        for(String ingr : ingredientNames){
+            ingredientText ingredient = new ingredientText(ingr, this, newIngrList);
+            popupContent.getChildren().add(ingredient.getText());
+        }
+        Button done = new Button();
+        Button clear = new Button();
+
+        done.setOnAction(_ ->{
+
+        });
+        HBox buttonBox = new HBox(10,done, clear);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        popupContent.getChildren().addAll(buttonBox);
+        popupContent.setAlignment(Pos.CENTER);
+
+        popup.getContent().add(popupContent);
+
+        return newIngrList;
     }
 
     private Popup createLogOutPopup(Stage popStage) {
