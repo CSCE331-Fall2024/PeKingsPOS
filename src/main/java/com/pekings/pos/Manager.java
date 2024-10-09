@@ -901,10 +901,6 @@ public class Manager {
         popupContent.setStyle("-fx-background-color: white; -fx-border-color: black; -fx-border-width: 2px;");
 
 
-        for(String ingr : ingredientNames){
-            ingredientText ingredient = new ingredientText(ingr, this, newIngrList);
-            popupContent.getChildren().add(ingredient.getText());
-        }
         Button done = new Button();
         Button clear = new Button();
 
