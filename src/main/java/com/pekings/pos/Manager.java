@@ -147,14 +147,15 @@ public class Manager {
                     }
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
+                    nameField.setEditable(false);
+                    priceField.setEditable(false);
                 });
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
-                    Popup dlt = createDeletePopup(menuItemsContainer,itemRow);
+                    Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
                     dlt.show(stage);
                     //menuItemsContainer.getChildren().remove(itemRow);
-
-
+                    menuItems.fire();
                 });
 
                 itemRow.getChildren().addAll(nameField, priceField, editButton, saveButton, deleteButton);
@@ -273,6 +274,8 @@ public class Manager {
                     repo.updateIngredientInventory(newIngredient);
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
+                    nameField.setEditable(false);
+                    quantityField.setEditable(false);
                 });
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
@@ -280,6 +283,7 @@ public class Manager {
                     dltIngredient.show(stage);
                     //TODO Add remove Ingredient method once added to repo
                     //repo.removeIngredientStock((int)ingredient.getId(),ingredient.getAmount());
+
                 });
 
                 itemRow.getChildren().addAll(nameField, idField, quantityField, editButton, saveButton, deleteButton);
