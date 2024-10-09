@@ -754,7 +754,6 @@ public class Manager {
     private Popup createDeletePopup(VBox container, HBox itemRow, MenuItem item){
         Popup popup = new Popup();
 
-
         // Create VBox for popup
         VBox popupContent = new VBox(10);
         popupContent.setPadding(new Insets(10));
