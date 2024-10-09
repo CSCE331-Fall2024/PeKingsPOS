@@ -117,7 +117,7 @@ public class Manager {
                     priceField.setPrefWidth(100);
 
                     Button editButton = new Button("_Edit");
-                    Button saveButton = new Button("_Save");
+                    Button saveButton = new Button("_Save All Changes");
                     Button deleteButton = new Button("_Delete");
 
                     saveButton.setVisible(false);
@@ -141,11 +141,12 @@ public class Manager {
                         // delete current menu item then add the edited version in
                         // void addMenuItem(MenuItem menuItem);
                         //
-                        updateMenuItem(item.getId(), newName, newPrice);
+                        updateMenuItem((int)item.getId(), newName, newPrice);
                     });
                     deleteButton.setOnAction(_ -> {
                         // Remove from database here
-                        removeMenuItem(item.getId());
+
+                        removeMenuItem((int)item.getId());
                         menuItemsContainer.getChildren().remove(itemRow);
                     });
 
@@ -254,7 +255,7 @@ public class Manager {
                 });
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
-                    removeMenuItem(ingredient.getId());
+                    removeMenuItem((int)ingredient.getId());
                     inventoryItemsContainer.getChildren().remove(itemRow);
                 });
 
@@ -445,9 +446,12 @@ public class Manager {
         //Will need removeMenuItem and addItem to update
     }
 
-    private void removeMenuItem(long id) {
+    private void removeMenuItem(int id) {
         // Remove the menu item from the database
         // You need to implement this method based on your database structure
+
+        //Get id from menuItemsList
+        repo.deleteMenuItem(id);
     }
 
     private long addItem(String name, float price) {

@@ -12,6 +12,8 @@ public interface Repository {
 
     void addMenuItem(MenuItem menuItem);
 
+    void deleteMenuItem(int id);
+
     MenuItem getMenuItem(int itemID);
 
     List<MenuItem> getOrderItems(int orderID);
@@ -41,6 +43,8 @@ public interface Repository {
     Map<MenuItem, Integer> getTopMenuItemsOrders(Date from, Date to);
 
     List<Ingredient> getIngredients(int menuItemID);
+
+    List<Ingredient> getAllIngredients();
 
     Map<String, Integer> getTopPaymentMethods();
 
