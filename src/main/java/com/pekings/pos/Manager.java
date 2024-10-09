@@ -153,7 +153,7 @@ public class Manager {
                     //
                     //repo.addMenuItem(new MenuItem(-1, newName, newPrice, ingredients));
 
-                    updateMenuItem((int) item.getId(), newName, newPrice);
+//                    updateMenuItem((int) item.getId(), newName, newPrice);
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
                 });
@@ -271,7 +271,7 @@ public class Manager {
                     // delete current menu item then add the edited version in
                     // void addMenuItem(MenuItem menuItem);
 
-                    updateMenuItem(ingredient.getId(), newName, newQuantity);
+//                    updateMenuItem(ingredient.getId(), newName, newQuantity);
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
                 });
@@ -510,6 +510,8 @@ public class Manager {
         dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart()));
 
         buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn);
+        buttonBox.setAlignment(Pos.CENTER);
+
         contentBox.getChildren().add(buttonBox);
 
         mainScrollPane.setContent(contentBox);
@@ -608,7 +610,7 @@ public class Manager {
 
 
     // update remove and add functions
-    private void updateMenuItem(long id, String newName, float newPrice) {
+    private void updateMenuItem(long id, String newName, float newPrice, List<Ingredient> ingredients) {
         // Update the menu item in the database
         // You need to implement this method based on your database structure
         //updateMenuItem(item.getId(), newName, newPrice);
@@ -616,7 +618,9 @@ public class Manager {
         //Will need removeMenuItem and addItem to update
         // TODO Needs updateMenuItem(), deletion and add shouldn't be necessary if update is implemented
         // TODO: Function obsolete if it calls a repo function and just passes in current arguments
-
+//        repo.removeMenuItem(id);
+//        repo.addMenuItem(new MenuItem(id, newName, newPrice, ingredients));
+//        repo.updateMenuItem(id, newName, newPrice);
     }
 // TODO Finish Popup for AddMenuItem Ingredient list
 //    private List<Ingredient> createNewIngredientList(){
@@ -678,6 +682,7 @@ public class Manager {
     private long addIngredient(String name, float price, int quantity) {
         Ingredient ingredient = new Ingredient(-1, name, price, quantity, (price * quantity));
 //        repo.addIngredientStock(ID, quantity)
+//        repo.addNewIngredient(ingredient);
 
         return -1;
     }
@@ -688,19 +693,24 @@ public class Manager {
         // Employee newEmployee = new Employee(id, username, password, position,lastClockIn,clockedIn);
         //repo.removeEmployee(id)
         // AND repo.addEmployee(newEmployee)
+
+        deleteEmployee(id);
+//        repo.addEmployee(id, username, password, position, false);
     }
 
     // TODO add addEmployee(Employee newEmployee) in repo
-    private void addNewEmployee(String username, String password, String position, Time lastClockIn) {
+    private void addNewEmployee(String username, String password, String position) {
         // long id = -1;
         // boolean clockedIn = false;
         // Employee newEmployee = new Employee(id, username, password,position,lastClockIn,clockedIn);
         // Same here: repo.addEmployee(newEmployee)
+
+//        repo.addEmployee(-1, username, password, position, false);
     }
 
     // TODO add removeEmployee(id) in repo
     private void deleteEmployee(long id) {
-
+//        repo.removeEmployee(id);
     }
 
     private Button createLogOutButton(Stage stage) {
