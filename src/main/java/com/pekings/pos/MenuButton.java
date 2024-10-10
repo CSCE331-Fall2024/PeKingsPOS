@@ -2,13 +2,8 @@ package com.pekings.pos;
 
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.util.OrderText;
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 
 import static javafx.scene.text.TextAlignment.CENTER;
 

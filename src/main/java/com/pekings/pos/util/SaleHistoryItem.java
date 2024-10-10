@@ -1,7 +1,6 @@
 package com.pekings.pos.util;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 public class SaleHistoryItem {
 

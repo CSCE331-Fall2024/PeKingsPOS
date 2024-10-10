@@ -521,6 +521,65 @@ public class PersistentRepository implements Repository {
         }, addOrderQuery, Statement.RETURN_GENERATED_KEYS);
     }
 
+    @Override
+    public void addNewIngredientInventory(Ingredient ingredient) {
+        String query = queryLoader.getQuery("add_new_ingredient_inventory")
+                .formatted(ingredient.getName(), ingredient.getPrice(),
+                        ingredient.getAmount(), ingredient.getBatchPrice());
+        performNonFetchQuery(query);
+    }
+
+    @Override
+    public void updateIngredientInventory(Ingredient ingredient) {
+        String query = queryLoader.getQuery("edit_ingredient_inventory")
+                .formatted(ingredient.getPrice() + "", ingredient.getAmount() + "",
+                        ingredient.getBatchPrice() + "", ingredient.getName(), ingredient.getId());
+        performNonFetchQuery(query);
+    }
+
+    @Override
+    public void deleteIngredientInventory(int ingredientID) {
+        String query = queryLoader.getQuery("remove_ingredient_inventory")
+                .formatted(ingredientID + "");
+        performNonFetchQuery(query);
+    }
+
+    @Override
+    public void addEmployee(Employee employee) {
+        String add = queryLoader.getQuery("add_employee")
+                .formatted(employee.getUsername(), employee.getPassword(),
+                        employee.getPosition(), employee.isClockedIn() + "",
+                        employee.getId() + "");
+        performNonFetchQuery(add);
+    }
+
+    @Override
+    public void removeEmployee(int id) {
+        String delete = queryLoader.getQuery("remove_employee")
+                .formatted(id + "");
+        performNonFetchQuery(delete);
+    }
+
+    @Override
+    public void updateEmployee(Employee employee) {
+        String update = queryLoader.getQuery("update_employee")
+                .formatted(employee.getUsername(), employee.getPassword(),
+                        employee.getPosition(), employee.isClockedIn() + "",
+                        employee.getId() + "");
+        performNonFetchQuery(update);
+    }
+
+    @Override
+    public void removeMenuItem(int id) {
+        String removeMenuIngredient = queryLoader.getQuery("remove_menu_ingredient")
+                .formatted(id + "");
+
+        String removeMenuItem = queryLoader.getQuery("remove_menu_item")
+                .formatted(id + "");
+
+        performNonFetchQuery(removeMenuIngredient, removeMenuItem);
+    }
+
     public Employee makeEmployee(ResultSet resultSet) throws SQLException {
         int id = resultSet.getInt("id");
         String username = resultSet.getString("username");
