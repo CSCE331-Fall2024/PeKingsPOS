@@ -359,6 +359,18 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
+    public Map<Ingredient, Integer> getTopIngredients(Date from, Date to, int topWhat) {
+        Map<Ingredient, Integer> topIngredients = new HashMap<>();
+        performFetchQuery("get_top_ingredients_periodic", resultSet -> {
+            int ingredientID = resultSet.getInt("ingredient_id");
+            Ingredient ingredient = getIngredient(ingredientID);
+            int usage = resultSet.getInt("total_usage");
+            topIngredients.put(ingredient, usage);
+        }, from.toString(), to.toString(), topWhat + "");
+        return topIngredients;
+    }
+
+    @Override
     public Map<Date, Double> getTopDatesRevenue(int topWhat) {
         Map<Date, Double> revenueMap = new HashMap<>();
         performFetchQuery("get_top_days_revenue", resultSet -> {

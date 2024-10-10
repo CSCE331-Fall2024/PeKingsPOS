@@ -62,6 +62,8 @@ public interface Repository {
 
     Map<Ingredient, Integer> getTopIngredients(int topWhat);
 
+    Map<Ingredient, Integer> getTopIngredients(Date from, Date to, int topWhat);
+
     Map<Date, Double> getTopDatesRevenue(int topWhat);
 
     Map<Date, Integer> getTopDatesTotalOrders(int topWhat);

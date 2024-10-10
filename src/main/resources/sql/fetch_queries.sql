@@ -142,6 +142,19 @@ GROUP BY i.id, i.name
 ORDER BY total_usage DESC
 LIMIT '%s';
 
+-- get_top_ingredients_periodic
+SELECT
+    i.id AS ingredient_id,
+    COUNT(oi.menu_item_id) AS total_usage
+FROM order_items oi
+         JOIN menu_ingredients mi ON oi.menu_item_id = mi.menu_item
+         JOIN inventory i ON mi.ingredient_id = i.id
+         JOIN orders o ON oi.order_id = o.id
+WHERE o.order_time BETWEEN '%s' AND '%s'
+GROUP BY i.id, i.name
+ORDER BY total_usage DESC
+LIMIT '%s';
+
 -- get_top_days_revenue
 SELECT
     DATE(o.order_time) AS order_day,
