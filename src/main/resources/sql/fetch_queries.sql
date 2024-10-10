@@ -3,6 +3,7 @@ SELECT
     menu.id AS menu_item_id,
     menu.name AS menu_item_name,
     menu.price AS menu_item_price,
+    menu.active AS menu_item_active,
     inventory.name AS ingredient_name,
     menu_ingredients.ingredients_in_item AS ingredient_quantity,
     inventory.price_batch AS ingredient_batch_price,

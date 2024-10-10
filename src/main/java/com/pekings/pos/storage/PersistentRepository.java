@@ -88,8 +88,11 @@ public class PersistentRepository implements Repository {
             int menuID = resultSet.getInt("id");
             String name = resultSet.getString("name");
             float price = resultSet.getFloat("price");
+            boolean active = resultSet.getBoolean("active");
             List<Ingredient> ingredients = getIngredients(menuID);
-            menuItems.add(new MenuItem(menuID, name, price, ingredients));
+
+            MenuItem menuItem = new MenuItem(menuID, name, price, ingredients, active);
+            menuItems.add(menuItem);
         }, id + "");
 
         return menuItems.getFirst();
@@ -157,6 +160,7 @@ public class PersistentRepository implements Repository {
             int id = resultSet.getInt("menu_item_id");
             String name = resultSet.getString("menu_item_name");
             float price = resultSet.getFloat("menu_item_price");
+            boolean active = resultSet.getBoolean("menu_item_active");
 
             String ingredient_name = resultSet.getString("ingredient_name");
             int quantity = resultSet.getInt("ingredient_quantity");
@@ -171,7 +175,7 @@ public class PersistentRepository implements Repository {
                 assert menuItem != null;
                 menuItem.addIngredient(ingredient);
             } else {
-                MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>());
+                MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>(), active);
                 menuItem.addIngredient(ingredient);
                 menuItems.add(menuItem);
             }
