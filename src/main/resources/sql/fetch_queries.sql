@@ -31,6 +31,9 @@ INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) VAL
 -- get_menu_item
 SELECT * FROM menu WHERE id = '%s';
 
+-- update_menu_item
+UPDATE menu SET name = '%s', price = '%s', active = '%s' WHERE id = '%s';
+
 -- get_menu_item_order
 SELECT * FROM order_items WHERE order_id = '%s';
 

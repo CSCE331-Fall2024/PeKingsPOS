@@ -142,7 +142,7 @@ public class Manager {
                         List<Ingredient> tempIngredients = repo.getIngredients((int) item.getId());
                         repo.removeMenuItem((int) item.getId());
                         menuItemsContainer.getChildren().remove(itemRow);
-                        MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients);
+                        MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
                         repo.addMenuItem(newOne);
                     }
                     saveButton.setVisible(false);

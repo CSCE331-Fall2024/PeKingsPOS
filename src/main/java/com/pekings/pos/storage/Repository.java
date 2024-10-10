@@ -16,6 +16,8 @@ public interface Repository {
 
     MenuItem getMenuItem(int itemID);
 
+    void updateMenuItem(MenuItem menuItem);
+
     List<MenuItem> getOrderItems(int orderID);
 
     double getDailyIncome(Date date);

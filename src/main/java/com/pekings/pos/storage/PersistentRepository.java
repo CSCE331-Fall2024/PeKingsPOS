@@ -99,6 +99,15 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
+    public void updateMenuItem(MenuItem menuItem) {
+        String query = queryLoader.getQuery("update_menu_item")
+                .formatted(menuItem.getName(), menuItem.getPrice() + "",
+                        menuItem.isActive(), menuItem.getId() + "");
+
+        performNonFetchQuery(query);
+    }
+
+    @Override
     public List<MenuItem> getOrderItems(int orderID) {
         List<MenuItem> menuItems = new ArrayList<>();
         performFetchQuery("get_menu_item_order", resultSet -> {
