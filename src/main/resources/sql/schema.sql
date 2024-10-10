@@ -42,7 +42,8 @@ CREATE TABLE "order_items" (
 CREATE TABLE "menu" (
     id SERIAL PRIMARY KEY,
     name TEXT,
-    price DECIMAL
+    price DECIMAL,
+    active BOOLEAN
 );
 
 -- List of ingredients for each menu item
