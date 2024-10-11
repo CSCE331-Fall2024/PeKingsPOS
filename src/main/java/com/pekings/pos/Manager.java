@@ -485,7 +485,7 @@ public class Manager {
 
         return managerScene;
     }
-
+    // Change for master pull request
     private void displayStatsReport(PieChart initChart) {
         rootManager.getChildren().clear();
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
