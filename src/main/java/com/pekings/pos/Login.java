@@ -69,6 +69,19 @@ public class Login {
             if (e.getCode().toString().equals("ENTER")){
                 checkLogin();
             }
+
+            // Auto login features are temporary
+            if (e.isControlDown() && e.isShiftDown() && e.getCode().toString().equals("C")) {
+                Button btn = new Button("Log\nOut");
+                btn.setOnAction(_ -> PrimaryStage.setScene(login));
+                Cashier cash = new Cashier(PrimaryStage, btn, repo.getEmployees().getFirst().getId());
+                cashier = cash.getScene();
+                PrimaryStage.setScene(cashier);
+            }
+            if (e.isControlDown() && e.isShiftDown() && e.getCode().toString().equals("M")) {
+                Manager manager = new Manager(PrimaryStage, login, repo);
+                PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
+            }
         });
 
         Label passwordLabel = new Label("Password: ");
