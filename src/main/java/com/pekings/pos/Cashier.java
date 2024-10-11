@@ -395,7 +395,6 @@ public class Cashier {
             cash.setOnAction(e -> {
                 Random random = new Random();
                 repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
-                openNewOrder();
             });
 
             Button card = new Button("Card");
@@ -405,7 +404,6 @@ public class Cashier {
             card.setOnAction(e -> {
                 Random random = new Random();
                 repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
-                openNewOrder();
             });
 
             // Create HBox for top buttons

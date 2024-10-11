@@ -88,11 +88,23 @@ public class PersistentRepository implements Repository {
             int menuID = resultSet.getInt("id");
             String name = resultSet.getString("name");
             float price = resultSet.getFloat("price");
+            boolean active = resultSet.getBoolean("active");
             List<Ingredient> ingredients = getIngredients(menuID);
-            menuItems.add(new MenuItem(menuID, name, price, ingredients));
+
+            MenuItem menuItem = new MenuItem(menuID, name, price, ingredients, active);
+            menuItems.add(menuItem);
         }, id + "");
 
         return menuItems.getFirst();
+    }
+
+    @Override
+    public void updateMenuItem(MenuItem menuItem) {
+        String query = queryLoader.getQuery("update_menu_item")
+                .formatted(menuItem.getName(), menuItem.getPrice() + "",
+                        menuItem.isActive(), menuItem.getId() + "");
+
+        performNonFetchQuery(query);
     }
 
     @Override
@@ -157,6 +169,7 @@ public class PersistentRepository implements Repository {
             int id = resultSet.getInt("menu_item_id");
             String name = resultSet.getString("menu_item_name");
             float price = resultSet.getFloat("menu_item_price");
+            boolean active = resultSet.getBoolean("menu_item_active");
 
             String ingredient_name = resultSet.getString("ingredient_name");
             int quantity = resultSet.getInt("ingredient_quantity");
@@ -171,7 +184,7 @@ public class PersistentRepository implements Repository {
                 assert menuItem != null;
                 menuItem.addIngredient(ingredient);
             } else {
-                MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>());
+                MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>(), active);
                 menuItem.addIngredient(ingredient);
                 menuItems.add(menuItem);
             }
@@ -359,6 +372,18 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
+    public Map<Ingredient, Integer> getTopIngredients(Date from, Date to, int topWhat) {
+        Map<Ingredient, Integer> topIngredients = new HashMap<>();
+        performFetchQuery("get_top_ingredients_periodic", resultSet -> {
+            int ingredientID = resultSet.getInt("ingredient_id");
+            Ingredient ingredient = getIngredient(ingredientID);
+            int usage = resultSet.getInt("total_usage");
+            topIngredients.put(ingredient, usage);
+        }, from.toString(), to.toString(), topWhat + "");
+        return topIngredients;
+    }
+
+    @Override
     public Map<Date, Double> getTopDatesRevenue(int topWhat) {
         Map<Date, Double> revenueMap = new HashMap<>();
         performFetchQuery("get_top_days_revenue", resultSet -> {
@@ -457,13 +482,16 @@ public class PersistentRepository implements Repository {
     @Override
     public void addOrder(Order order) {
 
-        performNonFetchQuery(statement -> {
-            String addOrderQuery = queryLoader.getQuery("add_order")
-                    .formatted(order.getCustomerID(), order.getPrice() + "", order.getPaymentMethod(),
-                            order.getEmployeeID() + "", order.getPurchaseTime().toString());
-            statement.executeUpdate(addOrderQuery);
+        String addOrderQuery = queryLoader.getQuery("add_order")
+                .formatted(order.getCustomerID(), order.getPrice() + "", order.getPaymentMethod(),
+                        order.getEmployeeID() + "", order.getPurchaseTime().toString());
 
-            ResultSet resultSet = statement.getGeneratedKeys();
+        performPreparedStatement(preparedStatement -> {
+
+            preparedStatement.execute();
+
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
+
             int orderID = -1;
             while (resultSet.next()) {
                 orderID = resultSet.getInt(1);
@@ -477,15 +505,19 @@ public class PersistentRepository implements Repository {
             List<String> queries = new ArrayList<>();
 
             for (MenuItem menuItem : order.getItemsSold()) {
+
+                // add order_items
                 String addItemSold = queryLoader.getQuery("add_item_sold")
                         .formatted(orderID + "", menuItem.getId() + "");
 
                 queries.add(addItemSold);
 
+                // add to menu_ingredients
                 for (Ingredient ingredient : menuItem.getIngredients()) {
                     String addIngredient = queryLoader.getQuery("add_order_inventory")
-                            .formatted(order.getId() + "", ingredient.getId() + "");
+                            .formatted(orderID + "", ingredient.getId() + "");
 
+                    // remove from inventory
                     String removeInventoryIngredient = queryLoader.getQuery("update_ingredient_amount")
                             .formatted(ingredient.getAmount() * (-1), ingredient.getId() + "");
 
@@ -495,7 +527,7 @@ public class PersistentRepository implements Repository {
             }
 
             performNonFetchQuery(queries.toArray(String[]::new));
-        });
+        }, addOrderQuery, Statement.RETURN_GENERATED_KEYS);
     }
 
     @Override
@@ -613,6 +645,16 @@ public class PersistentRepository implements Repository {
             Statement statement = conn.createStatement();
             consumer.accept(statement);
             statement.close();
+        } catch (Exception x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    private void performPreparedStatement(ThrowingConsumer<PreparedStatement> consumer, String query, int autoGeneratedKeys) {
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(query, autoGeneratedKeys);
+            consumer.accept(preparedStatement);
+            preparedStatement.close();
         } catch (Exception x) {
             throw new RuntimeException(x);
         }

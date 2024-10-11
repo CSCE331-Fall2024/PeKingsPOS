@@ -117,9 +117,6 @@ public class Login {
                     cashier = cash.getScene();
                     PrimaryStage.setScene(cashier);
                 } else {
-                    Button btn = new Button("Log Out");
-                    btn.setOnAction(e -> PrimaryStage.setScene(login));
-
                     Manager manager = new Manager(PrimaryStage, login, repo);
                     PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
                 }
