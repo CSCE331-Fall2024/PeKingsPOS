@@ -16,6 +16,8 @@ public interface Repository {
 
     MenuItem getMenuItem(int itemID);
 
+    void updateMenuItem(MenuItem menuItem);
+
     List<MenuItem> getOrderItems(int orderID);
 
     double getDailyIncome(Date date);
@@ -61,6 +63,8 @@ public interface Repository {
     void clockOut(int employeeID);
 
     Map<Ingredient, Integer> getTopIngredients(int topWhat);
+
+    Map<Ingredient, Integer> getTopIngredients(Date from, Date to, int topWhat);
 
     Map<Date, Double> getTopDatesRevenue(int topWhat);
 

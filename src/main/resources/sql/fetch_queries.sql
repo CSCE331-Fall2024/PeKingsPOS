@@ -3,6 +3,7 @@ SELECT
     menu.id AS menu_item_id,
     menu.name AS menu_item_name,
     menu.price AS menu_item_price,
+    menu.active AS menu_item_active,
     inventory.name AS ingredient_name,
     menu_ingredients.ingredients_in_item AS ingredient_quantity,
     inventory.price_batch AS ingredient_batch_price,
@@ -29,6 +30,9 @@ INSERT INTO menu_ingredients (ingredient_id, menu_item, ingredients_in_item) VAL
 
 -- get_menu_item
 SELECT * FROM menu WHERE id = '%s';
+
+-- update_menu_item
+UPDATE menu SET name = '%s', price = '%s', active = '%s' WHERE id = '%s';
 
 -- get_menu_item_order
 SELECT * FROM order_items WHERE order_id = '%s';
@@ -138,6 +142,19 @@ FROM order_items oi
          JOIN menu_ingredients mi ON oi.menu_item_id = mi.menu_item
          JOIN inventory i ON mi.ingredient_id = i.id
          JOIN orders o ON oi.order_id = o.id
+GROUP BY i.id, i.name
+ORDER BY total_usage DESC
+LIMIT '%s';
+
+-- get_top_ingredients_periodic
+SELECT
+    i.id AS ingredient_id,
+    COUNT(oi.menu_item_id) AS total_usage
+FROM order_items oi
+         JOIN menu_ingredients mi ON oi.menu_item_id = mi.menu_item
+         JOIN inventory i ON mi.ingredient_id = i.id
+         JOIN orders o ON oi.order_id = o.id
+WHERE o.order_time BETWEEN '%s' AND '%s'
 GROUP BY i.id, i.name
 ORDER BY total_usage DESC
 LIMIT '%s';

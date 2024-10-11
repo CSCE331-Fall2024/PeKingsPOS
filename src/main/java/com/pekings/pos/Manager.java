@@ -142,7 +142,7 @@ public class Manager {
                         List<Ingredient> tempIngredients = repo.getIngredients((int) item.getId());
                         repo.removeMenuItem((int) item.getId());
                         menuItemsContainer.getChildren().remove(itemRow);
-                        MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients);
+                        MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
                         repo.addMenuItem(newOne);
                     }
                     saveButton.setVisible(false);
@@ -563,8 +563,15 @@ public class Manager {
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Top 5 Menu Items by Number of Orders");
 
-        // Retrieve the top menu items by number of orders
-        Map<MenuItem, Integer> topItems = repo.getTopMenuItemsOrders(5);
+        Map<MenuItem, Integer> topItems = repo.getTopMenuItemsOrders(5).entrySet()
+                .stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // Sorting in descending order
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1, // If there are duplicate keys, keep the first one (though duplicates shouldn't happen here)
+                        LinkedHashMap::new // Collecting into a LinkedHashMap to preserve order
+                ));
 
         // Create a data series for the chart
         XYChart.Series<String, Number> series = new XYChart.Series<>();
