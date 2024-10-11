@@ -90,133 +90,7 @@ public class Manager {
         logOut = createLogOutButton(stage);
         // Button actions
 
-        menuItems.setOnAction(_ -> { // Create vertical box that lines up perfectly the names, quantity, and prices of each menu item.
-
-            rootManager.getChildren().clear();
-            rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
-
-            // Create main container for menu items
-            VBox menuItemsContainer = new VBox(10); // 10 is the spacing between items
-            menuItemsContainer.setPadding(new Insets(15, 15, 15, 15));
-
-            HBox Header = new HBox(10);
-            Label nameColumn = new Label("Name");
-            Label priceColumn = new Label("Price");
-            nameColumn.setStyle("-fx-font-weight: bold");
-            priceColumn.setStyle("-fx-font-weight: bold");
-            nameColumn.setPrefWidth(300);
-            priceColumn.setPrefWidth(100);
-            Header.getChildren().addAll(nameColumn, priceColumn);
-            menuItemsContainer.getChildren().add(Header);
-
-            // Add menu items to the list and display them
-            for (MenuItem item : menuItemList) {
-                HBox itemRow = new HBox(10);
-                TextField nameField = new TextField(item.getName());
-                TextField priceField = new TextField(String.format("$%.2f", item.getPrice()));
-                nameField.setPrefWidth(300);
-                priceField.setPrefWidth(100);
-
-                Button editButton = new Button("_Edit");
-                Button saveButton = new Button("_Save Changes");
-                Button deleteButton = new Button("_Delete");
-
-                saveButton.setVisible(false);
-                nameField.setEditable(false);
-                priceField.setEditable(false);
-
-                editButton.setOnAction(_ -> {
-                    saveButton.setVisible(true);
-                    nameField.setEditable(true);
-                    priceField.setEditable(true);
-                    editButton.setVisible(false);
-
-                });
-
-
-                saveButton.setOnAction(_ -> {
-                    String newName = nameField.getText();
-                    String newPriceStr = priceField.getText();
-                    float newPrice = Float.parseFloat(newPriceStr.substring(1));
-
-//                  System.out.println("MenuItem edited");
-                    int tempIdHold = (int) item.getId();
-                    List<Ingredient> tempIngredients = repo.getIngredients(tempIdHold);
-//                    repo.removeMenuItem((int) item.getId());
-                    menuItemsContainer.getChildren().remove(itemRow);
-                    MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
-//                    repo.addMenuItem(newOne);
-                    repo.updateMenuItem(newOne);
-
-                    saveButton.setVisible(false);
-                    editButton.setVisible(true);
-                    nameField.setEditable(false);
-                    priceField.setEditable(false);
-                    System.out.println("MenuItem edited Finish");
-                });
-                deleteButton.setOnAction(_ -> {
-                    // Remove from database here
-                    Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
-                    dlt.show(stage);
-                    //menuItemsContainer.getChildren().remove(itemRow);
-                    menuItems.fire();
-                });
-
-                itemRow.getChildren().addAll(nameField, priceField, editButton, saveButton, deleteButton);
-                menuItemsContainer.getChildren().add(itemRow);
-
-
-            }
-
-
-            HBox newItemRow = new HBox(10);
-            TextField newNameField = new TextField();
-            TextField newPriceField = new TextField();
-            Button addButton = new Button("Add Item");
-
-            newNameField.setPromptText("New item name");
-            newPriceField.setPromptText("Price");
-            newNameField.setPrefWidth(300);
-            newPriceField.setPrefWidth(100);
-
-            addButton.setOnAction(_ -> {
-                String newName = newNameField.getText();
-                float newPrice = Float.parseFloat(newPriceField.getText().substring(1));
-                // Add to database here
-                //List<Ingredient> newList = createNewIngredientList();
-                //MenuItem newMenuItem = new MenuItem(newName,newPrice, newList);
-                // newMenuItem = new MenuItem(-1, newName, newPrice,)
-                //repo.addMenuItem(newName, newPrice);
-                // Refresh the list (you might want to just add the new item instead of refreshing everything)
-                // Change
-                List<Ingredient> ingredients = repo.getAllIngredients();
-                List<String> ingredientNames = ingredients.stream().map(Ingredient::getName).toList();
-                List<String> addMenuPop = createAddMenuItemPopup(ingredientNames);
-                VBox header = new VBox(10);
-
-//                repo.addMenuItem();
-                menuItems.fire(); // This will refresh the entire list
-            });
-
-
-            newItemRow.getChildren().addAll(newNameField, newPriceField, addButton);
-            menuItemsContainer.getChildren().add(newItemRow);
-
-            // Adds space so the add item buttons display fully
-            Region extraSpace = new Region();
-            extraSpace.setPrefHeight(50);
-            VBox.setVgrow(extraSpace, javafx.scene.layout.Priority.ALWAYS);
-            menuItemsContainer.getChildren().add(extraSpace);
-
-            ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
-            scrollPane.setPrefWidth(650);
-            scrollPane.setPrefHeight(700);
-            scrollPane.setLayoutX(160);
-            scrollPane.setLayoutY(0);
-
-
-            rootManager.getChildren().add(scrollPane);
-        });
+        menuItems.setOnAction(_ -> openMenuItems(stage));
         PieChart initialChart = createTopMenuItemsRevenueChart();
 
 
@@ -491,7 +365,7 @@ public class Manager {
         centerScroll.setPrefHeight(700);
 
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
-
+        openMenuItems(stage);
 
         return managerScene;
     }
@@ -986,5 +860,132 @@ public class Manager {
         });
 
         return Btn;
+    }
+
+    private void openMenuItems(Stage stage){
+        rootManager.getChildren().clear();
+        rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
+
+        // Create main container for menu items
+        VBox menuItemsContainer = new VBox(10); // 10 is the spacing between items
+        menuItemsContainer.setPadding(new Insets(15, 15, 15, 15));
+
+        HBox Header = new HBox(10);
+        Label nameColumn = new Label("Name");
+        Label priceColumn = new Label("Price");
+        nameColumn.setStyle("-fx-font-weight: bold");
+        priceColumn.setStyle("-fx-font-weight: bold");
+        nameColumn.setPrefWidth(300);
+        priceColumn.setPrefWidth(100);
+        Header.getChildren().addAll(nameColumn, priceColumn);
+        menuItemsContainer.getChildren().add(Header);
+
+        // Add menu items to the list and display them
+        for (MenuItem item : menuItemList) {
+            HBox itemRow = new HBox(10);
+            TextField nameField = new TextField(item.getName());
+            TextField priceField = new TextField(String.format("$%.2f", item.getPrice()));
+            nameField.setPrefWidth(300);
+            priceField.setPrefWidth(100);
+
+            Button editButton = new Button("_Edit");
+            Button saveButton = new Button("_Save Changes");
+            Button deleteButton = new Button("_Delete");
+
+            saveButton.setVisible(false);
+            nameField.setEditable(false);
+            priceField.setEditable(false);
+
+            editButton.setOnAction(_ -> {
+                saveButton.setVisible(true);
+                nameField.setEditable(true);
+                priceField.setEditable(true);
+                editButton.setVisible(false);
+
+            });
+
+
+            saveButton.setOnAction(_ -> {
+                String newName = nameField.getText();
+                String newPriceStr = priceField.getText();
+                float newPrice = Float.parseFloat(newPriceStr.substring(1));
+
+//                  System.out.println("MenuItem edited");
+                int tempIdHold = (int) item.getId();
+                List<Ingredient> tempIngredients = repo.getIngredients(tempIdHold);
+//                    repo.removeMenuItem((int) item.getId());
+                menuItemsContainer.getChildren().remove(itemRow);
+                MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
+//                    repo.addMenuItem(newOne);
+                repo.updateMenuItem(newOne);
+
+                saveButton.setVisible(false);
+                editButton.setVisible(true);
+                nameField.setEditable(false);
+                priceField.setEditable(false);
+                System.out.println("MenuItem edited Finish");
+            });
+            deleteButton.setOnAction(_ -> {
+                // Remove from database here
+                Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
+                dlt.show(stage);
+                //menuItemsContainer.getChildren().remove(itemRow);
+                openMenuItems(stage);
+            });
+
+            itemRow.getChildren().addAll(nameField, priceField, editButton, saveButton, deleteButton);
+            menuItemsContainer.getChildren().add(itemRow);
+
+
+        }
+
+
+        HBox newItemRow = new HBox(10);
+        TextField newNameField = new TextField();
+        TextField newPriceField = new TextField();
+        Button addButton = new Button("Add Item");
+
+        newNameField.setPromptText("New item name");
+        newPriceField.setPromptText("Price");
+        newNameField.setPrefWidth(300);
+        newPriceField.setPrefWidth(100);
+
+        addButton.setOnAction(_ -> {
+            String newName = newNameField.getText();
+            float newPrice = Float.parseFloat(newPriceField.getText().substring(1));
+            // Add to database here
+            //List<Ingredient> newList = createNewIngredientList();
+            //MenuItem newMenuItem = new MenuItem(newName,newPrice, newList);
+            // newMenuItem = new MenuItem(-1, newName, newPrice,)
+            //repo.addMenuItem(newName, newPrice);
+            // Refresh the list (you might want to just add the new item instead of refreshing everything)
+            // Change
+            List<Ingredient> ingredients = repo.getAllIngredients();
+            List<String> ingredientNames = ingredients.stream().map(Ingredient::getName).toList();
+            List<String> addMenuPop = createAddMenuItemPopup(ingredientNames);
+            VBox header = new VBox(10);
+
+//                repo.addMenuItem();
+            openMenuItems(stage); // This will refresh the entire list
+        });
+
+
+        newItemRow.getChildren().addAll(newNameField, newPriceField, addButton);
+        menuItemsContainer.getChildren().add(newItemRow);
+
+        // Adds space so the add item buttons display fully
+        Region extraSpace = new Region();
+        extraSpace.setPrefHeight(50);
+        VBox.setVgrow(extraSpace, javafx.scene.layout.Priority.ALWAYS);
+        menuItemsContainer.getChildren().add(extraSpace);
+
+        ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
+        scrollPane.setPrefWidth(650);
+        scrollPane.setPrefHeight(700);
+        scrollPane.setLayoutX(160);
+        scrollPane.setLayoutY(0);
+
+
+        rootManager.getChildren().add(scrollPane);
     }
 }
