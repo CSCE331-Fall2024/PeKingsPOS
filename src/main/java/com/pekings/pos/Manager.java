@@ -181,7 +181,7 @@ public class Manager {
 
             addButton.setOnAction(_ -> {
                 String newName = newNameField.getText();
-                float newPrice = Float.parseFloat(newPriceField.getText());
+                float newPrice = Float.parseFloat(newPriceField.getText().substring(1));
                 // Add to database here
                 //List<Ingredient> newList = createNewIngredientList();
                 //MenuItem newMenuItem = new MenuItem(newName,newPrice, newList);
@@ -190,8 +190,7 @@ public class Manager {
                 // Refresh the list (you might want to just add the new item instead of refreshing everything)
                 // Change
                 List<Ingredient> ingredients = repo.getAllIngredients();
-                List<String> ingredientNames = ingredients.stream().map(Ingredient::getName)
-                        .toList();
+                List<String> ingredientNames = ingredients.stream().map(Ingredient::getName).toList();
                 List<String> addMenuPop = createAddMenuItemPopup(ingredientNames);
                 VBox header = new VBox(10);
 
