@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.chart.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -135,20 +136,23 @@ public class Manager {
 
                 saveButton.setOnAction(_ -> {
                     String newName = nameField.getText();
-                    float newPrice = Float.parseFloat(priceField.getText());
+                    String newPriceStr = priceField.getText();
+                    float newPrice = Float.parseFloat(newPriceStr.substring(1));
 
-                    if(!Objects.equals(newName, item.getName()) || (int)newPrice != item.getPrice()) {
-                        int tempIdHold = (int) item.getId();
-                        List<Ingredient> tempIngredients = repo.getIngredients((int) item.getId());
-                        repo.removeMenuItem((int) item.getId());
-                        menuItemsContainer.getChildren().remove(itemRow);
-                        MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
-                        repo.addMenuItem(newOne);
-                    }
+//                  System.out.println("MenuItem edited");
+                    int tempIdHold = (int) item.getId();
+                    List<Ingredient> tempIngredients = repo.getIngredients(tempIdHold);
+//                    repo.removeMenuItem((int) item.getId());
+                    menuItemsContainer.getChildren().remove(itemRow);
+                    MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
+//                    repo.addMenuItem(newOne);
+                    repo.updateMenuItem(newOne);
+
                     saveButton.setVisible(false);
                     editButton.setVisible(true);
                     nameField.setEditable(false);
                     priceField.setEditable(false);
+                    System.out.println("MenuItem edited Finish");
                 });
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
@@ -199,11 +203,18 @@ public class Manager {
             newItemRow.getChildren().addAll(newNameField, newPriceField, addButton);
             menuItemsContainer.getChildren().add(newItemRow);
 
+            // Adds space so the add item buttons display fully
+            Region extraSpace = new Region();
+            extraSpace.setPrefHeight(50);
+            VBox.setVgrow(extraSpace, javafx.scene.layout.Priority.ALWAYS);
+            menuItemsContainer.getChildren().add(extraSpace);
+
             ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
-            scrollPane.setPrefViewportWidth(650);
-            scrollPane.setPrefViewportHeight(685);
+            scrollPane.setPrefWidth(650);
+            scrollPane.setPrefHeight(700);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(0);
+
 
             rootManager.getChildren().add(scrollPane);
         });
