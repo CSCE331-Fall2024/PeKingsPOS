@@ -4,11 +4,15 @@ import com.pekings.pos.object.Employee;
 import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.storage.Repository;
-import com.pekings.pos.util.DateGenerator;
+import com.pekings.pos.util.DateUtil;
+import com.pekings.pos.util.SaleHistoryItem;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.*;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.shape.Rectangle;
@@ -487,7 +491,6 @@ public class Manager {
         return managerScene;
     }
 
-
     private void displayStatsReport(PieChart initChart) {
         rootManager.getChildren().clear();
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
@@ -523,11 +526,19 @@ public class Manager {
 
         pucBox.setVisible(false);
 
+        HBox zReportBox = new HBox();
+        zReportBox.setPrefWidth(845);
+        zReportBox.setLayoutX(100);
+        zReportBox.setLayoutY(30);
+
+        zReportBox.setVisible(false);
+
         Button topMenuItemsRevenueBtn = new Button("Top Menu Items (Total Revenue)");
         Button topMenuItemsOrdersBtn = new Button("Top Menu Items (# of Orders)");
         Button dailyIncomeBtn = new Button("Daily Income");
         Button pucBtn = new Button("Product Usage Chart");
         Button submitTimeBtn = new Button("Submit Time");
+        Button zReport = new Button("Z Report");
 
         TextField from = new TextField();
         TextField to = new TextField();
@@ -537,32 +548,53 @@ public class Manager {
         topMenuItemsRevenueBtn.setOnAction(_ -> {
             updateChart(createTopMenuItemsRevenueChart());
             pucBox.setVisible(false);
+            zReportBox.setVisible(false);
         });
         topMenuItemsOrdersBtn.setOnAction(_ -> {
             updateChart(createTopMenuItemsOrdersChart());
             pucBox.setVisible(false);
+            zReportBox.setVisible(false);
         });
         dailyIncomeBtn.setOnAction(_ -> {
             updateChart(createDailyIncomeChart());
             pucBox.setVisible(false);
+            zReportBox.setVisible(false);
         });
 
         pucBtn.setOnAction(_ -> {
             //updateChart(createPUCChart(from, to));
             pucBox.setVisible(true);
+            zReportBox.setVisible(false);
         });
+
+        zReport.setOnAction(actionEvent -> {
+            pucBox.setVisible(false);
+            zReportBox.setVisible(true);
+        });
+
+        TextField zReportDay = new TextField();
+        zReportDay.setPromptText("Format: YYYY-MM-DD");
+        Button submitZReportDay = new Button("Submit");
+
         submitTimeBtn.setOnAction(_ -> {
             updateChart(createPUCChart(from, to));
         });
 
+        submitZReportDay.setOnAction(actionEvent -> {
+            VBox vb = (VBox) ((ScrollPane) rootManager.getChildren().get(rootManager.getChildren().size() - 1)).getContent();
+            vb.getChildren().set(0, createZReport(DateUtil.fromString(zReportDay.getText())));
+        });
 
-        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn, pucBtn);
+        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn, pucBtn, zReport);
         buttonBox.setAlignment(Pos.CENTER);
 
         pucBox.getChildren().addAll(from,submitTimeBtn,to);
         pucBox.setAlignment(Pos.CENTER);
 
-        contentBox.getChildren().addAll(buttonBox,pucBox);
+        zReportBox.getChildren().addAll(zReportDay, submitZReportDay);
+        zReportBox.setAlignment(Pos.CENTER);
+
+        contentBox.getChildren().addAll(buttonBox, pucBox, zReportBox);
 
         mainScrollPane.setContent(contentBox);
         rootManager.getChildren().add(mainScrollPane);
@@ -587,6 +619,27 @@ public class Manager {
         chart.setData(pieChartData);
         chart.setTitle("Top 5 Menu Items by Revenue");
         return chart;
+    }
+
+    private TableView<SaleHistoryItem> createZReport(Date day) {
+        TableView<SaleHistoryItem> tableView = new TableView<>();
+        TableColumn<SaleHistoryItem, String> order_hour = new TableColumn<>("Hour");
+        TableColumn<SaleHistoryItem, String> totalOrderColumns = new TableColumn<>("Orders");
+        TableColumn<SaleHistoryItem, String> totalRevenueColumns = new TableColumn<>("Revenue");
+
+        order_hour.setCellValueFactory(new PropertyValueFactory<>("time"));
+        totalOrderColumns.setCellValueFactory(new PropertyValueFactory<>("totalOrders"));
+        totalRevenueColumns.setCellValueFactory(new PropertyValueFactory<>("totalRevenue"));
+
+        tableView.getColumns().add(order_hour);
+        tableView.getColumns().add(totalOrderColumns);
+        tableView.getColumns().add(totalRevenueColumns);
+
+        List<SaleHistoryItem> saleHistoryItems = repo.getSalesHistory(day, DateUtil.addDay(day));
+        saleHistoryItems.reversed(); // we get this from midnight next day to midnight requested day, so reverse
+        tableView.getItems().addAll(saleHistoryItems);
+
+        return tableView;
     }
 
     private LineChart<String, Number> createTopMenuItemsOrdersChart() {
@@ -674,8 +727,8 @@ public class Manager {
 
         String fromInput = from.getText();
         String toInput = to.getText();
-        Date fromDate = DateGenerator.fromString(fromInput);
-        Date toDate = DateGenerator.fromString(toInput);
+        Date fromDate = DateUtil.fromString(fromInput);
+        Date toDate = DateUtil.fromString(toInput);
 
         // Create a histogram/barchart
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
