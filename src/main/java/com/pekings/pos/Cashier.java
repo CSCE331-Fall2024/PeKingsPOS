@@ -111,14 +111,7 @@ public class Cashier {
         cancelOrder.setStyle("-fx-background-color: #36919E");
         cancelOrder.setLayoutX(30);
         cancelOrder.setLayoutY(255);
-        cancelOrder.setOnAction(e -> {
-            Orders.remove(this);
-            if(Orders.isEmpty()) {
-                openNewOrder();
-            }else{
-                PrimaryStage.setScene(Orders.getLast().getScene());
-            }
-        });
+        cancelOrder.setOnAction(e -> cancelOrder());
 
         Button viewPrevious = new Button("  View\nPrevious");
         viewPrevious.setPrefWidth(80);
@@ -286,8 +279,10 @@ public class Cashier {
 
         //Adds the menu buttons to the menu TilePane
         for (MenuItem i : menuItems) {
-            MenuButton MenuItemButton = new MenuButton(i, orderPane, this);
-            menuPane.getChildren().add(MenuItemButton.createMenuBtn());
+            if(i.isActive()) {
+                MenuButton MenuItemButton = new MenuButton(i, orderPane, this);
+                menuPane.getChildren().add(MenuItemButton.createMenuBtn());
+            }
         }
 
 
@@ -394,7 +389,9 @@ public class Cashier {
             cash.setStyle("-fx-background-color: lightgreen");
             cash.setOnAction(e -> {
                 Random random = new Random();
-                repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
+                repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
+                closeOrder();
+//                openNewOrder();
             });
 
             Button card = new Button("Card");
@@ -403,7 +400,9 @@ public class Cashier {
             card.setStyle("-fx-background-color: orange");
             card.setOnAction(e -> {
                 Random random = new Random();
-                repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "cash", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
+                repo.addOrder(new Order(-1, (random.nextInt(1000) + 1), orderItems, (Math.round((sub * 1.0625) * 100) / 100.00), "credit_card", new Date(Calendar.getInstance().getTimeInMillis()), (int) employeeID));
+                closeOrder();
+//                openNewOrder();
             });
 
             // Create HBox for top buttons
@@ -422,8 +421,6 @@ public class Cashier {
             BorderPane borderPane = new BorderPane();
             borderPane.setTop(topHBox);
             borderPane.setCenter(bottomVBox);
-
-            //        content.getChildren().addAll(cancel);
             centerScroll.setContent(borderPane);
         }
     }
@@ -523,5 +520,19 @@ public class Cashier {
             total += "0";
         }
         totalTxt.setText("Total: $" + total);
+    }
+
+    private void cancelOrder(){
+        Orders.remove(this);
+        if(Orders.isEmpty()) {
+            openNewOrder();
+        }else{
+            PrimaryStage.setScene(Orders.getLast().getScene());
+        }
+    }
+
+    private void closeOrder(){
+        Orders.remove(this);
+        openNewOrder();
     }
 }
