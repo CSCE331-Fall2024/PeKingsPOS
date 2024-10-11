@@ -70,18 +70,18 @@ public class Login {
                 checkLogin();
             }
 
-            //Auto login features are temporary
-//            if (e.getCode().toString().equals("c")){
-//                Button btn = new Button("Log\nOut");
-//                btn.setOnAction(_ -> PrimaryStage.setScene(login));
-//                Cashier cash = new Cashier(PrimaryStage, btn, repo.getEmployees().getFirst().getId());
-//                cashier = cash.getScene();
-//                PrimaryStage.setScene(cashier);
-//            }
-//            if (e.getCode().toString().equals("m")){
-//                Manager manager = new Manager(PrimaryStage, login, repo);
-//                PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
-//            }
+            // Auto login features are temporary
+            if (e.isControlDown() && e.isShiftDown() && e.getCode().toString().equals("C")) {
+                Button btn = new Button("Log\nOut");
+                btn.setOnAction(_ -> PrimaryStage.setScene(login));
+                Cashier cash = new Cashier(PrimaryStage, btn, repo.getEmployees().getFirst().getId());
+                cashier = cash.getScene();
+                PrimaryStage.setScene(cashier);
+            }
+            if (e.isControlDown() && e.isShiftDown() && e.getCode().toString().equals("M")) {
+                Manager manager = new Manager(PrimaryStage, login, repo);
+                PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
+            }
         });
 
         Label passwordLabel = new Label("Password: ");
