@@ -70,7 +70,7 @@ public interface Repository {
 
     Map<Date, Integer> getTopDatesTotalOrders(int topWhat);
 
-    List<SaleHistoryItem> getSalesHistory(int howManyHoursBack);
+    List<SaleHistoryItem> getSalesHistory(Date from, Date to);
 
     List<SaleHistoryItem> getAllTimeSalesHistory();
 
