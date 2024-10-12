@@ -51,4 +51,12 @@ public class Order {
     public long getEmployeeID() {
         return employeeID;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order other)) return false;
+
+        return getId() == other.getId();
+    }
 }

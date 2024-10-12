@@ -24,4 +24,12 @@ public class Customer {
     public List<Order> getOrders() {
         return new ArrayList<>(orders);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Employee other)) return false;
+
+        return getId() == other.getId();
+    }
 }
