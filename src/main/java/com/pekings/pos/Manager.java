@@ -4,11 +4,16 @@ import com.pekings.pos.object.Employee;
 import com.pekings.pos.object.Ingredient;
 import com.pekings.pos.object.MenuItem;
 import com.pekings.pos.storage.Repository;
+import com.pekings.pos.util.DateUtil;
+import com.pekings.pos.util.SaleHistoryItem;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
@@ -397,18 +402,82 @@ public class Manager {
         buttonBox.setLayoutX(100);
         buttonBox.setLayoutY(15);
 
+        HBox pucBox = new HBox(10);
+        pucBox.setPrefWidth(845);
+        pucBox.setLayoutX(100);
+        pucBox.setLayoutY(30);
+
+        pucBox.setVisible(false);
+
+        HBox zReportBox = new HBox();
+        zReportBox.setPrefWidth(845);
+        zReportBox.setLayoutX(100);
+        zReportBox.setLayoutY(30);
+
+        zReportBox.setVisible(false);
+
         Button topMenuItemsRevenueBtn = new Button("Top Menu Items (Total Revenue)");
         Button topMenuItemsOrdersBtn = new Button("Top Menu Items (# of Orders)");
         Button dailyIncomeBtn = new Button("Daily Income");
+        Button pucBtn = new Button("Product Usage Chart");
+        Button submitTimeBtn = new Button("Submit Time");
+        Button zReport = new Button("Z Report");
 
-        topMenuItemsRevenueBtn.setOnAction(_ -> updateChart(createTopMenuItemsRevenueChart()));
-        topMenuItemsOrdersBtn.setOnAction(_ -> updateChart(createTopMenuItemsOrdersChart()));
-        dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart()));
+        TextField from = new TextField();
+        TextField to = new TextField();
+        from.setPromptText("From: YYYY-MM-DD");
+        to.setPromptText("To: YYYY-MM-DD");
 
-        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn);
+        topMenuItemsRevenueBtn.setOnAction(_ -> {
+            updateChart(createTopMenuItemsRevenueChart());
+            pucBox.setVisible(false);
+            zReportBox.setVisible(false);
+        });
+        topMenuItemsOrdersBtn.setOnAction(_ -> {
+            updateChart(createTopMenuItemsOrdersChart());
+            pucBox.setVisible(false);
+            zReportBox.setVisible(false);
+        });
+        dailyIncomeBtn.setOnAction(_ -> {
+            updateChart(createDailyIncomeChart());
+            pucBox.setVisible(false);
+            zReportBox.setVisible(false);
+        });
+
+        pucBtn.setOnAction(_ -> {
+            //updateChart(createPUCChart(from, to));
+            pucBox.setVisible(true);
+            zReportBox.setVisible(false);
+        });
+
+        zReport.setOnAction(actionEvent -> {
+            pucBox.setVisible(false);
+            zReportBox.setVisible(true);
+        });
+
+        TextField zReportDay = new TextField();
+        zReportDay.setPromptText("Format: YYYY-MM-DD");
+        Button submitZReportDay = new Button("Submit");
+
+        submitTimeBtn.setOnAction(_ -> {
+            updateChart(createPUCChart(from, to));
+        });
+
+        submitZReportDay.setOnAction(actionEvent -> {
+            VBox vb = (VBox) ((ScrollPane) rootManager.getChildren().get(rootManager.getChildren().size() - 1)).getContent();
+            vb.getChildren().set(0, createZReport(DateUtil.fromString(zReportDay.getText())));
+        });
+
+        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn, pucBtn, zReport);
         buttonBox.setAlignment(Pos.CENTER);
 
-        contentBox.getChildren().add(buttonBox);
+        pucBox.getChildren().addAll(from,submitTimeBtn,to);
+        pucBox.setAlignment(Pos.CENTER);
+
+        zReportBox.getChildren().addAll(zReportDay, submitZReportDay);
+        zReportBox.setAlignment(Pos.CENTER);
+
+        contentBox.getChildren().addAll(buttonBox, pucBox, zReportBox);
 
         mainScrollPane.setContent(contentBox);
         rootManager.getChildren().add(mainScrollPane);
@@ -433,6 +502,27 @@ public class Manager {
         chart.setData(pieChartData);
         chart.setTitle("Top 5 Menu Items by Revenue");
         return chart;
+    }
+
+    private TableView<SaleHistoryItem> createZReport(Date day) {
+        TableView<SaleHistoryItem> tableView = new TableView<>();
+        TableColumn<SaleHistoryItem, String> order_hour = new TableColumn<>("Hour");
+        TableColumn<SaleHistoryItem, String> totalOrderColumns = new TableColumn<>("Orders");
+        TableColumn<SaleHistoryItem, String> totalRevenueColumns = new TableColumn<>("Revenue");
+
+        order_hour.setCellValueFactory(new PropertyValueFactory<>("time"));
+        totalOrderColumns.setCellValueFactory(new PropertyValueFactory<>("totalOrders"));
+        totalRevenueColumns.setCellValueFactory(new PropertyValueFactory<>("totalRevenue"));
+
+        tableView.getColumns().add(order_hour);
+        tableView.getColumns().add(totalOrderColumns);
+        tableView.getColumns().add(totalRevenueColumns);
+
+        List<SaleHistoryItem> saleHistoryItems = repo.getSalesHistory(day, DateUtil.addDay(day));
+        saleHistoryItems.reversed(); // we get this from midnight next day to midnight requested day, so reverse
+        tableView.getItems().addAll(saleHistoryItems);
+
+        return tableView;
     }
 
     private LineChart<String, Number> createTopMenuItemsOrdersChart() {
@@ -508,6 +598,50 @@ public class Manager {
 
         lineChart.getData().add(series);
         return lineChart;
+    }
+
+
+    private BarChart<String, Number> createPUCChart(TextField from, TextField to) {
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+
+        xAxis.setLabel("Ingredients");
+        yAxis.setLabel("Usage Count");
+
+        String fromInput = from.getText();
+        String toInput = to.getText();
+        Date fromDate = DateUtil.fromString(fromInput);
+        Date toDate = DateUtil.fromString(toInput);
+
+        // Create a histogram/barchart
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Product Usage Chart");
+
+        // Data series
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Amount of Ingredients Used");
+
+        // Getting top ingredients and amount of top ingredients
+        int maxIngredients = repo.getAllIngredients().size();
+
+        Map<Ingredient, Integer> ingredientsInPeriod = repo.getTopIngredients(fromDate, toDate, maxIngredients);
+
+        // Populating series with the data from the map
+        for (Map.Entry<Ingredient, Integer> entry : ingredientsInPeriod.entrySet()) {
+            series.getData().add(new XYChart.Data<>(entry.getKey().getName(), entry.getValue()));
+        }
+
+        // Add the series to the histogram
+        barChart.getData().add(series);
+
+        // Adjust the y-axis
+        yAxis.setAutoRanging(false);
+        yAxis.setLowerBound(0);
+        int maxUsage = ingredientsInPeriod.values().stream().mapToInt(Integer::intValue).max().orElse(100);
+        yAxis.setUpperBound(maxUsage * 1.1);
+        yAxis.setTickUnit(maxUsage / 10);
+
+        return barChart;
     }
 
 

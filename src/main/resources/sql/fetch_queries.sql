@@ -184,9 +184,9 @@ SELECT
     COUNT(o.id) AS total_orders,
     SUM(o.price) AS total_revenue
 FROM orders o
+WHERE o.order_time BETWEEN '%s' AND '%s'
 GROUP BY order_hour
-ORDER BY order_hour DESC
-LIMIT '%s';
+ORDER BY order_hour DESC;
 
 -- get_all_time_sales_history
 SELECT

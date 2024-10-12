@@ -40,4 +40,12 @@ public class Ingredient {
     public float getBatchPrice() {
         return batchPrice;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ingredient other)) return false;
+
+        return getId() == other.getId();
+    }
 }

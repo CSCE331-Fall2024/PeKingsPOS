@@ -404,7 +404,7 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public List<SaleHistoryItem> getSalesHistory(int howManyHoursBack) {
+    public List<SaleHistoryItem> getSalesHistory(Date from, Date to) {
         List<SaleHistoryItem> salesHistory = new ArrayList<>();
         performFetchQuery("get_sales_history", resultSet -> {
             Timestamp timestamp = resultSet.getTimestamp("order_hour");
@@ -412,7 +412,7 @@ public class PersistentRepository implements Repository {
             double revenue = resultSet.getDouble("total_revenue");
             SaleHistoryItem saleHistoryItem = new SaleHistoryItem(timestamp, total_orders, revenue);
             salesHistory.add(saleHistoryItem);
-        }, howManyHoursBack + "");
+        }, from.toString(), to.toString());
         return salesHistory;
     }
 
