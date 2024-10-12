@@ -46,4 +46,12 @@ public class MenuItem {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MenuItem other)) return false;
+
+        return getId() == other.getId();
+    }
 }
