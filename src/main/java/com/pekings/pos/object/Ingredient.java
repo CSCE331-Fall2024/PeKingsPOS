@@ -1,6 +1,8 @@
 package com.pekings.pos.object;
 
 
+import com.pekings.pos.SelectedIngredientsBox;
+
 public class Ingredient {
 
     private final long id;
@@ -16,6 +18,8 @@ public class Ingredient {
         this.amount = amount;
         this.batchPrice = batchPrice;
     }
+
+
 
     public long getId() {
         return id;

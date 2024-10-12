@@ -8,18 +8,15 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.*;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.control.TextField;
 import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 
@@ -55,6 +52,8 @@ public class Manager {
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
     boolean deleteBool = false;
+
+    public final Map<String, Boolean> checkBoxStates = new HashMap<>();
 
     public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
         this.PrimaryStage = PrimaryStage;
@@ -943,6 +942,7 @@ public class Manager {
         HBox newItemRow = new HBox(10);
         TextField newNameField = new TextField();
         TextField newPriceField = new TextField();
+        Button selectIngredients = new Button("Ingredients");
         Button addButton = new Button("Add Item");
 
         newNameField.setPromptText("New item name");
@@ -950,27 +950,30 @@ public class Manager {
         newNameField.setPrefWidth(300);
         newPriceField.setPrefWidth(100);
 
-        addButton.setOnAction(_ -> {
-            String newName = newNameField.getText();
-            float newPrice = Float.parseFloat(newPriceField.getText().substring(1));
-            // Add to database here
-            //List<Ingredient> newList = createNewIngredientList();
-            //MenuItem newMenuItem = new MenuItem(newName,newPrice, newList);
-            // newMenuItem = new MenuItem(-1, newName, newPrice,)
-            //repo.addMenuItem(newName, newPrice);
-            // Refresh the list (you might want to just add the new item instead of refreshing everything)
-            // Change
-            List<Ingredient> ingredients = repo.getAllIngredients();
-            List<String> ingredientNames = ingredients.stream().map(Ingredient::getName).toList();
-            List<String> addMenuPop = createAddMenuItemPopup(ingredientNames);
-            VBox header = new VBox(10);
+        selectIngredients.setOnAction(_ -> showSelectionDialog());
 
-//                repo.addMenuItem();
+        addButton.setOnAction(_ -> {
+            String name = newNameField.getText();
+            if(name.isEmpty()){
+                System.out.println("Name is empty");
+                return;
+            }
+
+            String priceString = newPriceField.getText();
+            if(priceString.isEmpty()){
+                System.out.println("Price is empty");
+                return;
+            }else if(priceString.startsWith("$")){
+                priceString = priceString.substring(1);
+            }
+            float price = Float.parseFloat(priceString);
+            MenuItem newMenuItem = new MenuItem(-1, name, price, getIngredients(), true);
+//            repo.addMenuItem(newMenuItem);
             openMenuItems(stage); // This will refresh the entire list
         });
 
 
-        newItemRow.getChildren().addAll(newNameField, newPriceField, addButton);
+        newItemRow.getChildren().addAll(newNameField, newPriceField, selectIngredients, addButton);
         menuItemsContainer.getChildren().add(newItemRow);
 
         // Adds space so the add item buttons display fully
@@ -985,7 +988,60 @@ public class Manager {
         scrollPane.setLayoutX(160);
         scrollPane.setLayoutY(0);
 
-
+        checkBoxStates.clear();
         rootManager.getChildren().add(scrollPane);
+    }
+
+    private List<Ingredient> getIngredients(){
+        List<String> ingredientStrings = new ArrayList<>();
+        List<Ingredient> ingredients = new ArrayList<>();
+        for (Map.Entry<String, Boolean> entry : checkBoxStates.entrySet()) {
+            if(entry.getValue()){
+                ingredientStrings.add(entry.getKey());
+            }
+        }
+        System.out.println(ingredientStrings);
+
+        return ingredients;
+    }
+
+    private void showSelectionDialog() {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Select Items");
+
+        VBox dialogContent = new VBox(10, new Label("Select the items:"));
+        List<Ingredient> ingredients = repo.getAllIngredients();
+//        CheckBox[] checkBoxes = new CheckBox[ingredients.size()];
+        SelectedIngredientsBox[] ingredientsBoxes = new SelectedIngredientsBox[ingredients.size()];
+
+        for(int i = 0; i < ingredients.size(); i++) {
+            SelectedIngredientsBox box = new SelectedIngredientsBox(ingredients.get(i), this);
+//            checkBoxes[i] = box.getCheckBox();
+            ingredientsBoxes[i] = box;
+            dialogContent.getChildren().add(box.getCheckBox());
+        }
+
+
+
+
+        ScrollPane scrollPane = new ScrollPane(dialogContent);
+        scrollPane.setFitToWidth(true); // Make the scroll pane fit the dialog width
+        scrollPane.setPrefHeight(200); // Set a fixed height for the scroll pane
+
+        dialog.getDialogPane().setContent(scrollPane);
+
+        // Add a button to close the dialog
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+
+        // Set a preferred width for the dialog
+        dialog.getDialogPane().setPrefWidth(400);
+
+        // Show the dialog and wait for a result
+        dialog.showAndWait();
+
+        for (SelectedIngredientsBox box : ingredientsBoxes) {
+            checkBoxStates.put(box.ingredient.getName(), box.getCheckBox().isSelected());
+        }
+//        System.out.println(checkBoxStates.size());
     }
 }
