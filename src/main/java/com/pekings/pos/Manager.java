@@ -37,13 +37,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Manager {
-    // Fixed?
     Stage PrimaryStage;
     Scene loginScreen;
 
     List<MenuItem> menuItemList;
     List<Employee> employeeList;
-//    List<Ingredient> ingredientList;
 
     private Repository repo;
     private Pane rootManager;
