@@ -4,9 +4,9 @@ import java.sql.Timestamp;
 
 public class SaleHistoryItem {
 
-    private Timestamp time;
-    private int totalOrders;
-    private double totalRevenue;
+    private final Timestamp time;
+    private final int totalOrders;
+    private final double totalRevenue;
 
     public SaleHistoryItem(Timestamp time, int totalOrders, double totalRevenue) {
         this.time = time;
