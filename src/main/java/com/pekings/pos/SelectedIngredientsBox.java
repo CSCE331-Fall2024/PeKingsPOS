@@ -16,7 +16,7 @@ public class SelectedIngredientsBox {
         this.manager = manager;
 
         checkBox = new CheckBox(ingredient.getName());
-        checkBox.setSelected(manager.checkBoxStates.getOrDefault(ingredient.getName(), false));
+        checkBox.setSelected(manager.checkBoxStates.getOrDefault(ingredient.getId(), false));
     }
 
     public CheckBox getCheckBox() {

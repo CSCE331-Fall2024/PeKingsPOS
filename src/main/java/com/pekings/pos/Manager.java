@@ -57,7 +57,8 @@ public class Manager {
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
     boolean deleteBool = false;
 
-    public final Map<String, Boolean> checkBoxStates = new HashMap<>();
+//    public final Map<String, Boolean> checkBoxStates = new HashMap<>();
+public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
 
     public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
         this.PrimaryStage = PrimaryStage;
@@ -1024,16 +1025,31 @@ public class Manager {
             Button saveButton = new Button("_Save Changes");
             Button deleteButton = new Button("_Delete");
 
+            Button activeButton = new Button();
+            if(item.isActive()){
+                activeButton.setText("Active");
+            }else{
+                activeButton.setText("Inactive");
+            }
+            activeButton.setOnAction(_ -> {
+                if(activeButton.getText().equals("Active")){
+                    activeButton.setText("Inactive");
+                }else{
+                    activeButton.setText("Active");
+                }
+            });
+
             saveButton.setVisible(false);
             nameField.setEditable(false);
+            activeButton.setDisable(true);
             priceField.setEditable(false);
 
             editButton.setOnAction(_ -> {
+                activeButton.setDisable(false);
                 saveButton.setVisible(true);
                 nameField.setEditable(true);
                 priceField.setEditable(true);
                 editButton.setVisible(false);
-
             });
 
 
@@ -1045,27 +1061,29 @@ public class Manager {
 //                  System.out.println("MenuItem edited");
                 int tempIdHold = (int) item.getId();
                 List<Ingredient> tempIngredients = repo.getIngredients(tempIdHold);
-//                    repo.removeMenuItem((int) item.getId());
                 menuItemsContainer.getChildren().remove(itemRow);
-                MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
-//                    repo.addMenuItem(newOne);
+                boolean isActive = activeButton.getText().equals("Active");
+                MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, isActive);
                 repo.updateMenuItem(newOne);
 
                 saveButton.setVisible(false);
                 editButton.setVisible(true);
                 nameField.setEditable(false);
                 priceField.setEditable(false);
-                System.out.println("MenuItem edited Finish");
+                activeButton.setDisable(true);
+//                System.out.println("MenuItem edited Finish");
             });
+
+
             deleteButton.setOnAction(_ -> {
                 // Remove from database here
-                Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
-                dlt.show(stage);
+//                Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
+//                dlt.show(stage);
                 //menuItemsContainer.getChildren().remove(itemRow);
                 openMenuItems(stage);
             });
 
-            itemRow.getChildren().addAll(nameField, priceField, editButton, saveButton, deleteButton);
+            itemRow.getChildren().addAll(activeButton, nameField, editButton, saveButton, deleteButton);
             menuItemsContainer.getChildren().add(itemRow);
 
 
@@ -1101,7 +1119,7 @@ public class Manager {
             }
             float price = Float.parseFloat(priceString);
             MenuItem newMenuItem = new MenuItem(-1, name, price, getIngredients(), true);
-//            repo.addMenuItem(newMenuItem);
+            repo.addMenuItem(newMenuItem);
             openMenuItems(stage); // This will refresh the entire list
         });
 
@@ -1128,12 +1146,13 @@ public class Manager {
     private List<Ingredient> getIngredients(){
         List<String> ingredientStrings = new ArrayList<>();
         List<Ingredient> ingredients = new ArrayList<>();
-        for (Map.Entry<String, Boolean> entry : checkBoxStates.entrySet()) {
+        for (Map.Entry<Long, Boolean> entry : checkBoxStates.entrySet()) {
             if(entry.getValue()){
-                ingredientStrings.add(entry.getKey());
+                ingredients.add(repo.getIngredient(Math.toIntExact(entry.getKey())));
+                ingredientStrings.add(repo.getIngredient(Math.toIntExact(entry.getKey())).getName());
             }
         }
-        System.out.println(ingredientStrings);
+//        System.out.println(ingredientStrings);
 
         return ingredients;
     }
@@ -1144,12 +1163,10 @@ public class Manager {
 
         VBox dialogContent = new VBox(10, new Label("Select the items:"));
         List<Ingredient> ingredients = repo.getAllIngredients();
-//        CheckBox[] checkBoxes = new CheckBox[ingredients.size()];
         SelectedIngredientsBox[] ingredientsBoxes = new SelectedIngredientsBox[ingredients.size()];
 
         for(int i = 0; i < ingredients.size(); i++) {
             SelectedIngredientsBox box = new SelectedIngredientsBox(ingredients.get(i), this);
-//            checkBoxes[i] = box.getCheckBox();
             ingredientsBoxes[i] = box;
             dialogContent.getChildren().add(box.getCheckBox());
         }
@@ -1173,7 +1190,7 @@ public class Manager {
         dialog.showAndWait();
 
         for (SelectedIngredientsBox box : ingredientsBoxes) {
-            checkBoxStates.put(box.ingredient.getName(), box.getCheckBox().isSelected());
+            checkBoxStates.put(box.ingredient.getId(), box.getCheckBox().isSelected());
         }
 //        System.out.println(checkBoxStates.size());
     }
