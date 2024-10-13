@@ -213,8 +213,8 @@ public class Manager {
             inventoryItemsContainer.getChildren().add(extraSpace);
 
             ScrollPane scrollPane = new ScrollPane(inventoryItemsContainer);
-            scrollPane.setPrefWidth(850);
-            scrollPane.setPrefHeight(685);
+            scrollPane.setPrefWidth(810);
+            scrollPane.setPrefHeight(645);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(0);
 
@@ -353,8 +353,8 @@ public class Manager {
             employeeContainer.getChildren().add(newItemRow);
 
             ScrollPane scrollPane = new ScrollPane(employeeContainer);
-            scrollPane.setPrefWidth(850);
-            scrollPane.setPrefHeight(685);
+            scrollPane.setPrefWidth(810);
+            scrollPane.setPrefHeight(645);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(15);
 
@@ -381,7 +381,7 @@ public class Manager {
         mainScrollPane.setLayoutX(150);
         mainScrollPane.setLayoutY(0);
         mainScrollPane.setPrefWidth(850);
-        mainScrollPane.setPrefHeight(700);
+        mainScrollPane.setPrefHeight(660);
 
         VBox contentBox = new VBox(10);
         Label hoverLabel = new Label();
@@ -1061,6 +1061,11 @@ public class Manager {
                     System.out.println("Please enter a price");
                     return;
                 }
+                newPriceStr = newPriceStr.replaceAll(",", ".");
+                if(newPriceStr.split("\\.").length > 2){
+                    System.out.println("Too many decimals/commas");
+                    return;
+                }
                 if(newPriceStr.charAt(0) == '$'){
                     newPriceStr = newPriceStr.substring(1);
                 }
@@ -1128,6 +1133,11 @@ public class Manager {
                 System.out.println("Please enter a price");
                 return;
             }
+            priceString = priceString.replaceAll(",", ".");
+            if(priceString.split("\\.").length > 2){
+                System.out.println("Too many decimals/commas");
+                return;
+            }
             if(priceString.charAt(0) == '$'){
                 priceString = priceString.substring(1);
             }
@@ -1159,8 +1169,8 @@ public class Manager {
         menuItemsContainer.getChildren().add(extraSpace);
 
         ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
-        scrollPane.setPrefWidth(850);
-        scrollPane.setPrefHeight(700);
+        scrollPane.setPrefWidth(810);
+        scrollPane.setPrefHeight(645);
         scrollPane.setLayoutX(160);
         scrollPane.setLayoutY(0);
 
