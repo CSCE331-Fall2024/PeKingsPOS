@@ -58,7 +58,7 @@ public class Manager {
     boolean deleteBool = false;
 
 //    public final Map<String, Boolean> checkBoxStates = new HashMap<>();
-public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
+public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
 
     public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
         this.PrimaryStage = PrimaryStage;
@@ -1147,9 +1147,9 @@ public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
 
     private List<Ingredient> getIngredients(){
         List<Ingredient> ingredients = new ArrayList<>();
-        for (Map.Entry<Long, Boolean> entry : checkBoxStates.entrySet()) {
+        for (Map.Entry<Ingredient, Boolean> entry : checkBoxStates.entrySet()) {
             if(entry.getValue()){
-                ingredients.add(repo.getIngredient(Math.toIntExact(entry.getKey())));
+                ingredients.add(entry.getKey());
             }
         }
         return ingredients;
@@ -1188,7 +1188,7 @@ public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
         dialog.showAndWait();
 
         for (SelectedIngredientsBox box : ingredientsBoxes) {
-            checkBoxStates.put(box.ingredient.getId(), box.getCheckBox().isSelected());
+            checkBoxStates.put(box.getIngredient(), box.getCheckBox().isSelected());
         }
 //        System.out.println(checkBoxStates.size());
     }

@@ -7,19 +7,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SelectedIngredientsBox {
-    Ingredient ingredient;
-    Manager manager;
-    CheckBox checkBox;
+    private final Ingredient ingredient;
+    private final Manager manager;
+    private final CheckBox checkBox;
 
     public SelectedIngredientsBox(Ingredient ingredient, Manager manager) {
         this.ingredient = ingredient;
         this.manager = manager;
 
         checkBox = new CheckBox(ingredient.getName());
-        checkBox.setSelected(manager.checkBoxStates.getOrDefault(ingredient.getId(), false));
+        checkBox.setSelected(manager.checkBoxStates.getOrDefault(ingredient, false));
     }
 
     public CheckBox getCheckBox() {
         return checkBox;
+    }
+
+    public Ingredient getIngredient() {
+        return ingredient;
+    }
+
+    public Manager getManager() {
+        return manager;
     }
 }

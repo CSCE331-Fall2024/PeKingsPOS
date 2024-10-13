@@ -2,6 +2,7 @@ package com.pekings.pos.object;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.Objects;
 
 public class Employee {
 
@@ -51,5 +52,10 @@ public class Employee {
         if (!(o instanceof Employee other)) return false;
 
         return getId() == other.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
