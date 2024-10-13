@@ -1083,7 +1083,7 @@ public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
                 openMenuItems(stage);
             });
 
-            itemRow.getChildren().addAll(activeButton, nameField, editButton, saveButton, deleteButton);
+            itemRow.getChildren().addAll(activeButton, nameField, priceField, editButton, saveButton, deleteButton);
             menuItemsContainer.getChildren().add(itemRow);
 
 
