@@ -796,6 +796,7 @@ public class Manager {
             if (Objects.equals(deleteMsg.getText(), "DELETE")) {
                 repo.deleteMenuItem((int) item.getId());
                 container.getChildren().remove(itemRow);
+                openMenuItems(PrimaryStage);
                 popup.hide();
             }
             else{
@@ -1091,8 +1092,8 @@ public class Manager {
                 // Remove from database here
                 Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
                 dlt.show(stage);
-                menuItemsContainer.getChildren().remove(itemRow);
-                openMenuItems(stage);
+//                menuItemsContainer.getChildren().remove(itemRow);
+//                openMenuItems(stage);
             });
 
             itemRow.getChildren().addAll(activeButton, nameField, priceField, editButton, saveButton, deleteButton);
