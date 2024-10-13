@@ -75,7 +75,7 @@ public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
         //int ingredientSum = ingredientIntegerMap.values().stream().reduce(Integer::sum).orElse(-1);
         Scene managerScene = new Scene(rootManager, 1000, 700);
         repo = Main.getRepository();
-        menuItemList = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
+
         employeeList = repo.getEmployees().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         // Text for Manager Screen
 
@@ -996,6 +996,7 @@ public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
     }
 
     private void openMenuItems(Stage stage){
+        menuItemList = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         rootManager.getChildren().clear();
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
 
@@ -1071,15 +1072,16 @@ public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
                 nameField.setEditable(false);
                 priceField.setEditable(false);
                 activeButton.setDisable(true);
+                openMenuItems(stage);
 //                System.out.println("MenuItem edited Finish");
             });
 
 
             deleteButton.setOnAction(_ -> {
                 // Remove from database here
-//                Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
-//                dlt.show(stage);
-                //menuItemsContainer.getChildren().remove(itemRow);
+                Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
+                dlt.show(stage);
+                menuItemsContainer.getChildren().remove(itemRow);
                 openMenuItems(stage);
             });
 
@@ -1144,16 +1146,12 @@ public final Map<Long, Boolean> checkBoxStates = new HashMap<>();
     }
 
     private List<Ingredient> getIngredients(){
-        List<String> ingredientStrings = new ArrayList<>();
         List<Ingredient> ingredients = new ArrayList<>();
         for (Map.Entry<Long, Boolean> entry : checkBoxStates.entrySet()) {
             if(entry.getValue()){
                 ingredients.add(repo.getIngredient(Math.toIntExact(entry.getKey())));
-                ingredientStrings.add(repo.getIngredient(Math.toIntExact(entry.getKey())).getName());
             }
         }
-//        System.out.println(ingredientStrings);
-
         return ingredients;
     }
 
