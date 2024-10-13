@@ -57,8 +57,7 @@ public class Manager {
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
     boolean deleteBool = false;
 
-//    public final Map<String, Boolean> checkBoxStates = new HashMap<>();
-public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
+    public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
 
     public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
         this.PrimaryStage = PrimaryStage;
@@ -208,9 +207,14 @@ public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
             newItemRow.getChildren().addAll(newNameField, newIdField, newquantityField, newPriceField, addButton);
             inventoryItemsContainer.getChildren().add(newItemRow);
 
+            Region extraSpace = new Region();
+            extraSpace.setPrefHeight(50);
+            VBox.setVgrow(extraSpace, javafx.scene.layout.Priority.ALWAYS);
+            inventoryItemsContainer.getChildren().add(extraSpace);
+
             ScrollPane scrollPane = new ScrollPane(inventoryItemsContainer);
-            scrollPane.setPrefViewportWidth(650);
-            scrollPane.setPrefViewportHeight(685);
+            scrollPane.setPrefWidth(850);
+            scrollPane.setPrefHeight(685);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(0);
 
@@ -311,16 +315,11 @@ public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
 
 
                 itemRow.getChildren().addAll(usernameField, passwordField, employeeIDField, positionField, activeStatusField, editButton, clockedInOut, saveButton, deleteButton);
+                itemRow.setPadding(new Insets(0, 30, 0, 0));
                 employeeContainer.getChildren().add(itemRow);
 
             }
 
-
-            //                TextField usernameField = new TextField(employee.getUsername());
-            //                TextField passwordField = new TextField(employee.getPassword());
-            //                TextField employeeIDField = new TextField(String.valueOf(employee.getId()));
-            //                TextField positionField = new TextField(employee.getPosition());
-            //                TextField activeStatusField = new TextField("N/A");
 
             HBox newItemRow = new HBox(10);
             TextField newUsernameField = new TextField();
@@ -354,8 +353,8 @@ public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
             employeeContainer.getChildren().add(newItemRow);
 
             ScrollPane scrollPane = new ScrollPane(employeeContainer);
-            scrollPane.setPrefViewportWidth(650);
-            scrollPane.setPrefViewportHeight(685);
+            scrollPane.setPrefWidth(850);
+            scrollPane.setPrefHeight(685);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(15);
 
@@ -1057,7 +1056,18 @@ public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
             saveButton.setOnAction(_ -> {
                 String newName = nameField.getText();
                 String newPriceStr = priceField.getText();
-                float newPrice = Float.parseFloat(newPriceStr.substring(1));
+                if(newPriceStr.isEmpty()){
+                    System.out.println("Please enter a price");
+                    return;
+                }
+                if(newPriceStr.charAt(0) == '$'){
+                    newPriceStr = newPriceStr.substring(1);
+                }
+                if(! (newPriceStr.matches("[0-9]*(\\.[0-9]+)?"))){
+                    System.out.println("Invalid characters in price field");
+                    return;
+                }
+                float newPrice = Float.parseFloat(newPriceStr);
 
 //                  System.out.println("MenuItem edited");
                 int tempIdHold = (int) item.getId();
@@ -1114,15 +1124,27 @@ public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
 
             String priceString = newPriceField.getText();
             if(priceString.isEmpty()){
-                System.out.println("Price is empty");
+                System.out.println("Please enter a price");
                 return;
-            }else if(priceString.startsWith("$")){
+            }
+            if(priceString.charAt(0) == '$'){
                 priceString = priceString.substring(1);
             }
+            if(! (priceString.matches("[0-9]*(\\.[0-9]+)?"))){
+                System.out.println("Invalid characters in price field");
+                return;
+            }
             float price = Float.parseFloat(priceString);
-            MenuItem newMenuItem = new MenuItem(-1, name, price, getIngredients(), true);
+
+            List<Ingredient> ingredients = getIngredients();
+            if(ingredients.isEmpty()){
+                System.out.println("No ingredients found");
+                return;
+            }
+
+            MenuItem newMenuItem = new MenuItem(-1, name, price, ingredients, true);
             repo.addMenuItem(newMenuItem);
-            openMenuItems(stage); // This will refresh the entire list
+            openMenuItems(stage); // This will refresh the entire screen
         });
 
 
@@ -1136,7 +1158,7 @@ public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
         menuItemsContainer.getChildren().add(extraSpace);
 
         ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
-        scrollPane.setPrefWidth(650);
+        scrollPane.setPrefWidth(850);
         scrollPane.setPrefHeight(700);
         scrollPane.setLayoutX(160);
         scrollPane.setLayoutY(0);
@@ -1190,6 +1212,5 @@ public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
         for (SelectedIngredientsBox box : ingredientsBoxes) {
             checkBoxStates.put(box.getIngredient(), box.getCheckBox().isSelected());
         }
-//        System.out.println(checkBoxStates.size());
     }
 }
