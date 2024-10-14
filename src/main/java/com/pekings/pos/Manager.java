@@ -597,14 +597,9 @@ public class Manager {
         XYChart.Series<String, Double> series = new XYChart.Series<>();
         series.setName("Daily Revenue");
 
-//        Map<Date, Double> revenueData = repo.getTopDatesRevenue(30);
-
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        System.out.println("Get Data");
-        //revenueData is probably enpty :(
-//        int i = 1;
         for (Map.Entry<MenuItem, Double> entry : revenueData.entrySet()) {
 
             Double revenue = entry.getValue();
@@ -1077,24 +1072,23 @@ public class Manager {
                 String newName = nameField.getText();
                 String newPriceStr = priceField.getText();
                 if(newPriceStr.isEmpty()){
-                    System.out.println("Please enter a price");
+                    showErrorPopup("Please enter a price");
                     return;
                 }
                 newPriceStr = newPriceStr.replaceAll(",", ".");
                 if(newPriceStr.split("\\.").length > 2){
-                    System.out.println("Too many decimals/commas");
+                    showErrorPopup("Too many decimals/commas");
                     return;
                 }
                 if(newPriceStr.charAt(0) == '$'){
                     newPriceStr = newPriceStr.substring(1);
                 }
                 if(! (newPriceStr.matches("[0-9]*(\\.[0-9]+)?"))){
-                    System.out.println("Invalid characters in price field");
+                    showErrorPopup("Invalid characters in price field");
                     return;
                 }
                 float newPrice = Float.parseFloat(newPriceStr);
 
-//                  System.out.println("MenuItem edited");
                 int tempIdHold = (int) item.getId();
                 List<Ingredient> tempIngredients = repo.getIngredients(tempIdHold);
                 menuItemsContainer.getChildren().remove(itemRow);
@@ -1108,7 +1102,6 @@ public class Manager {
                 priceField.setEditable(false);
                 activeButton.setDisable(true);
                 openMenuItems(stage);
-//                System.out.println("MenuItem edited Finish");
             });
 
 
@@ -1143,32 +1136,32 @@ public class Manager {
         addButton.setOnAction(_ -> {
             String name = newNameField.getText();
             if(name.isEmpty()){
-                System.out.println("Name is empty");
+                showErrorPopup("Name is empty");
                 return;
             }
 
             String priceString = newPriceField.getText();
             if(priceString.isEmpty()){
-                System.out.println("Please enter a price");
+                showErrorPopup("Please enter a price");
                 return;
             }
             priceString = priceString.replaceAll(",", ".");
             if(priceString.split("\\.").length > 2){
-                System.out.println("Too many decimals/commas");
+                showErrorPopup("Too many decimals/commas");
                 return;
             }
             if(priceString.charAt(0) == '$'){
                 priceString = priceString.substring(1);
             }
             if(! (priceString.matches("[0-9]*(\\.[0-9]+)?"))){
-                System.out.println("Invalid characters in price field");
+                showErrorPopup("Invalid characters in price field");
                 return;
             }
             float price = Float.parseFloat(priceString);
 
             List<Ingredient> ingredients = getIngredients();
             if(ingredients.isEmpty()){
-                System.out.println("No ingredients found");
+                showErrorPopup("No ingredients found");
                 return;
             }
 
@@ -1242,5 +1235,13 @@ public class Manager {
         for (SelectedIngredientsBox box : ingredientsBoxes) {
             checkBoxStates.put(box.getIngredient(), box.getCheckBox().isSelected());
         }
+    }
+
+    private void showErrorPopup(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
