@@ -5,6 +5,14 @@ import com.pekings.pos.util.OrderText;
 import javafx.scene.control.Button;
 import javafx.scene.layout.TilePane;
 
+/** * Returns a button linked to a menu item. On click, it'll add the menu item to the order and display it.
+ *
+ * @author MenuButton creates all functionality for the menu button given any menu item
+ * @param  item   an item from the menu item database
+ * @param  name  the TilePane you'll add the text to
+ * @param cashier the instance of the cashier screen you'll be editing information in
+ */
+
 import static javafx.scene.text.TextAlignment.CENTER;
 
 public class MenuButton {
@@ -28,7 +36,6 @@ public class MenuButton {
         btn.setStyle("-fx-background-color: #BA6433");
 
         btn.setOnAction(e -> {
-//            cashier.edited = true;
             new OrderText(cashier, item, pane);
         });
 
