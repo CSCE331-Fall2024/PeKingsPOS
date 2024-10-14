@@ -259,7 +259,7 @@ public class Manager {
             employeeContainer.getChildren().add(Header);
             // Add menu items to the list and display them
             //if edit is clicked. Go back through all employees and set save, and delete to visible
-            for (Employee employee : employeeList) {
+            for (Employee employee : repo.getEmployees().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList()) {
                 HBox itemRow = new HBox(10);
                 TextField usernameField = new TextField(employee.getUsername());
                 TextField passwordField = new TextField(employee.getPassword());
@@ -296,11 +296,13 @@ public class Manager {
                     usernameField.setEditable(true);
                     passwordField.setEditable(true);
                     clockedInOut.setVisible(true);
-                    updateEmployee(employee.getId(), usernameField.getText(), passwordField.getText(), employee.getPosition(), employee.getLastClockIn(), employee.isClockedIn());
+
                 });
 
                 saveButton.setOnAction(_ -> {
                     String newName = usernameField.getText();
+                    String newPass = passwordField.getText();
+                    String newPos = positionField.getText();
 
                     // now update the database with edited information
                     // delete current menu item then add the edited version in
@@ -310,8 +312,9 @@ public class Manager {
                     saveButton.setVisible(false);
                     clockedInOut.setVisible(false);
                     editButton.setVisible(true);
-                    updateEmployee(employee.getId(), usernameField.getText(), passwordField.getText(), employee.getPosition(), employee.getLastClockIn(), employee.isClockedIn());
+                    updateEmployee(employee.getId(), newName, newPass, newPos, employee.getLastClockIn(), employee.isClockedIn());
                 });
+
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
                     Popup employeePopup = createDeletePopupEmployee(employeeContainer, itemRow, employee);
@@ -346,7 +349,6 @@ public class Manager {
 
             newUsernameField.setPromptText("Set New Username");
             newPasswordField.setPromptText("Set New Password");
-            newEmployeeIDField.setPromptText("Set ID + 1");
             newPositionField.setPromptText("Employee Position");
             newEmployeeIDField.setPrefWidth(100);
             newPositionField.setPrefWidth(250);
@@ -355,18 +357,18 @@ public class Manager {
             addButton.setOnAction(_ -> {
                 String newUser = newUsernameField.getText();
                 String newPass = newPasswordField.getText();
-
+                String newPos = newPositionField.getText();
                 // Add to database here user, pass, pos, lastClockIn, clockedIn = false
                 Time lstIn = new Time(0,0,0);
 
-                Employee newGuy = new Employee((employeeList.getLast().getId()+1),newUser,newPass,"Employee",lstIn, false);
+                Employee newGuy = new Employee((employeeList.getLast().getId()+1),newUser,newPass,newPos,lstIn, false);
                 repo.addEmployee(newGuy);
                 // Refresh the list (you might want to just add the new item instead of refreshing everything)
                 employees.fire(); // This will refresh the entire list
             });
 
 
-            newItemRow.getChildren().addAll(newUsernameField, newPasswordField, newEmployeeIDField, newPositionField, newActiveStatusField, addButton);
+            newItemRow.getChildren().addAll(newUsernameField,newPasswordField,newPositionField,newActiveStatusField, addButton);
             employeeContainer.getChildren().add(newItemRow);
 
             ScrollPane scrollPane = new ScrollPane(employeeContainer);
@@ -508,6 +510,7 @@ public class Manager {
 
         VBox contentBox = (VBox) ((ScrollPane) rootManager.getChildren().get(rootManager.getChildren().size() - 1)).getContent();
         contentBox.getChildren().set(0, newChart);
+
     }
 
     private PieChart createTopMenuItemsRevenueChart() {
@@ -597,20 +600,14 @@ public class Manager {
         XYChart.Series<String, Double> series = new XYChart.Series<>();
         series.setName("Daily Revenue");
 
-//        Map<Date, Double> revenueData = repo.getTopDatesRevenue(30);
 
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        System.out.println("Get Data");
-        //revenueData is probably enpty :(
-//        int i = 1;
         for (Map.Entry<MenuItem, Double> entry : revenueData.entrySet()) {
 
             Double revenue = entry.getValue();
             series.getData().add(new XYChart.Data<>(entry.getKey().getName(), revenue));
         }
         lineChart.getData().add(series);
+        lineChart.setLegendVisible(false);
 
         return lineChart;
     }
@@ -737,12 +734,11 @@ public class Manager {
 //    }
 
     // TODO Needs addNewIngredient() in repo
-    private long addIngredient(String name, float price, int quantity) {
+    private void addIngredient(String name, float price, int quantity) {
         Ingredient ingredient = new Ingredient(-1, name, price, quantity, (price * quantity));
 //        repo.addIngredientStock(ID, quantity)
-//        repo.addNewIngredient(ingredient);
-
-        return -1;
+//        repo.addNewIngredient(ingredient)
+        repo.addNewIngredientInventory(ingredient);
     }
 
     // TODO Once 2 repo functions are implemented, add them to update Employee
