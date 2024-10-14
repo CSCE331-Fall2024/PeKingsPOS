@@ -10,10 +10,32 @@ import java.util.Set;
 
 public interface Repository {
 
+    /**
+     * Adds a menu item to the DB. The required
+     * MenuItem must have a list of ingredients ready to
+     * go as well as their IDs.
+     * You may omit the ID field in MenuItem, but not everywhere else
+     *
+     * @param menuItem Complete menu item object
+     */
     void addMenuItem(MenuItem menuItem);
 
+    /**
+     * Deletes a menu item. This method also deletes
+     * entries in tables dependent to menu items.
+     * This does not delete orders that contain the item,
+     * but it can cause these orders to have "ghost items"
+     *
+     * @param menuItemID Complete menu item object
+     */
     void deleteMenuItem(int menuItemID);
 
+    /**
+     * Returns a menu item based on its id
+     *
+     * @param itemID - The ID of the requested item
+     * @return - Filled out MenuItem object
+     */
     MenuItem getMenuItem(int itemID);
 
     void updateMenuItem(MenuItem menuItem);

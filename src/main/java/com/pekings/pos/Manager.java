@@ -500,7 +500,6 @@ public class Manager {
         mainScrollPane.setContent(contentBox);
         rootManager.getChildren().add(mainScrollPane);
     }
-    //private void updateList()
 
     private void updateChart(Chart newChart) {
         // This is to hold whatever chart was last in the order
