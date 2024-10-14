@@ -8,17 +8,14 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.*;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.control.TextField;
 import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 
@@ -27,6 +24,7 @@ import javafx.stage.Stage;
 
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.sql.Date;
 import java.util.Calendar;
@@ -53,7 +51,11 @@ public class Manager {
     Button inventory = createButton(30, 255, "_Inventory", "-fx-background-color: #36919E");
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
-    boolean deleteBool = false;
+    LocalDate beginningOfMonth = LocalDate.now().withDayOfMonth(1);
+    LocalDate date30DaysAhead = LocalDate.now().plusDays(30);
+    Date beginning = Date.valueOf(beginningOfMonth);
+    Date daysAhead = Date.valueOf(date30DaysAhead);
+
 
     public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
         this.PrimaryStage = PrimaryStage;
@@ -62,17 +64,20 @@ public class Manager {
         rootManager = new Pane();
     }
 
-
     public Scene createManagerScene(Stage stage) {
         // Setup Manager Scene
 
-        List<Ingredient> ingredientList = repo.getAllIngredients();
+
         //int ingredientSum = ingredientIntegerMap.values().stream().reduce(Integer::sum).orElse(-1);
         Scene managerScene = new Scene(rootManager, 1000, 700);
         repo = Main.getRepository();
         menuItemList = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         employeeList = repo.getEmployees().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         // Text for Manager Screen
+        List<Ingredient> ingredientList = repo.getAllIngredients();
+        // Set date for last 30 days. Runs once
+        Map<MenuItem, Double> revenueData = repo.getTopMenuItemsRevenue(beginning, daysAhead);
+
 
         text.setX(50);
         text.setY(660);
@@ -202,6 +207,7 @@ public class Manager {
             ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
             scrollPane.setPrefViewportWidth(650);
             scrollPane.setPrefViewportHeight(685);
+            scrollPane.setMaxHeight(660);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(0);
 
@@ -210,16 +216,19 @@ public class Manager {
         PieChart initialChart = createTopMenuItemsRevenueChart();
 
 
-        stats.setOnAction(_ -> displayStatsReport(initialChart));
+        stats.setOnAction(_ -> displayStatsReport(initialChart, revenueData));
 
         //List<Ingredient> ingredientList;
         // Same thing with different values for Inventory
         inventory.setOnAction(_ -> {
+            //inventoryButton(rootManager);
+            repo.getAllIngredients();
             rootManager.getChildren().clear();
             rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
 
+
             // Create main container for menu items
-            VBox inventoryItemsContainer = new VBox(10); // 10 is the spacing between items
+            VBox inventoryItemsContainer = new VBox(10); //  is the spacing between items
             inventoryItemsContainer.setPadding(new Insets(15, 15, 15, 15));
 
             HBox Header = new HBox(10);
@@ -236,8 +245,9 @@ public class Manager {
             inventoryItemsContainer.getChildren().add(Header);
 
 
+
             // Add menu items to the list and display them
-            for (Ingredient ingredient : ingredientList) {
+            for (Ingredient ingredient : repo.getAllIngredients()) {
                 HBox itemRow = new HBox(10);
                 TextField nameField = new TextField(ingredient.getName());
                 TextField idField = new TextField(String.valueOf(ingredient.getId()));
@@ -279,13 +289,10 @@ public class Manager {
                 });
                 deleteButton.setOnAction(_ -> {
                     // Remove from database here
-                    Popup dltIngredient = createDeletePopupIngredient(inventoryItemsContainer,itemRow);
+                    Popup dltIngredient = createDeletePopupIngredient(inventoryItemsContainer,itemRow,ingredient);
                     dltIngredient.show(stage);
-                    //TODO Add remove Ingredient method once added to repo
-                    //repo.removeIngredientStock((int)ingredient.getId(),ingredient.getAmount());
 
                 });
-
                 itemRow.getChildren().addAll(nameField, idField, quantityField, editButton, saveButton, deleteButton);
                 inventoryItemsContainer.getChildren().add(itemRow);
 
@@ -320,9 +327,12 @@ public class Manager {
             newItemRow.getChildren().addAll(newNameField, newIdField, newquantityField, newPriceField, addButton);
             inventoryItemsContainer.getChildren().add(newItemRow);
 
+
             ScrollPane scrollPane = new ScrollPane(inventoryItemsContainer);
             scrollPane.setPrefViewportWidth(650);
             scrollPane.setPrefViewportHeight(685);
+            scrollPane.setMaxHeight(660);
+            scrollPane.setFitToHeight(true);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(0);
 
@@ -360,7 +370,7 @@ public class Manager {
             employeeContainer.getChildren().add(Header);
             // Add menu items to the list and display them
             //if edit is clicked. Go back through all employees and set save, and delete to visible
-            for (Employee employee : employeeList) {
+            for (Employee employee : repo.getEmployees().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList()) {
                 HBox itemRow = new HBox(10);
                 TextField usernameField = new TextField(employee.getUsername());
                 TextField passwordField = new TextField(employee.getPassword());
@@ -409,6 +419,7 @@ public class Manager {
                     //
                     //updateMenuItem((int)item.getId(), newName, );
                     saveButton.setVisible(false);
+                    clockedInOut.setVisible(false);
                     editButton.setVisible(true);
                     updateEmployee(employee.getId(), usernameField.getText(), passwordField.getText(), employee.getPosition(), employee.getLastClockIn(), employee.isClockedIn());
                 });
@@ -418,7 +429,14 @@ public class Manager {
                     employeePopup.show(stage);
 
                     //removeMenuItem((int) item.getId());
-                    employeeContainer.getChildren().remove(itemRow);
+                });
+                clockedInOut.setOnAction(_ -> {
+                    if(!employee.isClockedIn()){
+                        repo.clockIn((int) employee.getId());
+                    }else {
+                        repo.clockOut((int)employee.getId());
+                    }
+                    employees.fire();
                 });
 
 
@@ -444,6 +462,8 @@ public class Manager {
 
             newUsernameField.setPromptText("Set New Username");
             newPasswordField.setPromptText("Set New Password");
+            newEmployeeIDField.setPromptText("Set ID + 1");
+            newPositionField.setPromptText("Employee Position");
             newEmployeeIDField.setPrefWidth(100);
             newPositionField.setPrefWidth(250);
             newActiveStatusField.setPrefWidth(100);
@@ -458,7 +478,7 @@ public class Manager {
                 Employee newGuy = new Employee((employeeList.getLast().getId()+1),newUser,newPass,"Employee",lstIn, false);
                 repo.addEmployee(newGuy);
                 // Refresh the list (you might want to just add the new item instead of refreshing everything)
-                menuItems.fire(); // This will refresh the entire list
+                employees.fire(); // This will refresh the entire list
             });
 
 
@@ -468,6 +488,7 @@ public class Manager {
             ScrollPane scrollPane = new ScrollPane(employeeContainer);
             scrollPane.setPrefViewportWidth(650);
             scrollPane.setPrefViewportHeight(685);
+            scrollPane.setMaxHeight(660);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(15);
 
@@ -486,7 +507,7 @@ public class Manager {
         return managerScene;
     }
     // Change for master pull request
-    private void displayStatsReport(PieChart initChart) {
+    private void displayStatsReport(PieChart initChart, Map<MenuItem, Double> revenueData) {
         rootManager.getChildren().clear();
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
 
@@ -520,7 +541,7 @@ public class Manager {
 
         topMenuItemsRevenueBtn.setOnAction(_ -> updateChart(createTopMenuItemsRevenueChart()));
         topMenuItemsOrdersBtn.setOnAction(_ -> updateChart(createTopMenuItemsOrdersChart()));
-        dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart()));
+        dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart(revenueData)));
 
         buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn);
         buttonBox.setAlignment(Pos.CENTER);
@@ -530,6 +551,7 @@ public class Manager {
         mainScrollPane.setContent(contentBox);
         rootManager.getChildren().add(mainScrollPane);
     }
+    //private void updateList()
 
     private void updateChart(Chart newChart) {
         // This is to hold whatever chart was last in the order
@@ -588,42 +610,30 @@ public class Manager {
         return lineChart;
     }
 
-    private LineChart<String, Number> createDailyIncomeChart() {
+    private LineChart<String, Double> createDailyIncomeChart(Map<MenuItem, Double> revenueData) {
         CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
+        ValueAxis yAxis = new NumberAxis();
 
-        xAxis.setLabel("Date");
-        yAxis.setLabel("Revenue $");
-
-        yAxis.setLowerBound(0); // minimum revenue value
-        yAxis.setUpperBound(1000); // maximum revenue value
+        xAxis.setLabel("MenuItems");
+        yAxis.setLabel("Revenue");
+        xAxis.setMaxWidth(550);
 
         // Create a LineChart
-        LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        LineChart<String, Double> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle("Revenue for Last 30 Days");
 
         // Create data series
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        XYChart.Series<String, Double> series = new XYChart.Series<>();
         series.setName("Daily Revenue");
 
-
-        Map<Date, Double> revenueData = repo.getTopDatesRevenue(30);
-
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-        System.out.println("Get Data");
-        //revenueData is probably enpty :(
-        for (Map.Entry<Date, Double> entry : revenueData.entrySet()) {
-            String dateStr = dateFormat.format(entry.getKey());
-            System.out.println("Date: " + dateStr);
+        int i = 1;
+        for (Map.Entry<MenuItem, Double> entry : revenueData.entrySet()) {
 
             Double revenue = entry.getValue();
-            series.getData().add(new XYChart.Data<>(dateStr, revenue));
+            series.getData().add(new XYChart.Data<>(entry.getKey().getName(), revenue));
         }
-
-
         lineChart.getData().add(series);
+
         return lineChart;
     }
 
@@ -730,10 +740,8 @@ public class Manager {
     }
 
     // TODO add removeEmployee(id) in repo
-    private void deleteEmployee(long id) {
-//        repo.removeEmployee(id);
-    }
 
+    //private void inventoryButton(Pane rootManager, )
     private Button createLogOutButton(Stage stage) {
         Button logOut = new Button("_Log\nOut");
         logOut.setStyle("-fx-background-color: red;");
@@ -768,6 +776,7 @@ public class Manager {
 
 
         Label confirmationLabel = new Label("Completely delete this entry?");
+        Label typeDelete = new Label("Type DELETE");
         confirmationLabel.setFont(Font.font(14));
 
 
@@ -797,7 +806,7 @@ public class Manager {
         VBox buttonBox = new VBox(10, deleteMsg, box);
         buttonBox.setAlignment(Pos.CENTER);
 
-        popupContent.getChildren().addAll(confirmationLabel, buttonBox, box);
+        popupContent.getChildren().addAll(confirmationLabel,typeDelete, buttonBox, box);
         popupContent.setAlignment(Pos.CENTER);
 
         popup.getContent().add(popupContent);
@@ -805,7 +814,7 @@ public class Manager {
         return popup;
     }
 
-    private Popup createDeletePopupIngredient(VBox container, HBox itemRow){
+    private Popup createDeletePopupIngredient(VBox container, HBox itemRow, Ingredient ingredient){
         Popup popup = new Popup();
 
         // Create VBox for popup
@@ -815,6 +824,7 @@ public class Manager {
 
 
         Label confirmationLabel = new Label("Completely delete this entry?");
+        Label typeDelete = new Label("Type DELETE");
         confirmationLabel.setFont(Font.font(14));
 
 
@@ -825,7 +835,7 @@ public class Manager {
 
         done.setOnAction(_ -> {
             if (Objects.equals(deleteMsg.getText(), "DELETE")) {
-                //repo.deleteIngredientItem( item.getId());
+                repo.deleteIngredientInventory((int)ingredient.getId());
                 container.getChildren().remove(itemRow);
                 popup.hide();
             }
@@ -844,7 +854,7 @@ public class Manager {
         VBox buttonBox = new VBox(10, deleteMsg, box);
         buttonBox.setAlignment(Pos.CENTER);
 
-        popupContent.getChildren().addAll(confirmationLabel, buttonBox, box);
+        popupContent.getChildren().addAll(confirmationLabel,typeDelete, buttonBox, box);
         popupContent.setAlignment(Pos.CENTER);
 
         popup.getContent().add(popupContent);
@@ -861,6 +871,7 @@ public class Manager {
 
 
         Label confirmationLabel = new Label("Completely delete this entry?");
+        Label typeDelete = new Label("Type DELETE");
         confirmationLabel.setFont(Font.font(14));
 
 
@@ -889,7 +900,7 @@ public class Manager {
         VBox buttonBox = new VBox(10, deleteMsg, box);
         buttonBox.setAlignment(Pos.CENTER);
 
-        popupContent.getChildren().addAll(confirmationLabel, buttonBox, box);
+        popupContent.getChildren().addAll(confirmationLabel,typeDelete, buttonBox, box);
         popupContent.setAlignment(Pos.CENTER);
 
         popup.getContent().add(popupContent);
