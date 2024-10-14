@@ -1,6 +1,10 @@
 package com.pekings.pos.object;
 
 
+import com.pekings.pos.SelectedIngredientsBox;
+
+import java.util.Objects;
+
 public class Ingredient {
 
     private final long id;
@@ -16,6 +20,8 @@ public class Ingredient {
         this.amount = amount;
         this.batchPrice = batchPrice;
     }
+
+
 
     public long getId() {
         return id;
@@ -35,5 +41,18 @@ public class Ingredient {
 
     public float getBatchPrice() {
         return batchPrice;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ingredient other)) return false;
+
+        return getId() == other.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

@@ -51,16 +51,28 @@ public class PersistentRepository implements Repository {
         String addItemQuery = queryLoader.getQuery("add_menu_item")
                 .formatted(menuItem.getName(), menuItem.getPrice());
 
-        List<String> queries = new ArrayList<>();
-        queries.add(addItemQuery);
+        performPreparedStatement(preparedStatement -> {
+            preparedStatement.execute();
 
-        for (Ingredient ingredient : menuItem.getIngredients()) {
-            String ingredientQuery = queryLoader.getQuery("add_ingredient")
-                    .formatted(ingredient.getId() + "", menuItem.getId() + "", ingredient.getAmount() + "");
-            queries.add(ingredientQuery);
-        }
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
-        performNonFetchQuery(queries.toArray(String[]::new));
+            int menuItemID = -1;
+            while (resultSet.next()) {
+                menuItemID = resultSet.getInt(1);
+            }
+
+            List<String> queries = new ArrayList<>();
+            queries.add(addItemQuery);
+
+            for (Ingredient ingredient : menuItem.getIngredients()) {
+                String ingredientQuery = queryLoader.getQuery("add_ingredient")
+                        .formatted(ingredient.getId() + "", menuItemID + "", ingredient.getAmount() + "");
+                queries.add(ingredientQuery);
+            }
+
+            performNonFetchQuery(queries.toArray(String[]::new));
+
+        }, addItemQuery, Statement.RETURN_GENERATED_KEYS);
     }
 
     @Override
@@ -404,7 +416,7 @@ public class PersistentRepository implements Repository {
     }
 
     @Override
-    public List<SaleHistoryItem> getSalesHistory(int howManyHoursBack) {
+    public List<SaleHistoryItem> getSalesHistory(Date from, Date to) {
         List<SaleHistoryItem> salesHistory = new ArrayList<>();
         performFetchQuery("get_sales_history", resultSet -> {
             Timestamp timestamp = resultSet.getTimestamp("order_hour");
@@ -412,7 +424,7 @@ public class PersistentRepository implements Repository {
             double revenue = resultSet.getDouble("total_revenue");
             SaleHistoryItem saleHistoryItem = new SaleHistoryItem(timestamp, total_orders, revenue);
             salesHistory.add(saleHistoryItem);
-        }, howManyHoursBack + "");
+        }, from.toString(), to.toString());
         return salesHistory;
     }
 

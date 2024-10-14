@@ -2,6 +2,7 @@ package com.pekings.pos.object;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.util.Objects;
 
 public class Employee {
 
@@ -43,5 +44,18 @@ public class Employee {
 
     public boolean isClockedIn() {
         return clockedIn;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Employee other)) return false;
+
+        return getId() == other.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
