@@ -10,20 +10,18 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.*;
+import javafx.scene.control.*;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Region;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.control.TextField;
 import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 
@@ -44,7 +42,6 @@ public class Manager {
 
     List<MenuItem> menuItemList;
     List<Employee> employeeList;
-//    List<Ingredient> ingredientList;
 
     private Repository repo;
     private Pane rootManager;
@@ -59,6 +56,8 @@ public class Manager {
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
     Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
     boolean deleteBool = false;
+
+    public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
 
     public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo) {
         this.PrimaryStage = PrimaryStage;
@@ -75,7 +74,7 @@ public class Manager {
         //int ingredientSum = ingredientIntegerMap.values().stream().reduce(Integer::sum).orElse(-1);
         Scene managerScene = new Scene(rootManager, 1000, 700);
         repo = Main.getRepository();
-        menuItemList = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
+
         employeeList = repo.getEmployees().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         // Text for Manager Screen
 
@@ -94,124 +93,7 @@ public class Manager {
         logOut = createLogOutButton(stage);
         // Button actions
 
-        menuItems.setOnAction(_ -> { // Create vertical box that lines up perfectly the names, quantity, and prices of each menu item.
-
-            rootManager.getChildren().clear();
-            rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
-
-            // Create main container for menu items
-            VBox menuItemsContainer = new VBox(10); // 10 is the spacing between items
-            menuItemsContainer.setPadding(new Insets(15, 15, 15, 15));
-
-            HBox Header = new HBox(10);
-            Label nameColumn = new Label("Name");
-            Label priceColumn = new Label("Price");
-            nameColumn.setStyle("-fx-font-weight: bold");
-            priceColumn.setStyle("-fx-font-weight: bold");
-            nameColumn.setPrefWidth(300);
-            priceColumn.setPrefWidth(100);
-            Header.getChildren().addAll(nameColumn, priceColumn);
-            menuItemsContainer.getChildren().add(Header);
-
-            // Add menu items to the list and display them
-            for (MenuItem item : menuItemList) {
-                HBox itemRow = new HBox(10);
-                TextField nameField = new TextField(item.getName());
-                TextField priceField = new TextField(String.format("$%.2f", item.getPrice()));
-                nameField.setPrefWidth(300);
-                priceField.setPrefWidth(100);
-
-                Button editButton = new Button("_Edit");
-                Button saveButton = new Button("_Save Changes");
-                Button deleteButton = new Button("_Delete");
-
-                saveButton.setVisible(false);
-                nameField.setEditable(false);
-                priceField.setEditable(false);
-
-                editButton.setOnAction(_ -> {
-                    saveButton.setVisible(true);
-                    nameField.setEditable(true);
-                    priceField.setEditable(true);
-                    editButton.setVisible(false);
-
-                });
-
-
-                saveButton.setOnAction(_ -> {
-                    String newName = nameField.getText();
-                    float newPrice = Float.parseFloat(priceField.getText());
-
-                    if(!Objects.equals(newName, item.getName()) || (int)newPrice != item.getPrice()) {
-                        int tempIdHold = (int) item.getId();
-                        List<Ingredient> tempIngredients = repo.getIngredients((int) item.getId());
-                        repo.removeMenuItem((int) item.getId());
-                        menuItemsContainer.getChildren().remove(itemRow);
-                        MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, true);
-                        repo.addMenuItem(newOne);
-                    }
-                    saveButton.setVisible(false);
-                    editButton.setVisible(true);
-                    nameField.setEditable(false);
-                    priceField.setEditable(false);
-                });
-                deleteButton.setOnAction(_ -> {
-                    // Remove from database here
-                    Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
-                    dlt.show(stage);
-                    //menuItemsContainer.getChildren().remove(itemRow);
-                    menuItems.fire();
-                });
-
-                itemRow.getChildren().addAll(nameField, priceField, editButton, saveButton, deleteButton);
-                menuItemsContainer.getChildren().add(itemRow);
-
-
-            }
-
-
-            HBox newItemRow = new HBox(10);
-            TextField newNameField = new TextField();
-            TextField newPriceField = new TextField();
-            Button addButton = new Button("Add Item");
-
-            newNameField.setPromptText("New item name");
-            newPriceField.setPromptText("Price");
-            newNameField.setPrefWidth(300);
-            newPriceField.setPrefWidth(100);
-
-            addButton.setOnAction(_ -> {
-                String newName = newNameField.getText();
-                float newPrice = Float.parseFloat(newPriceField.getText());
-                // Add to database here
-                //List<Ingredient> newList = createNewIngredientList();
-                //MenuItem newMenuItem = new MenuItem(newName,newPrice, newList);
-                // newMenuItem = new MenuItem(-1, newName, newPrice,)
-                //repo.addMenuItem(newName, newPrice);
-                // Refresh the list (you might want to just add the new item instead of refreshing everything)
-                // Change
-                List<Ingredient> ingredients = repo.getAllIngredients();
-                List<String> ingredientNames = ingredients.stream().map(Ingredient::getName)
-                        .toList();
-                List<String> addMenuPop = createAddMenuItemPopup(ingredientNames);
-                VBox header = new VBox(10);
-
-//                repo.addMenuItem();
-                menuItems.fire(); // This will refresh the entire list
-            });
-
-
-            newItemRow.getChildren().addAll(newNameField, newPriceField, addButton);
-            menuItemsContainer.getChildren().add(newItemRow);
-
-            ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
-            scrollPane.setPrefViewportWidth(650);
-            scrollPane.setPrefViewportHeight(685);
-            scrollPane.setLayoutX(160);
-            scrollPane.setLayoutY(0);
-
-            rootManager.getChildren().add(scrollPane);
-        });
+        menuItems.setOnAction(_ -> openMenuItems(stage));
         PieChart initialChart = createTopMenuItemsRevenueChart();
 
 
@@ -325,9 +207,14 @@ public class Manager {
             newItemRow.getChildren().addAll(newNameField, newIdField, newquantityField, newPriceField, addButton);
             inventoryItemsContainer.getChildren().add(newItemRow);
 
+            Region extraSpace = new Region();
+            extraSpace.setPrefHeight(50);
+            VBox.setVgrow(extraSpace, javafx.scene.layout.Priority.ALWAYS);
+            inventoryItemsContainer.getChildren().add(extraSpace);
+
             ScrollPane scrollPane = new ScrollPane(inventoryItemsContainer);
-            scrollPane.setPrefViewportWidth(650);
-            scrollPane.setPrefViewportHeight(685);
+            scrollPane.setPrefWidth(810);
+            scrollPane.setPrefHeight(645);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(0);
 
@@ -428,16 +315,11 @@ public class Manager {
 
 
                 itemRow.getChildren().addAll(usernameField, passwordField, employeeIDField, positionField, activeStatusField, editButton, clockedInOut, saveButton, deleteButton);
+                itemRow.setPadding(new Insets(0, 30, 0, 0));
                 employeeContainer.getChildren().add(itemRow);
 
             }
 
-
-            //                TextField usernameField = new TextField(employee.getUsername());
-            //                TextField passwordField = new TextField(employee.getPassword());
-            //                TextField employeeIDField = new TextField(String.valueOf(employee.getId()));
-            //                TextField positionField = new TextField(employee.getPosition());
-            //                TextField activeStatusField = new TextField("N/A");
 
             HBox newItemRow = new HBox(10);
             TextField newUsernameField = new TextField();
@@ -471,8 +353,8 @@ public class Manager {
             employeeContainer.getChildren().add(newItemRow);
 
             ScrollPane scrollPane = new ScrollPane(employeeContainer);
-            scrollPane.setPrefViewportWidth(650);
-            scrollPane.setPrefViewportHeight(685);
+            scrollPane.setPrefWidth(810);
+            scrollPane.setPrefHeight(645);
             scrollPane.setLayoutX(160);
             scrollPane.setLayoutY(15);
 
@@ -486,7 +368,7 @@ public class Manager {
         centerScroll.setPrefHeight(700);
 
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
-
+        openMenuItems(stage);
 
         return managerScene;
     }
@@ -499,7 +381,7 @@ public class Manager {
         mainScrollPane.setLayoutX(150);
         mainScrollPane.setLayoutY(0);
         mainScrollPane.setPrefWidth(850);
-        mainScrollPane.setPrefHeight(700);
+        mainScrollPane.setPrefHeight(660);
 
         VBox contentBox = new VBox(10);
         Label hoverLabel = new Label();
@@ -914,6 +796,7 @@ public class Manager {
             if (Objects.equals(deleteMsg.getText(), "DELETE")) {
                 repo.deleteMenuItem((int) item.getId());
                 container.getChildren().remove(itemRow);
+                openMenuItems(PrimaryStage);
                 popup.hide();
             }
             else{
@@ -1110,5 +993,235 @@ public class Manager {
         });
 
         return Btn;
+    }
+
+    private void openMenuItems(Stage stage){
+        menuItemList = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
+        rootManager.getChildren().clear();
+        rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
+
+        // Create main container for menu items
+        VBox menuItemsContainer = new VBox(10); // 10 is the spacing between items
+        menuItemsContainer.setPadding(new Insets(15, 15, 15, 15));
+
+        HBox Header = new HBox(10);
+        Label nameColumn = new Label("Name");
+        Label priceColumn = new Label("Price");
+        nameColumn.setStyle("-fx-font-weight: bold");
+        priceColumn.setStyle("-fx-font-weight: bold");
+        nameColumn.setPrefWidth(300);
+        priceColumn.setPrefWidth(100);
+        Header.getChildren().addAll(nameColumn, priceColumn);
+        menuItemsContainer.getChildren().add(Header);
+
+        // Add menu items to the list and display them
+        for (MenuItem item : menuItemList) {
+            HBox itemRow = new HBox(10);
+            TextField nameField = new TextField(item.getName());
+            TextField priceField = new TextField(String.format("$%.2f", item.getPrice()));
+            nameField.setPrefWidth(300);
+            priceField.setPrefWidth(100);
+
+            Button editButton = new Button("_Edit");
+            Button saveButton = new Button("_Save Changes");
+            Button deleteButton = new Button("_Delete");
+
+            Button activeButton = new Button();
+            if(item.isActive()){
+                activeButton.setText("Active");
+            }else{
+                activeButton.setText("Inactive");
+            }
+            activeButton.setOnAction(_ -> {
+                if(activeButton.getText().equals("Active")){
+                    activeButton.setText("Inactive");
+                }else{
+                    activeButton.setText("Active");
+                }
+            });
+
+            saveButton.setVisible(false);
+            nameField.setEditable(false);
+            activeButton.setDisable(true);
+            priceField.setEditable(false);
+
+            editButton.setOnAction(_ -> {
+                activeButton.setDisable(false);
+                saveButton.setVisible(true);
+                nameField.setEditable(true);
+                priceField.setEditable(true);
+                editButton.setVisible(false);
+            });
+
+
+            saveButton.setOnAction(_ -> {
+                String newName = nameField.getText();
+                String newPriceStr = priceField.getText();
+                if(newPriceStr.isEmpty()){
+                    System.out.println("Please enter a price");
+                    return;
+                }
+                newPriceStr = newPriceStr.replaceAll(",", ".");
+                if(newPriceStr.split("\\.").length > 2){
+                    System.out.println("Too many decimals/commas");
+                    return;
+                }
+                if(newPriceStr.charAt(0) == '$'){
+                    newPriceStr = newPriceStr.substring(1);
+                }
+                if(! (newPriceStr.matches("[0-9]*(\\.[0-9]+)?"))){
+                    System.out.println("Invalid characters in price field");
+                    return;
+                }
+                float newPrice = Float.parseFloat(newPriceStr);
+
+//                  System.out.println("MenuItem edited");
+                int tempIdHold = (int) item.getId();
+                List<Ingredient> tempIngredients = repo.getIngredients(tempIdHold);
+                menuItemsContainer.getChildren().remove(itemRow);
+                boolean isActive = activeButton.getText().equals("Active");
+                MenuItem newOne = new MenuItem(tempIdHold, newName, newPrice, tempIngredients, isActive);
+                repo.updateMenuItem(newOne);
+
+                saveButton.setVisible(false);
+                editButton.setVisible(true);
+                nameField.setEditable(false);
+                priceField.setEditable(false);
+                activeButton.setDisable(true);
+                openMenuItems(stage);
+//                System.out.println("MenuItem edited Finish");
+            });
+
+
+            deleteButton.setOnAction(_ -> {
+                // Remove from database here
+                Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
+                dlt.show(stage);
+//                menuItemsContainer.getChildren().remove(itemRow);
+//                openMenuItems(stage);
+            });
+
+            itemRow.getChildren().addAll(activeButton, nameField, priceField, editButton, saveButton, deleteButton);
+            menuItemsContainer.getChildren().add(itemRow);
+
+
+        }
+
+
+        HBox newItemRow = new HBox(10);
+        TextField newNameField = new TextField();
+        TextField newPriceField = new TextField();
+        Button selectIngredients = new Button("Ingredients");
+        Button addButton = new Button("Add Item");
+
+        newNameField.setPromptText("New item name");
+        newPriceField.setPromptText("Price");
+        newNameField.setPrefWidth(300);
+        newPriceField.setPrefWidth(100);
+
+        selectIngredients.setOnAction(_ -> showSelectionDialog());
+
+        addButton.setOnAction(_ -> {
+            String name = newNameField.getText();
+            if(name.isEmpty()){
+                System.out.println("Name is empty");
+                return;
+            }
+
+            String priceString = newPriceField.getText();
+            if(priceString.isEmpty()){
+                System.out.println("Please enter a price");
+                return;
+            }
+            priceString = priceString.replaceAll(",", ".");
+            if(priceString.split("\\.").length > 2){
+                System.out.println("Too many decimals/commas");
+                return;
+            }
+            if(priceString.charAt(0) == '$'){
+                priceString = priceString.substring(1);
+            }
+            if(! (priceString.matches("[0-9]*(\\.[0-9]+)?"))){
+                System.out.println("Invalid characters in price field");
+                return;
+            }
+            float price = Float.parseFloat(priceString);
+
+            List<Ingredient> ingredients = getIngredients();
+            if(ingredients.isEmpty()){
+                System.out.println("No ingredients found");
+                return;
+            }
+
+            MenuItem newMenuItem = new MenuItem(-1, name, price, ingredients, true);
+            repo.addMenuItem(newMenuItem);
+            openMenuItems(stage); // This will refresh the entire screen
+        });
+
+
+        newItemRow.getChildren().addAll(newNameField, newPriceField, selectIngredients, addButton);
+        menuItemsContainer.getChildren().add(newItemRow);
+
+        // Adds space so the add item buttons display fully
+        Region extraSpace = new Region();
+        extraSpace.setPrefHeight(50);
+        VBox.setVgrow(extraSpace, javafx.scene.layout.Priority.ALWAYS);
+        menuItemsContainer.getChildren().add(extraSpace);
+
+        ScrollPane scrollPane = new ScrollPane(menuItemsContainer);
+        scrollPane.setPrefWidth(810);
+        scrollPane.setPrefHeight(645);
+        scrollPane.setLayoutX(160);
+        scrollPane.setLayoutY(0);
+
+        checkBoxStates.clear();
+        rootManager.getChildren().add(scrollPane);
+    }
+
+    private List<Ingredient> getIngredients(){
+        List<Ingredient> ingredients = new ArrayList<>();
+        for (Map.Entry<Ingredient, Boolean> entry : checkBoxStates.entrySet()) {
+            if(entry.getValue()){
+                ingredients.add(entry.getKey());
+            }
+        }
+        return ingredients;
+    }
+
+    private void showSelectionDialog() {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Select Items");
+
+        VBox dialogContent = new VBox(10, new Label("Select the items:"));
+        List<Ingredient> ingredients = repo.getAllIngredients();
+        SelectedIngredientsBox[] ingredientsBoxes = new SelectedIngredientsBox[ingredients.size()];
+
+        for(int i = 0; i < ingredients.size(); i++) {
+            SelectedIngredientsBox box = new SelectedIngredientsBox(ingredients.get(i), this);
+            ingredientsBoxes[i] = box;
+            dialogContent.getChildren().add(box.getCheckBox());
+        }
+
+
+
+
+        ScrollPane scrollPane = new ScrollPane(dialogContent);
+        scrollPane.setFitToWidth(true); // Make the scroll pane fit the dialog width
+        scrollPane.setPrefHeight(200); // Set a fixed height for the scroll pane
+
+        dialog.getDialogPane().setContent(scrollPane);
+
+        // Add a button to close the dialog
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+
+        // Set a preferred width for the dialog
+        dialog.getDialogPane().setPrefWidth(400);
+
+        // Show the dialog and wait for a result
+        dialog.showAndWait();
+
+        for (SelectedIngredientsBox box : ingredientsBoxes) {
+            checkBoxStates.put(box.getIngredient(), box.getCheckBox().isSelected());
+        }
     }
 }

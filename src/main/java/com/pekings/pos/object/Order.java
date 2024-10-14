@@ -3,6 +3,7 @@ package com.pekings.pos.object;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Order {
 
@@ -58,5 +59,10 @@ public class Order {
         if (!(o instanceof Order other)) return false;
 
         return getId() == other.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
