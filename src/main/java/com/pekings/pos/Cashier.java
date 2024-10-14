@@ -65,6 +65,12 @@ public class Cashier {
 
         exit = new Button(originalBtn.getText());
         exit.setOnAction(originalBtn.getOnAction());
+        exit.setOnMouseEntered(_ -> {
+            exit.setStyle("-fx-background-color: darkgray;");
+        });
+        exit.setOnMouseExited(_ -> {
+            exit.setStyle("-fx-background-color: RED");
+        });
 
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();

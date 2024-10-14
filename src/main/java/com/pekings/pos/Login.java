@@ -79,7 +79,7 @@ public class Login {
                 PrimaryStage.setScene(cashier);
             }
             if (e.isControlDown() && e.isShiftDown() && e.getCode().toString().equals("M")) {
-                Manager manager = new Manager(PrimaryStage, login, repo);
+                Manager manager = new Manager(PrimaryStage, login, repo, repo.getEmployees().getLast().getId());
                 PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
             }
         });
@@ -130,7 +130,7 @@ public class Login {
                     cashier = cash.getScene();
                     PrimaryStage.setScene(cashier);
                 } else {
-                    Manager manager = new Manager(PrimaryStage, login, repo);
+                    Manager manager = new Manager(PrimaryStage, login, repo, emp.getId());
                     PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
                 }
                 error.setText("");
