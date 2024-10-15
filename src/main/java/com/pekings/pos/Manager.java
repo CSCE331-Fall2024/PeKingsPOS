@@ -679,7 +679,14 @@ public class Manager {
         return lineChart;
     }
 
-
+    /** Returns a bar chart/histogram with ingredient history
+     * This function takes in two TextFields and sets up a histogram that accurately displays correct data
+     * for the Product Usage Chart (PUC). This PUC will be used for the manager to analyze relevant data regarding
+     * inventory given a time period.
+     * @param from  the beginning of the time period
+     * @param to  the end of the time period
+     * @return a histogram/bar graph of the ingredients used during a given time period
+     */
     private BarChart<String, Number> createPUCChart(TextField from, TextField to) {
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
