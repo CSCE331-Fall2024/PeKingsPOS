@@ -20,13 +20,22 @@ public class MenuButton {
     TilePane pane;
     Cashier cashier;
 
-
+    /**
+     * Stores all arguments as permanent variables in the class
+     *
+     * @param cashier The order screen to add information to. Multiple cashier screens may exist at once.
+     * @param item The menu item this button will represent. Stores all necessary menu item information.
+     * @param pane The TilePain to add order items to.
+     */
     public MenuButton(MenuItem item, TilePane pane, Cashier cashier){
         this.item = item;
         this.pane = pane;
         this.cashier = cashier;
     }
 
+    /**
+     * Returns a button with full functionality to add menu items to the order.
+     */
     public Button createMenuBtn(){
 
         Button btn = new Button(item.getName());

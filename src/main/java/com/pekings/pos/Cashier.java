@@ -57,7 +57,15 @@ public class Cashier {
     Button exit;
 
 
-
+    /**
+     * Sets up and creates the entire cashier scene, does NOT change the scene of the current stage.
+     * Includes calling all necessary functions for the cashier screen to function correctly.
+     * Creates all button functionality for the screen.
+     *
+     * @param PrimaryStage the stage the window holds
+     * @param backBtn button with pre-designated action, used for returning to previous screens it was called from.
+     * @param employeeID ID of the employee/manager, for placing orders
+     */
     public Cashier(Stage PrimaryStage, Button backBtn, long employeeID){
         this.PrimaryStage = PrimaryStage;
         this.employeeID = employeeID;
@@ -65,6 +73,12 @@ public class Cashier {
 
         exit = new Button(originalBtn.getText());
         exit.setOnAction(originalBtn.getOnAction());
+        exit.setOnMouseEntered(_ -> {
+            exit.setStyle("-fx-background-color: darkgray;");
+        });
+        exit.setOnMouseExited(_ -> {
+            exit.setStyle("-fx-background-color: RED");
+        });
 
         repo = Main.getRepository();
         menuItems = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
@@ -341,13 +355,18 @@ public class Cashier {
         rootCashier.getChildren().addAll(payment, orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt, removeItem);
     }
 
-
+    /**
+     * Returns the cashier scene and resets the scene to its default look
+     */
     public Scene getScene(){
         centerScroll.setContent(menuPane);
         return cashier;
     }
 
-
+    /**
+     * Adjusts the screen to show buttons allowing you to select previous orders.
+     * On a selection of an order, the scene will return to the default order screen of that specific order.
+     */
     private void viewPreviousOrders(){
         TilePane previousOrders = new TilePane();
         previousOrders.setPrefColumns(4);
@@ -373,7 +392,9 @@ public class Cashier {
         centerScroll.setContent(previousOrders);
     }
 
-
+    /**
+     * Alters the screen to allow for selection of payment option. On selection the order is completed and placed.
+     */
     private void finishOrder(){
         if(!orderItems.isEmpty()) {
             Button cancel = new Button("Cancel");
@@ -423,7 +444,14 @@ public class Cashier {
         }
     }
 
-
+    /**
+     * Handles the possible errors from taking in user input for a memo.
+     * If no memo exists on the latest item, it adds a memo to it.
+     * If a memo does exist on the latest item, it edits the existing memo rather than creating a new one.
+     *
+     * @param memo popup that closes upon a successful memo, remains open otherwise.
+     * @param memoField User input field that must contain a successful input to continue forward with the memo.
+     */
     private void finishMemo(TextField memoField, Popup memo){
         int size = orderPane.getChildren().size();
         String input = memoField.getText();
@@ -461,7 +489,11 @@ public class Cashier {
         }
     }
 
-
+    /**
+     * Handles deleting the Menu Items in the delete lists.
+     * This may result in the items in the orderItems list being
+     * out of order when compared to the visual order, however the items will remain the same.
+     */
     private void deleteItems(){
         for(Text txt : deleteText){
             int index = orderPane.getChildren().indexOf(txt);
@@ -482,13 +514,20 @@ public class Cashier {
         deleteOrderItems.clear();
     }
 
-
+    /**
+     * Opens a new order and displays it without closing and deleting the current one.
+     */
     private void openNewOrder(){
         Cashier newCashier = new Cashier(PrimaryStage, exit, employeeID);
         PrimaryStage.setScene(newCashier.getScene());
     }
 
-
+    /**
+     * Updates the displayed total for the order. This includes sub-total, tax, and total.
+     * Handles issues when changing from string to float.
+     *
+     * @param cost The amount you want to add to the subtotal
+     */
     public void updateTotals(double cost){
         sub += cost;
 
@@ -520,6 +559,12 @@ public class Cashier {
         totalTxt.setText("Total: $" + total);
     }
 
+    /**
+     * Removes order
+     * If no previous orders exist it opens a new one
+     * If a previous order does exist it reopens the last one automatically.
+     * Intended as a quick fix for accidental presses of the new order button.
+     */
     private void cancelOrder(){
         Orders.remove(this);
         if(Orders.isEmpty()) {
@@ -529,6 +574,9 @@ public class Cashier {
         }
     }
 
+    /**
+     * Finishes off the order by removing it from the open orders and opens a new one for the next customer
+     */
     private void closeOrder(){
         Orders.remove(this);
         openNewOrder();

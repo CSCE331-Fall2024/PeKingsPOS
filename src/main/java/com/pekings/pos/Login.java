@@ -27,23 +27,26 @@ public class Login {
     Text error;
     Group rootLogin;
 
+    /**
+     * Creates the login scene and sets functionality of all buttons and fields.
+     * Once finished it sets the stage to show this scene. Password fields are
+     * treated as confidential by hiding input.
+     *
+     * @param PrimaryStage The window to display all scenes on
+     */
     public Login(Stage PrimaryStage){
         repo = Main.getRepository();
-
         Employees = repo.getEmployees();
 
         for(Employee emp : Employees){
             System.out.println(emp.getUsername() + " : " + emp.getPassword() + " : " + emp.getPosition());
         }
 
-
-
         this.PrimaryStage = PrimaryStage;
         this.PrimaryStage.setTitle("PeKings POS");
         this.PrimaryStage.setResizable(false);
         this.PrimaryStage.setWidth(1000);
         this.PrimaryStage.setHeight(700);
-//        this.PrimaryStage.getIcons().add(new Image("file:icon.png"));
 
 
         rootLogin = new Group();
@@ -79,7 +82,7 @@ public class Login {
                 PrimaryStage.setScene(cashier);
             }
             if (e.isControlDown() && e.isShiftDown() && e.getCode().toString().equals("M")) {
-                Manager manager = new Manager(PrimaryStage, login, repo);
+                Manager manager = new Manager(PrimaryStage, login, repo, repo.getEmployees().getLast().getId());
                 PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
             }
         });
@@ -113,10 +116,13 @@ public class Login {
 
         this.PrimaryStage.setScene(login);
         this.PrimaryStage.show();
-
-
     }
 
+    /**
+     * Checks the login credentials inputted, and directs the user to their designated position scene.
+     * Treats the login screen as confidential by removing all inputs on an incorrect login attempt.
+     * Handles incorrect inputs by displaying errors on screen.
+     */
     private void checkLogin() {
         String username = usernameBox.getText();
         String password = passwordBox.getText();
@@ -130,7 +136,7 @@ public class Login {
                     cashier = cash.getScene();
                     PrimaryStage.setScene(cashier);
                 } else {
-                    Manager manager = new Manager(PrimaryStage, login, repo);
+                    Manager manager = new Manager(PrimaryStage, login, repo, emp.getId());
                     PrimaryStage.setScene(manager.createManagerScene(PrimaryStage));
                 }
                 error.setText("");
