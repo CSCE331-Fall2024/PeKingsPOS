@@ -57,7 +57,14 @@ public class Cashier {
     Button exit;
 
 
-
+    /**
+     * Sets up and creates the entire cashier scene, does NOT change the scene of the current stage.
+     * Includes calling all necessary functions for the cashier screen to function correctly
+     *
+     * @param PrimaryStage the stage the window holds
+     * @param backBtn button with action to return to the screen it sets
+     * @param employeeID ID of the employee/manager, for placing orders
+     */
     public Cashier(Stage PrimaryStage, Button backBtn, long employeeID){
         this.PrimaryStage = PrimaryStage;
         this.employeeID = employeeID;
@@ -347,13 +354,17 @@ public class Cashier {
         rootCashier.getChildren().addAll(payment, orderBorderLeft, paymentBorderTop, subTotalTxt, taxTxt, totalTxt, removeItem);
     }
 
-
+    /**
+     * Returns the cashier scene and resets the scene to its default look
+     */
     public Scene getScene(){
         centerScroll.setContent(menuPane);
         return cashier;
     }
 
-
+    /**
+     * Adjusts the screen to show buttons allowing you to select previous orders
+     */
     private void viewPreviousOrders(){
         TilePane previousOrders = new TilePane();
         previousOrders.setPrefColumns(4);
@@ -379,7 +390,9 @@ public class Cashier {
         centerScroll.setContent(previousOrders);
     }
 
-
+    /**
+     * Alters the screen to allow for selection of payment option. On selection the order is completed and placed.
+     */
     private void finishOrder(){
         if(!orderItems.isEmpty()) {
             Button cancel = new Button("Cancel");
@@ -429,7 +442,12 @@ public class Cashier {
         }
     }
 
-
+    /**
+     * Handles the possible errors from taking in user input for a memo and places memo where necessary
+     *
+     * @param memo popup that closes upon a successful memo, remains open otherwise.
+     * @param memoField User input field that must contain a successful input to continue forward with the memo.
+     */
     private void finishMemo(TextField memoField, Popup memo){
         int size = orderPane.getChildren().size();
         String input = memoField.getText();
@@ -467,7 +485,9 @@ public class Cashier {
         }
     }
 
-
+    /**
+     * Handles deleting the selected items in the order
+     */
     private void deleteItems(){
         for(Text txt : deleteText){
             int index = orderPane.getChildren().indexOf(txt);
@@ -488,13 +508,19 @@ public class Cashier {
         deleteOrderItems.clear();
     }
 
-
+    /**
+     * Opens a new order and displays it without closing the current one
+     */
     private void openNewOrder(){
         Cashier newCashier = new Cashier(PrimaryStage, exit, employeeID);
         PrimaryStage.setScene(newCashier.getScene());
     }
 
-
+    /**
+     * Updates the displayed total for the order
+     *
+     * @param cost The amount you want to add to the subtotal
+     */
     public void updateTotals(double cost){
         sub += cost;
 
@@ -526,6 +552,9 @@ public class Cashier {
         totalTxt.setText("Total: $" + total);
     }
 
+    /**
+     * Removes order and handles what to open next
+     */
     private void cancelOrder(){
         Orders.remove(this);
         if(Orders.isEmpty()) {
@@ -535,6 +564,9 @@ public class Cashier {
         }
     }
 
+    /**
+     * Finishes off the order by removing it from the open orders and opens a new one for the next customer
+     */
     private void closeOrder(){
         Orders.remove(this);
         openNewOrder();
