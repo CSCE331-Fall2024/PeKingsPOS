@@ -696,6 +696,15 @@ public class Manager {
 
         String fromInput = from.getText();
         String toInput = to.getText();
+
+        if (fromInput.isEmpty()) {
+            showErrorPopup("From date is required.");
+        }
+
+        if (toInput.isEmpty()) {
+            showErrorPopup("To date is required.");
+        }
+
         Date fromDate = DateUtil.fromString(fromInput);
         Date toDate = DateUtil.fromString(toInput);
 
