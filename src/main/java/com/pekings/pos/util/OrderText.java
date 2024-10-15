@@ -10,6 +10,15 @@ import javafx.scene.text.TextFlow;
 public class OrderText {
     boolean clicked = false;
 
+    /**
+     * Adds the text to the orderPane on function call.
+     * Allows for the text to be selectable and deletable from the order.
+     * Updates the order total.
+     *
+     * @param pane The pane to add the menu item to as a part of the order.
+     * @param cashier The screen to add all necessary information to.
+     * @param item The menu item the text will represent on the order screen.
+     */
     public OrderText(Cashier cashier, MenuItem item, TilePane pane){
         TextFlow textHolder = new TextFlow();
         Text txt = new Text(item.getName());
@@ -37,7 +46,6 @@ public class OrderText {
             if(!clicked) {
                 txt.setFill(Color.DARKBLUE);
                 priceTxt.setFill(Color.DARKBLUE);
-//                    row.setStyle("-fx-background-color: BLUE");
 
                 cashier.deleteTextHolder.add(textHolder);
                 cashier.deleteText.add(priceTxt);

@@ -64,6 +64,14 @@ public class Manager {
 
     public final Map<Ingredient, Boolean> checkBoxStates = new HashMap<>();
 
+    /**
+     * Assigns all passed values to permanent variables in the class.
+     *
+     * @param PrimaryStage The window which all scenes will be displayed on.
+     * @param id The manager ID, used for opening the cashier screen from the manager screen.
+     * @param repo Contains the repository, used for accessing database data.
+     * @param loginScreen Used in functions to return to the original login screen.
+     */
     public Manager(Stage PrimaryStage, Scene loginScreen, Repository repo, long id) {
         this.PrimaryStage = PrimaryStage;
         this.loginScreen = loginScreen;
@@ -72,7 +80,10 @@ public class Manager {
         rootManager = new Pane();
     }
 
-
+    //Still needs more info from Nathan. M
+    /**
+     * Opens Menu Items panel automatically
+     */
     public Scene createManagerScene(Stage stage) {
         // Setup Manager Scene
 
@@ -380,8 +391,6 @@ public class Manager {
 
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
         openMenuItems(stage);
-
-
 
         return managerScene;
     }
@@ -945,6 +954,15 @@ public class Manager {
         return Btn;
     }
 
+    /**
+     * This function opens the Menu Items tab for the manager.
+     * Displays all menu items, active or inactive.
+     * Allows full editing of the menu items except for ingredients.
+     * Allows for addition of new menu items such as seasonal items.
+     * Menu items may be set to be inactive or active for the cashiers.
+     *
+     * @param stage Used for an argument to recall this function and for displaying popups
+     */
     private void openMenuItems(Stage stage){
         menuItemList = repo.getMenuItems().stream().sorted(Comparator.comparingInt(value -> (int) value.getId())).toList();
         rootManager.getChildren().clear();
@@ -1042,17 +1060,12 @@ public class Manager {
 
 
             deleteButton.setOnAction(_ -> {
-                // Remove from database here
                 Popup dlt = createDeletePopup(menuItemsContainer,itemRow,item);
                 dlt.show(stage);
-//                menuItemsContainer.getChildren().remove(itemRow);
-//                openMenuItems(stage);
             });
 
             itemRow.getChildren().addAll(activeButton, nameField, priceField, editButton, saveButton, deleteButton);
             menuItemsContainer.getChildren().add(itemRow);
-
-
         }
 
 
@@ -1126,6 +1139,12 @@ public class Manager {
         rootManager.getChildren().add(scrollPane);
     }
 
+    /**
+     * Goes through the checkboxes stored data, if it was selected
+     * it adds the ingredient to a list of ingredients.
+     * Once finished checking all checkboxes data, it
+     * returns the selected ingredients list.
+     */
     private List<Ingredient> getIngredients(){
         List<Ingredient> ingredients = new ArrayList<>();
         for (Map.Entry<Ingredient, Boolean> entry : checkBoxStates.entrySet()) {
@@ -1136,6 +1155,12 @@ public class Manager {
         return ingredients;
     }
 
+    /**
+     * Opens a dialog window containing all ingredients.
+     * These ingredients may be selected using check boxes.
+     * Upon closing the dialog box, the data is saved to allow it to be
+     * redisplayed when it's opened again.
+     */
     private void showSelectionDialog() {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Select Items");
@@ -1149,9 +1174,6 @@ public class Manager {
             ingredientsBoxes[i] = box;
             dialogContent.getChildren().add(box.getCheckBox());
         }
-
-
-
 
         ScrollPane scrollPane = new ScrollPane(dialogContent);
         scrollPane.setFitToWidth(true); // Make the scroll pane fit the dialog width
@@ -1173,6 +1195,12 @@ public class Manager {
         }
     }
 
+    /**
+     * Opens an error screen popup displaying a message,
+     * intended for error handling across the manager screen.
+     *
+     * @param message String which will be displayed on the error screen to explain the error.
+     */
     private void showErrorPopup(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

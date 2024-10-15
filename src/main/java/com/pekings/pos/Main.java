@@ -9,6 +9,7 @@ public class Main {
 
     private static Repository repository;
 
+    //Explain the runtime portion: Fabio
     /**
      * Initializes the database and calls the functions to open and launch the window.
      *

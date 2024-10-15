@@ -59,10 +59,11 @@ public class Cashier {
 
     /**
      * Sets up and creates the entire cashier scene, does NOT change the scene of the current stage.
-     * Includes calling all necessary functions for the cashier screen to function correctly
+     * Includes calling all necessary functions for the cashier screen to function correctly.
+     * Creates all button functionality for the screen.
      *
      * @param PrimaryStage the stage the window holds
-     * @param backBtn button with action to return to the screen it sets
+     * @param backBtn button with pre-designated action, used for returning to previous screens it was called from.
      * @param employeeID ID of the employee/manager, for placing orders
      */
     public Cashier(Stage PrimaryStage, Button backBtn, long employeeID){
@@ -363,7 +364,8 @@ public class Cashier {
     }
 
     /**
-     * Adjusts the screen to show buttons allowing you to select previous orders
+     * Adjusts the screen to show buttons allowing you to select previous orders.
+     * On a selection of an order, the scene will return to the default order screen of that specific order.
      */
     private void viewPreviousOrders(){
         TilePane previousOrders = new TilePane();
@@ -443,7 +445,9 @@ public class Cashier {
     }
 
     /**
-     * Handles the possible errors from taking in user input for a memo and places memo where necessary
+     * Handles the possible errors from taking in user input for a memo.
+     * If no memo exists on the latest item, it adds a memo to it.
+     * If a memo does exist on the latest item, it edits the existing memo rather than creating a new one.
      *
      * @param memo popup that closes upon a successful memo, remains open otherwise.
      * @param memoField User input field that must contain a successful input to continue forward with the memo.
@@ -486,7 +490,9 @@ public class Cashier {
     }
 
     /**
-     * Handles deleting the selected items in the order
+     * Handles deleting the Menu Items in the delete lists.
+     * This may result in the items in the orderItems list being
+     * out of order when compared to the visual order, however the items will remain the same.
      */
     private void deleteItems(){
         for(Text txt : deleteText){
@@ -509,7 +515,7 @@ public class Cashier {
     }
 
     /**
-     * Opens a new order and displays it without closing the current one
+     * Opens a new order and displays it without closing and deleting the current one.
      */
     private void openNewOrder(){
         Cashier newCashier = new Cashier(PrimaryStage, exit, employeeID);
@@ -517,7 +523,8 @@ public class Cashier {
     }
 
     /**
-     * Updates the displayed total for the order
+     * Updates the displayed total for the order. This includes sub-total, tax, and total.
+     * Handles issues when changing from string to float.
      *
      * @param cost The amount you want to add to the subtotal
      */
@@ -553,7 +560,10 @@ public class Cashier {
     }
 
     /**
-     * Removes order and handles what to open next
+     * Removes order
+     * If no previous orders exist it opens a new one
+     * If a previous order does exist it reopens the last one automatically.
+     * Intended as a quick fix for accidental presses of the new order button.
      */
     private void cancelOrder(){
         Orders.remove(this);
