@@ -1,17 +1,14 @@
 package com.pekings.pos.object;
 
-
-import com.pekings.pos.SelectedIngredientsBox;
-
 import java.util.Objects;
 
 public class Ingredient {
 
     private final long id;
-    private final String name;
-    private final float price;
-    private final int amount;
-    private final float batchPrice;
+    private String name;
+    private float price;
+    private int amount;
+    private float batchPrice;
 
     public Ingredient(long id, String name, float price, int amount, float batchPrice) {
         this.id = id;
@@ -20,8 +17,6 @@ public class Ingredient {
         this.amount = amount;
         this.batchPrice = batchPrice;
     }
-
-
 
     public long getId() {
         return id;
@@ -41,6 +36,22 @@ public class Ingredient {
 
     public float getBatchPrice() {
         return batchPrice;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
+    }
+
+    public void setBatchPrice(float batchPrice) {
+        this.batchPrice = batchPrice;
     }
 
     @Override

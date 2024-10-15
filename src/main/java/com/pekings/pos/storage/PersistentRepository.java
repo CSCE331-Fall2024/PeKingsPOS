@@ -189,12 +189,11 @@ public class PersistentRepository implements Repository {
             int ingredient_price = resultSet.getInt("serving_price");
             int ingredient_id = resultSet.getInt("ingredient_id");
 
-            Ingredient ingredient = new Ingredient(ingredient_id, ingredient_name, quantity, ingredient_batch_price, ingredient_price);
+            Ingredient ingredient = new Ingredient(ingredient_id, ingredient_name, ingredient_price, quantity, ingredient_batch_price);
 
             if (menuItems.stream().anyMatch(menuItem -> menuItem.getId() == id)) {
-                MenuItem menuItem = menuItems.stream().filter(menuItem1 -> menuItem1.getId() == id).findAny().orElse(null);
-                assert menuItem != null;
-                menuItem.addIngredient(ingredient);
+                menuItems.stream().filter(menuItem1 -> menuItem1.getId() == id).findAny()
+                        .ifPresent(menuItem -> menuItem.addIngredient(ingredient));
             } else {
                 MenuItem menuItem = new MenuItem(id, name, price, new ArrayList<>(), active);
                 menuItem.addIngredient(ingredient);
@@ -273,7 +272,12 @@ public class PersistentRepository implements Repository {
         List<Ingredient> ingredients = new ArrayList<>();
         performFetchQuery("get_menu_item_ingredients", resultSet -> {
             int ingredientID = resultSet.getInt("ingredient_id");
+            int amount = resultSet.getInt("ingredients_in_item");
+
+            // we use getIngredient here so that we can get the usual properties
+            // then set the amount to the amount needed for the menuItem
             Ingredient ingredient = getIngredient(ingredientID);
+            ingredient.setAmount(amount);
 
             ingredients.add(ingredient);
         }, menuItemID + "");
@@ -526,14 +530,9 @@ public class PersistentRepository implements Repository {
 
                 // add to menu_ingredients
                 for (Ingredient ingredient : menuItem.getIngredients()) {
-                    String addIngredient = queryLoader.getQuery("add_order_inventory")
-                            .formatted(orderID + "", ingredient.getId() + "");
-
                     // remove from inventory
                     String removeInventoryIngredient = queryLoader.getQuery("update_ingredient_amount")
-                            .formatted(ingredient.getAmount() * (-1), ingredient.getId() + "");
-
-                    queries.add(addIngredient);
+                            .formatted(-ingredient.getAmount(), ingredient.getId() + "");
                     queries.add(removeInventoryIngredient);
                 }
             }
