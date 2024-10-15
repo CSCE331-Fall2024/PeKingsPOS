@@ -438,10 +438,14 @@ public class Manager {
         zReportBox.setPrefWidth(845);
         zReportBox.setLayoutX(100);
         zReportBox.setLayoutY(30);
+
         HBox xReportBox = new HBox();
         xReportBox.setPrefWidth(845);
         xReportBox.setLayoutX(100);
         xReportBox.setLayoutY(30);
+
+        HBox totHBox = new HBox();
+        totHBox.setAlignment(Pos.CENTER);
 
 
         zReportBox.setVisible(false);
@@ -454,6 +458,7 @@ public class Manager {
         Button zReport = new Button("Z Report");
         Button xReport = new Button("X Report");
 
+
         TextField from = new TextField();
         TextField to = new TextField();
         from.setPromptText("From: YYYY-MM-DD");
@@ -463,25 +468,29 @@ public class Manager {
             updateChart(createTopMenuItemsRevenueChart());
             pucBox.setVisible(false);
             zReportBox.setVisible(false);
+            totHBox.setVisible(false);
         });
         topMenuItemsOrdersBtn.setOnAction(_ -> {
             updateChart(createTopMenuItemsOrdersChart());
             pucBox.setVisible(false);
             zReportBox.setVisible(false);
+            totHBox.setVisible(false);
         });
         dailyIncomeBtn.setOnAction(_ -> {
 //            updateChart(createDailyIncomeChart());
             pucBox.setVisible(false);
             zReportBox.setVisible(false);
+            totHBox.setVisible(false);
         });
 
         pucBtn.setOnAction(_ -> {
             //updateChart(createPUCChart(from, to));
             pucBox.setVisible(true);
             zReportBox.setVisible(false);
+            totHBox.setVisible(false);
         });
 
-        zReport.setOnAction(actionEvent -> {
+        zReport.setOnAction(_ -> {
             pucBox.setVisible(false);
             zReportBox.setVisible(true);
         });
@@ -489,16 +498,40 @@ public class Manager {
             pucBox.setVisible(false);
             zReportBox.setVisible(false);
             xReportBox.setVisible(true);
+            totHBox.setVisible(false);
             VBox vb = (VBox) ((ScrollPane) rootManager.getChildren().get(rootManager.getChildren().size() - 1)).getContent();
             vb.getChildren().set(0, createXReport(Date.valueOf(LocalDate.now())));
         });
 
-        topMenuItemsRevenueBtn.setOnAction(_ -> updateChart(createTopMenuItemsRevenueChart()));
-        topMenuItemsOrdersBtn.setOnAction(_ -> updateChart(createTopMenuItemsOrdersChart()));
-        dailyIncomeBtn.setOnAction(_ -> updateChart(createDailyIncomeChart(revenueData)));
+        topMenuItemsRevenueBtn.setOnAction(_ -> {
+            updateChart(createTopMenuItemsRevenueChart());
+            pucBox.setVisible(false);
+        });
+        topMenuItemsOrdersBtn.setOnAction(_ -> {
+            updateChart(createTopMenuItemsOrdersChart());
+            pucBox.setVisible(false);
+        });
+        dailyIncomeBtn.setOnAction(_ -> {
+            updateChart(createDailyIncomeChart(revenueData));
+            pucBox.setVisible(false);
+        });
         TextField zReportDay = new TextField();
         zReportDay.setPromptText("Format: YYYY-MM-DD");
         Button submitZReportDay = new Button("Submit");
+        TextField totalRev = new TextField();
+        TextField totalOrder = new TextField();
+        Label rev = new Label("Total Revenue");
+        Label ord = new Label("Total Orders");
+
+
+        VBox zRevBox = new VBox();
+        VBox zOrdBox = new VBox();
+        zRevBox.getChildren().addAll(rev, totalRev);
+        zOrdBox.getChildren().addAll(ord, totalOrder);
+
+        totHBox.getChildren().addAll(zOrdBox,zRevBox);
+
+        totHBox.setVisible(false);
 
         submitTimeBtn.setOnAction(_ -> {
             updateChart(createPUCChart(from, to));
@@ -506,10 +539,10 @@ public class Manager {
 
         submitZReportDay.setOnAction(actionEvent -> {
             VBox vb = (VBox) ((ScrollPane) rootManager.getChildren().get(rootManager.getChildren().size() - 1)).getContent();
-            vb.getChildren().set(0, createZReport(DateUtil.fromString(zReportDay.getText())));
+            vb.getChildren().set(0, createZReport(DateUtil.fromString(zReportDay.getText()), totalRev, totalOrder));
+            totHBox.setVisible(true);
+            pucBox.setVisible(false);
         });
-
-
 
         buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn, pucBtn, zReport,xReport);
         buttonBox.setAlignment(Pos.CENTER);
@@ -520,7 +553,7 @@ public class Manager {
         zReportBox.getChildren().addAll(zReportDay, submitZReportDay);
         zReportBox.setAlignment(Pos.CENTER);
 
-        contentBox.getChildren().addAll(buttonBox, pucBox, zReportBox);
+        contentBox.getChildren().addAll(buttonBox, pucBox, zReportBox, totHBox);
 
         mainScrollPane.setContent(contentBox);
         rootManager.getChildren().add(mainScrollPane);
@@ -547,13 +580,11 @@ public class Manager {
         return chart;
     }
 
-    private TableView<SaleHistoryItem> createZReport(Date day) {
+    private TableView<SaleHistoryItem> createZReport(Date day, TextField totalRev, TextField totalOrder) {
         TableView<SaleHistoryItem> tableView = new TableView<>();
         TableColumn<SaleHistoryItem, String> order_hour = new TableColumn<>("Hour");
         TableColumn<SaleHistoryItem, String> totalOrderColumns = new TableColumn<>("Total Orders");
         TableColumn<SaleHistoryItem, String> totalRevenueColumns = new TableColumn<>("Total Revenue");
-
-
 
 
         order_hour.setCellValueFactory(new PropertyValueFactory<>("time"));
@@ -569,13 +600,12 @@ public class Manager {
 
         tableView.getItems().addAll(saleHistoryItems);
 
-        Timestamp currentTimestamp = saleHistoryItems.getLast().getTime(); // Never used. Just for SaleHistoryItem object creation
-        double totalRev = saleHistoryItems.stream().mapToDouble(SaleHistoryItem::getTotalRevenue).sum();
-        int totOrders = saleHistoryItems.stream().mapToInt(SaleHistoryItem::getTotalOrders).sum();
-        SaleHistoryItem total = new SaleHistoryItem(currentTimestamp, totOrders, totalRev);
 
-        tableView.getItems().add(total);
+        double totalRevSum = saleHistoryItems.stream().mapToDouble(SaleHistoryItem::getTotalRevenue).sum();
+        int totOrderSum = saleHistoryItems.stream().mapToInt(SaleHistoryItem::getTotalOrders).sum();
 
+        totalRev.setText("$" + totalRevSum);
+        totalOrder.setText(Integer.toString(totOrderSum));
 
         return tableView;
     }
