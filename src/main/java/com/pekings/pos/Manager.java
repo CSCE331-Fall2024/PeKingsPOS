@@ -29,8 +29,12 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.sql.Date;
 import java.util.Calendar;
@@ -434,6 +438,11 @@ public class Manager {
         zReportBox.setPrefWidth(845);
         zReportBox.setLayoutX(100);
         zReportBox.setLayoutY(30);
+        HBox xReportBox = new HBox();
+        xReportBox.setPrefWidth(845);
+        xReportBox.setLayoutX(100);
+        xReportBox.setLayoutY(30);
+
 
         zReportBox.setVisible(false);
 
@@ -443,6 +452,7 @@ public class Manager {
         Button pucBtn = new Button("Product Usage Chart");
         Button submitTimeBtn = new Button("Submit Time");
         Button zReport = new Button("Z Report");
+        Button xReport = new Button("X Report");
 
         TextField from = new TextField();
         TextField to = new TextField();
@@ -475,6 +485,13 @@ public class Manager {
             pucBox.setVisible(false);
             zReportBox.setVisible(true);
         });
+        xReport.setOnAction(_ -> {
+            pucBox.setVisible(false);
+            zReportBox.setVisible(false);
+            xReportBox.setVisible(true);
+            VBox vb = (VBox) ((ScrollPane) rootManager.getChildren().get(rootManager.getChildren().size() - 1)).getContent();
+            vb.getChildren().set(0, createXReport(Date.valueOf(LocalDate.now())));
+        });
 
         topMenuItemsRevenueBtn.setOnAction(_ -> updateChart(createTopMenuItemsRevenueChart()));
         topMenuItemsOrdersBtn.setOnAction(_ -> updateChart(createTopMenuItemsOrdersChart()));
@@ -492,7 +509,9 @@ public class Manager {
             vb.getChildren().set(0, createZReport(DateUtil.fromString(zReportDay.getText())));
         });
 
-        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn, pucBtn, zReport);
+
+
+        buttonBox.getChildren().addAll(topMenuItemsRevenueBtn, topMenuItemsOrdersBtn, dailyIncomeBtn, pucBtn, zReport,xReport);
         buttonBox.setAlignment(Pos.CENTER);
 
         pucBox.getChildren().addAll(from,submitTimeBtn,to);
@@ -531,8 +550,11 @@ public class Manager {
     private TableView<SaleHistoryItem> createZReport(Date day) {
         TableView<SaleHistoryItem> tableView = new TableView<>();
         TableColumn<SaleHistoryItem, String> order_hour = new TableColumn<>("Hour");
-        TableColumn<SaleHistoryItem, String> totalOrderColumns = new TableColumn<>("Orders");
-        TableColumn<SaleHistoryItem, String> totalRevenueColumns = new TableColumn<>("Revenue");
+        TableColumn<SaleHistoryItem, String> totalOrderColumns = new TableColumn<>("Total Orders");
+        TableColumn<SaleHistoryItem, String> totalRevenueColumns = new TableColumn<>("Total Revenue");
+
+
+
 
         order_hour.setCellValueFactory(new PropertyValueFactory<>("time"));
         totalOrderColumns.setCellValueFactory(new PropertyValueFactory<>("totalOrders"));
@@ -544,7 +566,51 @@ public class Manager {
 
         List<SaleHistoryItem> saleHistoryItems = repo.getSalesHistory(day, DateUtil.addDay(day));
         saleHistoryItems.reversed(); // we get this from midnight next day to midnight requested day, so reverse
+
         tableView.getItems().addAll(saleHistoryItems);
+
+        Timestamp currentTimestamp = saleHistoryItems.getLast().getTime(); // Never used. Just for SaleHistoryItem object creation
+        double totalRev = saleHistoryItems.stream().mapToDouble(SaleHistoryItem::getTotalRevenue).sum();
+        int totOrders = saleHistoryItems.stream().mapToInt(SaleHistoryItem::getTotalOrders).sum();
+        SaleHistoryItem total = new SaleHistoryItem(currentTimestamp, totOrders, totalRev);
+
+        tableView.getItems().add(total);
+
+
+        return tableView;
+    }
+
+    private TableView<SaleHistoryItem> createXReport(Date day) {
+        TableView<SaleHistoryItem> tableView = new TableView<>();
+
+        TableColumn<SaleHistoryItem, String> orderHourColumn = new TableColumn<>("Hour");
+        TableColumn<SaleHistoryItem, String> totalOrderColumn = new TableColumn<>("Orders");
+        TableColumn<SaleHistoryItem, String> totalRevenueColumn = new TableColumn<>("Revenue");
+
+        orderHourColumn.setCellValueFactory(new PropertyValueFactory<>("time"));
+        totalOrderColumn.setCellValueFactory(new PropertyValueFactory<>("totalOrders"));
+        totalRevenueColumn.setCellValueFactory(new PropertyValueFactory<>("totalRevenue"));
+
+        tableView.getColumns().add(orderHourColumn);
+        tableView.getColumns().add(totalOrderColumn);
+        tableView.getColumns().add(totalRevenueColumn);
+        // make each row hold 2 time stamps. Then add each revenue/orders/ up to that hour.
+
+        List<SaleHistoryItem> saleHistoryItems = repo.getSalesHistory(day, DateUtil.addDay(day));
+
+        saleHistoryItems.reversed(); // we get this from midnight next day to midnight requested day, so reverse
+
+        // Get the current time and round down to the nearest hour using truncatedTo. Sets the time from ex: 1:02 to 1:00
+        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+        Timestamp currentHour = Timestamp.valueOf(now);
+
+        // Compare the timestamp of specific sale to local hour. Then only add up to the previous hour
+        for (SaleHistoryItem item : saleHistoryItems) {
+            Timestamp saleTime = item.getTime();
+            if (saleTime.before(currentHour) || saleTime.equals(currentHour)) {
+                tableView.getItems().addAll(item);
+            }
+        }
 
         return tableView;
     }
