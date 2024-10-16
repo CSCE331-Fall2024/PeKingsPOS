@@ -8,6 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author ceeedric
+ *
+ * Data access object providing a bridge between business logic and
+ * DB. This interface is the only way available to fetch and update
+ * date in the DB
+ */
 public interface Repository {
 
     /**

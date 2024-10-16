@@ -9,11 +9,13 @@ public class Main {
 
     private static Repository repository;
 
-    //Explain the runtime portion, include the try and catch: Fabio
     /**
      * Initializes the database and calls the functions to open and launch the window.
+     * Main method is also responsible for adding a shutdown hook that calls
+     * {@link PersistentRepository#shutdown()}, responsible for safely closing the
+     * DB connection through JDBC
      *
-     * @param args arguments to give to the main on startup
+     * @param args Arguments received upon running the program
      */
     public static void main(String[] args) throws Exception {
         repository = new PersistentRepository();
