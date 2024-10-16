@@ -35,6 +35,8 @@ public class MenuButton {
 
     /**
      * Returns a button with full functionality to add menu items to the order.
+     *
+     * @return A button which adds contents to the order
      */
     public Button createMenuBtn(){
 

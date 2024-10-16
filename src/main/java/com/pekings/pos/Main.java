@@ -9,7 +9,7 @@ public class Main {
 
     private static Repository repository;
 
-    //Explain the runtime portion: Fabio
+    //Explain the runtime portion, include the try and catch: Fabio
     /**
      * Initializes the database and calls the functions to open and launch the window.
      *
@@ -31,6 +31,8 @@ public class Main {
 
     /**
      * returns the repository when called
+     *
+     * @return The repository created in the main
      */
     public static Repository getRepository() {
         return repository;

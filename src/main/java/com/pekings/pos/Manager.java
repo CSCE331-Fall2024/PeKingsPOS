@@ -1256,6 +1256,8 @@ public class Manager {
      * it adds the ingredient to a list of ingredients.
      * Once finished checking all checkboxes data, it
      * returns the selected ingredients list.
+     *
+     * @return A list containing the ingredients which were selected
      */
     private List<Ingredient> getIngredients(){
         List<Ingredient> ingredients = new ArrayList<>();
