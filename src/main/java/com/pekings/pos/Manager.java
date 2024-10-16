@@ -477,14 +477,14 @@ public class Manager {
             totHBox.setVisible(false);
         });
         dailyIncomeBtn.setOnAction(_ -> {
-//            updateChart(createDailyIncomeChart());
+
             pucBox.setVisible(false);
             zReportBox.setVisible(false);
             totHBox.setVisible(false);
         });
 
         pucBtn.setOnAction(_ -> {
-            //updateChart(createPUCChart(from, to));
+
             pucBox.setVisible(true);
             zReportBox.setVisible(false);
             totHBox.setVisible(false);
@@ -506,14 +506,20 @@ public class Manager {
         topMenuItemsRevenueBtn.setOnAction(_ -> {
             updateChart(createTopMenuItemsRevenueChart());
             pucBox.setVisible(false);
+            zReportBox.setVisible(false);
+            totHBox.setVisible(false);
         });
         topMenuItemsOrdersBtn.setOnAction(_ -> {
             updateChart(createTopMenuItemsOrdersChart());
             pucBox.setVisible(false);
+            zReportBox.setVisible(false);
+            totHBox.setVisible(false);
         });
         dailyIncomeBtn.setOnAction(_ -> {
             updateChart(createDailyIncomeChart(revenueData));
             pucBox.setVisible(false);
+            zReportBox.setVisible(false);
+            totHBox.setVisible(false);
         });
         TextField zReportDay = new TextField();
         zReportDay.setPromptText("Format: YYYY-MM-DD");
