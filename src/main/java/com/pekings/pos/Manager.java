@@ -60,7 +60,7 @@ public class Manager {
     Button menuItems = createButton(30, 160, "_Menu\nItems", "-fx-background-color: #36919E");
     Button inventory = createButton(30, 255, "_Inventory", "-fx-background-color: #36919E");
     Button employees = createButton(30, 350, "_Employees", "-fx-background-color: #36919E");
-    Button stats = createButton(30, 455, " _Stats \nReport", "-fx-background-color: #36919E");
+    Button stats = createButton(30, 445, " _Stats \nReport", "-fx-background-color: #36919E");
     LocalDate beginningOfMonth = LocalDate.now().withDayOfMonth(1);
     LocalDate date30DaysAhead = LocalDate.now().plusDays(30);
     Date beginning = Date.valueOf(beginningOfMonth);
