@@ -28,6 +28,8 @@ public class SelectedIngredientsBox {
 
     /**
      * Returns the stored checkbox
+     *
+     * @return A checkbox connected with an Ingredient
      */
     public CheckBox getCheckBox() {
         return checkBox;
@@ -35,6 +37,8 @@ public class SelectedIngredientsBox {
 
     /**
      * Returns the stored ingredient
+     *
+     * @return The ingredient given to the class
      */
     public Ingredient getIngredient() {
         return ingredient;
@@ -42,6 +46,8 @@ public class SelectedIngredientsBox {
 
     /**
      * Returns the manager scene this checkbox was linked to
+     *
+     * @return The manager screen that called this class
      */
     public Manager getManager() {
         return manager;

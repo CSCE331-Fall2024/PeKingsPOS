@@ -357,6 +357,8 @@ public class Cashier {
 
     /**
      * Returns the cashier scene and resets the scene to its default look
+     *
+     * @return The cashier scene the class generated.
      */
     public Scene getScene(){
         centerScroll.setContent(menuPane);
