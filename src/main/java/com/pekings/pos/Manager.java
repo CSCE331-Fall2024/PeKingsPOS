@@ -716,8 +716,6 @@ public class Manager {
      * @param from  the beginning of the time period
      * @param to  the end of the time period
      * @return a histogram/bar graph of the ingredients used during a given time period
-     * @throws EmptyTimeException if fromInput is empty
-     * @throws EmptyTimeException if toInput is empty
      */
     private BarChart<String, Number> createPUCChart(TextField from, TextField to) {
         CategoryAxis xAxis = new CategoryAxis();
@@ -730,11 +728,11 @@ public class Manager {
         String toInput = to.getText();
 
         if (fromInput.isEmpty()) {
-            showErrorPopup("From date is required."); // EmptyTimeException
+            showErrorPopup("From date is required.");
         }
 
         if (toInput.isEmpty()) {
-            showErrorPopup("To date is required.");// EmptyTimeException
+            showErrorPopup("To date is required.");
         }
 
         Date fromDate = DateUtil.fromString(fromInput);
