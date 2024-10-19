@@ -30,8 +30,6 @@ import javafx.stage.Stage;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -84,9 +82,12 @@ public class Manager {
         rootManager = new Pane();
     }
 
-    //Still needs more info from Nathan. M
     /**
-     * Opens Menu Items panel automatically
+     * Sets the basic scene for the manager screen with the different scene buttons.
+     * Each of those buttons changes the scene to show the specified data.
+     * Opens Menu Items panel automatically.
+     *
+     * @param stage The Primary window which all scenes will be displayed on
      */
     public Scene createManagerScene(Stage stage) {
         // Setup Manager Scene
@@ -398,7 +399,16 @@ public class Manager {
 
         return managerScene;
     }
-    // Change for master pull request
+
+    /**
+     * Function call for statsReport button
+     * Displays the initial scene of stats report for topMenuItems
+     * Displays different buttons that will change the statsReport scene
+     * Buttons are Top Menu Items (Total Revenue), Top Menu Items (# of Orders), Daily Income, Product Usage Chart, Z Report, and X Report
+     *
+     * @param initChart The initial Chart that will be displays (e.g. Top Menu Items (Total Revenue) graph)
+     * @param revenueData A Map containing the revenue data for the daily revenue button
+     */
     private void displayStatsReport(PieChart initChart, Map<MenuItem, Double> revenueData) {
         rootManager.getChildren().clear();
         rootManager.getChildren().addAll(r, text, logOut, menuItems, inventory, employees, stats);
@@ -565,6 +575,12 @@ public class Manager {
         rootManager.getChildren().add(mainScrollPane);
     }
 
+    /**
+     * The graph functions return their type of chart.
+     * update Chart takes in newChart and replaces the graph in the Stats Report scene with the new graph and displays it
+     *
+     * @param newChart newChart is the return from each graph function that returns a type of chart
+     */
     private void updateChart(Chart newChart) {
         // This is to hold whatever chart was last in the order
 
@@ -572,6 +588,12 @@ public class Manager {
         contentBox.getChildren().set(0, newChart);
     }
 
+    /**
+     * createTopMenuItemsRevenueChart creates a new Pie Chart, and uses the top menu items function
+     * to set the data of the pie chart with our database's top menu items.
+     *
+     * @return returns that chart to be used as the parameter in updateChart
+     */
     private PieChart createTopMenuItemsRevenueChart() {
         PieChart chart = new PieChart();
         Map<MenuItem, Double> topItems = repo.getTopMenuItemsRevenue(5);
@@ -616,6 +638,14 @@ public class Manager {
         return tableView;
     }
 
+    /**
+     * Creates a new scene display for stats report. When xReport button is pressed, it calls this function.
+     * Makes a table with Hour, Orders, and Revenue.
+     * In each row displayed the data from order sales
+     *
+     * @param day takes in the current day's date that will be used in determining which data to show
+     * @return returns a tableView of this x report
+     */
     private TableView<SaleHistoryItem> createXReport(Date day) {
         TableView<SaleHistoryItem> tableView = new TableView<>();
 
@@ -651,6 +681,13 @@ public class Manager {
         return tableView;
     }
 
+    /**
+     * Returns a line chart with number of orders history
+     * This function sets up a line chart that displays current order data
+     * for current top ordered menu items. This will be used for the manager to analyze popular orders.
+     *
+     * @return returns a line chart that displays the highest number of orders between the menu items
+     */
     private LineChart<String, Number> createTopMenuItemsOrdersChart() {
         // Create the axes for the LineChart
         CategoryAxis xAxis = new CategoryAxis();  // Menu items on X-axis
@@ -687,6 +724,14 @@ public class Manager {
         return lineChart;
     }
 
+    /**
+     * Returns a line chart with revenue history
+     * This function takes in a map of revenue data and sets up a line chart that displays correct revenue data
+     * for the daily income chart. This will be used for the manager to analyze relevant data covering the last 30 days
+     *
+     * @param revenueData a map of the revenue data for all the orders of menu items sold over the last 30 days
+     * @return returns the line chart that displays this data
+     */
     private LineChart<String, Double> createDailyIncomeChart(Map<MenuItem, Double> revenueData) {
         CategoryAxis xAxis = new CategoryAxis();
         ValueAxis yAxis = new NumberAxis();
@@ -715,10 +760,12 @@ public class Manager {
         return lineChart;
     }
 
-    /** Returns a bar chart/histogram with ingredient history
+    /**
+     * Returns a bar chart/histogram with ingredient history
      * This function takes in two TextFields and sets up a histogram that accurately displays correct data
      * for the Product Usage Chart (PUC). This PUC will be used for the manager to analyze relevant data regarding
      * inventory given a time period.
+     *
      * @param from  the beginning of the time period
      * @param to  the end of the time period
      * @return a histogram/bar graph of the ingredients used during a given time period
@@ -782,16 +829,45 @@ public class Manager {
         return String.format("%02d/%02d", cal.get(Calendar.MONTH) + 1, cal.get(Calendar.DAY_OF_MONTH));
     }
 
+    /**
+     * Adds an ingredient to the database
+     * This function takes in a user defined name, price, and quantity that is used as the parameter for another function call
+     * to initialize a new ingredient type. This will be used when a manager needs to add a new ingredient to the database
+     *
+     * @param name a string received from a textfield that is user inputted
+     * @param price a float received from a textfield that is cast into float and is user inputted
+     * @param quantity an int received from a textfield that is cast into an int and is user inputted
+     */
     private void addIngredient(String name, float price, int quantity) {
         Ingredient ingredient = new Ingredient(-1, name, price, quantity, (price * quantity));
         repo.addNewIngredientInventory(ingredient);
     }
 
+    /**
+     * Function updates a current Employee entry in the employee entity
+     * This function takes in textfields for an id, username, password, position, a time for lastClockIn, and a boolean.
+     * These will be used to initialize a new employee type and that new object will replace the employee entity selected
+     *
+     * @param id the id of the selected employee
+     * @param username the current/updated username changed from a textbox in the employee entries
+     * @param password the current/updated password changed from a textbox in the employee entries
+     * @param position the current/updated position changed from a textbox in the employee entries
+     * @param lastClockIn the last time the selected employee was clocked in
+     * @param clockedIn the boolean for the employee that is currently clocked in or not
+     */
     private void updateEmployee(long id, String username, String password, String position, Time lastClockIn, boolean clockedIn) {
         Employee newguy = new Employee(id, username, password, position, lastClockIn, clockedIn);
         repo.updateEmployee(newguy);
     }
 
+    /**
+     * Returns a button that when clicked opens a popup that prompts the user if they want to log out, or close the popup.
+     * If on manager screen, it will offer to switch to cashier side as well as the previous choices.
+     * This function takes in the current Primary Stage and adds the button to the Primary Stage.
+     *
+     * @param stage The primary stage of the manager scene
+     * @return a button called logOut
+     */
     private Button createLogOutButton(Stage stage) {
         Button logOut = new Button("_Log\nOut");
         logOut.setStyle("-fx-background-color: red;");
@@ -808,7 +884,7 @@ public class Manager {
             logOut.setStyle("-fx-background-color: RED");
         });
 
-        Popup logOutPopup = createLogOutPopup(stage);
+        Popup logOutPopup = createLogOutPopup();
         logOut.setOnAction(_ -> {
             logOutPopup.show(stage);
         });
@@ -816,6 +892,16 @@ public class Manager {
         return logOut;
     }
 
+    /**
+     * Returns a popup that prompts the manager to enter "DELETE" in the textbox provided if they wish to delete the selected data entry
+     * This function takes in the current Vbox, itemRow (in order to delete it), and the specific item so the correct database entry can be deleted
+     * with the correct private function repo.deleteMenuItem(...)
+     *
+     * @param container This variable passes the VBox container for the table of menu items
+     * @param itemRow passes the current item row entry selected
+     * @param item passes the specific menu item's id so the item can be deleted from the database
+     * @return returns a popup that prompts the manager to either delete the item or cancel
+     */
     private Popup createDeletePopup(VBox container, HBox itemRow, MenuItem item){
         Popup popup = new Popup();
 
@@ -865,6 +951,16 @@ public class Manager {
         return popup;
     }
 
+    /**
+     * Returns a popup that prompts the manager to enter "DELETE" in the textbox provided if they wish to delete the selected data entry
+     * This function takes in the current Vbox, itemRow (in order to delete it), and the specific ingredient so the correct database entry can be deleted
+     * with the correct private function repo.deleteIngredientInventory(...)
+     *
+     * @param container This variable passes the VBox container for the table of ingredients
+     * @param itemRow passes the current item row entry selected
+     * @param ingredient passes the specific ingredient's id so the item can be deleted from the database
+     * @return returns a popup that prompts the manager to either delete the item or cancel
+     */
     private Popup createDeletePopupIngredient(VBox container, HBox itemRow, Ingredient ingredient){
         Popup popup = new Popup();
 
@@ -912,6 +1008,17 @@ public class Manager {
 
         return popup;
     }
+
+    /**
+     * Returns a popup that prompts the manager to enter "DELETE" in the textbox provided if they wish to delete the selected data entry
+     * This function takes in the current Vbox, itemRow (in order to delete it), and the specific employee so the correct database entry can be deleted
+     * with the correct private function repo.removeEmployee(...)
+     *
+     * @param container This variable passes the VBox container for the table of ingredients
+     * @param itemRow passes the current item row entry selected
+     * @param item passes the specific employee's id so the item can be deleted from the database
+     * @return returns a popup that prompts the manager to either delete the item or cancel
+     */
     private Popup createDeletePopupEmployee(VBox container, HBox itemRow, Employee item){
         Popup popup = new Popup();
 
@@ -959,7 +1066,16 @@ public class Manager {
         return popup;
     }
 
-    private Popup createLogOutPopup(Stage popStage) {
+    /**
+     * Returns the popup that the createLogOutButton function calls
+     * This functions creates the window popup for the logout button to display when clicked.
+     * It prompts the user if they want to log out, or cancel. If the user is a manager, then it also prompts the user
+     * on the manager screen if they want to switch to the cashier scene, else if in cashier side, it will prompt the user
+     * if they want to return to the manager screen or log out.
+     *
+     * @return a popup that prompts the cashier or manager to either log out, cancel, or if manager to switch to cashier or manager screen
+     */
+    private Popup createLogOutPopup() {
         Popup popup = new Popup();
 
         // Create VBox for popup
@@ -1053,7 +1169,16 @@ public class Manager {
         return popup;
     }
 
-
+    /**
+     * Returns a button with the specified x, y, label, and color for easy button creation
+     * This template is used to create the basic buttons on the left in the manager screen
+     *
+     * @param x the x layout variable for the button
+     * @param y the y layout variable for the button
+     * @param label the string variable that has the string content in the button
+     * @param color the background color of the button
+     * @return returns the button created from the template with the specified x, y, label, and color
+     */
     private Button createButton(int x, int y, String label, String color) {
         Button Btn = new Button(label);
         Btn.setStyle(color);
